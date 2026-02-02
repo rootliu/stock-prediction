@@ -64,39 +64,41 @@ train_loader = DataLoader(dataset=dataset,
                           shuffle=True,
                           num_workers=2)
 
-# convert to an iterator and look at one random sample
-dataiter = iter(train_loader)
-data = dataiter.next()
-features, labels = data
-print(features, labels)
 
-# Dummy Training loop
-num_epochs = 2
-total_samples = len(dataset)
-n_iterations = math.ceil(total_samples/4)
-print(total_samples, n_iterations)
-for epoch in range(num_epochs):
-    for i, (inputs, labels) in enumerate(train_loader):
-        
-        # here: 178 samples, batch_size = 4, n_iters=178/4=44.5 -> 45 iterations
-        # Run your training process
-        if (i+1) % 5 == 0:
-            print(f'Epoch: {epoch+1}/{num_epochs}, Step {i+1}/{n_iterations}| Inputs {inputs.shape} | Labels {labels.shape}')
+if __name__ == '__main__':
+    # convert to an iterator and look at one random sample
+    dataiter = iter(train_loader)
+    data = next(dataiter)
+    features, labels = data
+    print(features, labels)
 
-# some famous datasets are available in torchvision.datasets
-# e.g. MNIST, Fashion-MNIST, CIFAR10, COCO
+    # Dummy Training loop
+    num_epochs = 2
+    total_samples = len(dataset)
+    n_iterations = math.ceil(total_samples/4)
+    print(total_samples, n_iterations)
+    for epoch in range(num_epochs):
+        for i, (inputs, labels) in enumerate(train_loader):
+            
+            # here: 178 samples, batch_size = 4, n_iters=178/4=44.5 -> 45 iterations
+            # Run your training process
+            if (i+1) % 5 == 0:
+                print(f'Epoch: {epoch+1}/{num_epochs}, Step {i+1}/{n_iterations}| Inputs {inputs.shape} | Labels {labels.shape}')
 
-train_dataset = torchvision.datasets.MNIST(root='./data', 
-                                           train=True, 
-                                           transform=torchvision.transforms.ToTensor(),  
-                                           download=True)
+    # some famous datasets are available in torchvision.datasets
+    # e.g. MNIST, Fashion-MNIST, CIFAR10, COCO
 
-train_loader = DataLoader(dataset=train_dataset, 
-                                           batch_size=3, 
-                                           shuffle=True)
+    train_dataset = torchvision.datasets.MNIST(root='./data', 
+                                               train=True, 
+                                               transform=torchvision.transforms.ToTensor(),  
+                                               download=True)
 
-# look at one random sample
-dataiter = iter(train_loader)
-data = dataiter.next()
-inputs, targets = data
-print(inputs.shape, targets.shape)
+    train_loader = DataLoader(dataset=train_dataset, 
+                                               batch_size=3, 
+                                               shuffle=True)
+
+    # look at one random sample
+    dataiter = iter(train_loader)
+    data = next(dataiter)
+    inputs, targets = data
+    print(inputs.shape, targets.shape)

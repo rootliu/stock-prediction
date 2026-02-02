@@ -38,13 +38,15 @@ dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4,
 dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
 class_names = image_datasets['train'].classes
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+# Updated for modern PyTorch (2025)
+device = torch.device("cuda:0" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu"))
+print(f"Using device: {device}")
 print(class_names)
 
 
 def imshow(inp, title):
     """Imshow for Tensor."""
-    inp = inp.numpy().transpose((1, 2, 0))
+    inp = inp.cpu().numpy().transpose((1, 2, 0)) # Ensure tensor is on cpu
     inp = std * inp + mean
     inp = np.clip(inp, 0, 1)
     plt.imshow(inp)
@@ -131,7 +133,11 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
 #### Finetuning the convnet ####
 # Load a pretrained model and reset final fully connected layer.
 
-model = models.resnet18(pretrained=True)
+# OLD: model = models.resnet18(pretrained=True)
+# NEW: Use weights parameter
+weights = models.ResNet18_Weights.DEFAULT
+model = models.resnet18(weights=weights)
+
 num_ftrs = model.fc.in_features
 # Here the size of each output sample is set to 2.
 # Alternatively, it can be generalized to nn.Linear(num_ftrs, len(class_names)).
@@ -161,7 +167,11 @@ model = train_model(model, criterion, optimizer, step_lr_scheduler, num_epochs=2
 #### ConvNet as fixed feature extractor ####
 # Here, we need to freeze all the network except the final layer.
 # We need to set requires_grad == False to freeze the parameters so that the gradients are not computed in backward()
-model_conv = torchvision.models.resnet18(pretrained=True)
+
+# OLD: model_conv = torchvision.models.resnet18(pretrained=True)
+weights = models.ResNet18_Weights.DEFAULT
+model_conv = torchvision.models.resnet18(weights=weights)
+
 for param in model_conv.parameters():
     param.requires_grad = False
 

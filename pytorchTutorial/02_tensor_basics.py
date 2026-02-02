@@ -130,3 +130,10 @@ if torch.cuda.is_available():
     # move to CPU again
     z.to("cpu")       # ``.to`` can also change dtype together!
     # z = z.numpy()
+
+if torch.backends.mps.is_available():
+    device = torch.device("mps")
+    x = torch.ones(5, device=device)
+    y = torch.ones(5, device=device)
+    z = x + y
+    print(z)
