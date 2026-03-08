@@ -10,6 +10,9 @@ import type {
   GoldSource,
   GoldQuote,
   GoldPredictResponse,
+  GoldMarketsResponse,
+  GoldCompareResponse,
+  GoldSessionResponse,
 } from '../types'
 
 // API基础配置
@@ -139,16 +142,40 @@ export const hkStockApi = {
 
 export const goldApi = {
   // 获取可用黄金来源
-  getSources: (): Promise<ApiResponse<GoldSource[]>> =>
-    api.get('/gold/sources'),
+  getSources: (group: 'ALL' | 'DOMESTIC' | 'FOREIGN' = 'ALL'): Promise<ApiResponse<GoldSource[]>> =>
+    api.get(`/gold/sources?group=${group}`),
+
+  // 获取黄金市场分组
+  getMarkets: (): Promise<GoldMarketsResponse> =>
+    api.get('/gold/markets'),
 
   // 获取黄金快照
   getQuote: (source: string): Promise<GoldQuote> =>
     api.get(`/gold/quote/${source}`),
 
   // 获取黄金日线（非K线展示场景也可复用）
-  getKline: (source: string, period: 'daily' | 'weekly' | 'monthly' = 'daily'): Promise<KLineResponse> =>
-    api.get(`/gold/kline/${source}?period=${period}`),
+  getKline: (
+    source: string,
+    period: 'daily' | 'weekly' | 'monthly' | '5min' | '15min' | '30min' | '60min' = 'daily',
+    session: 'ALL' | 'DAY' | 'NIGHT' = 'ALL'
+  ): Promise<KLineResponse> =>
+    api.get(`/gold/kline/${source}?period=${period}&session=${session}`),
+
+  // 国内/国外黄金对比
+  getCompare: (
+    group: 'ALL' | 'DOMESTIC' | 'FOREIGN' = 'ALL',
+    period: 'daily' | 'weekly' | 'monthly' = 'daily',
+    session: 'ALL' | 'DAY' | 'NIGHT' = 'ALL'
+  ): Promise<GoldCompareResponse> =>
+    api.get(`/gold/compare?group=${group}&period=${period}&session=${session}`),
+
+  // 黄金白盘/夜盘走势
+  getSession: (
+    source: string,
+    period: '5min' | '15min' | '30min' | '60min' = '5min',
+    days = 5
+  ): Promise<GoldSessionResponse> =>
+    api.get(`/gold/session/${source}?period=${period}&days=${days}`),
 
   // 获取黄金预测
   predict: (source: string, horizon = 5, lookback = 240): Promise<GoldPredictResponse> =>

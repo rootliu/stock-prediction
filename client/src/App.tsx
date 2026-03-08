@@ -86,6 +86,7 @@ function App() {
     { key: 'HK', label: '港股', icon: <GlobalOutlined /> },
     { key: 'GOLD', label: '黄金', icon: <FireOutlined /> },
   ]
+  const stockMarket: 'CN' | 'HK' = currentMarket === 'HK' ? 'HK' : 'CN'
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -169,7 +170,7 @@ function App() {
                       行情列表
                     </span>
                   ),
-                  children: <StockList market={currentMarket} />,
+                  children: <StockList market={stockMarket} />,
                 },
                 {
                   key: 'watchlist',
@@ -179,7 +180,7 @@ function App() {
                       自选股 ({watchlist.length})
                     </span>
                   ),
-                  children: <StockList market={currentMarket} isWatchlist />,
+                  children: <StockList market={stockMarket} isWatchlist />,
                 },
               ]}
             />

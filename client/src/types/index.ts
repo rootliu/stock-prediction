@@ -145,6 +145,9 @@ export interface GoldSource {
   name: string
   exchange: string
   description: string
+  market_group: 'DOMESTIC' | 'FOREIGN'
+  supports_intraday: boolean
+  supports_session: boolean
 }
 
 // 黄金行情快照
@@ -160,6 +163,8 @@ export interface GoldQuote {
   open: number
   volume: number
   timestamp: string
+  market_group?: 'DOMESTIC' | 'FOREIGN'
+  session?: 'ALL' | 'DAY' | 'NIGHT'
 }
 
 // 预测点
@@ -188,4 +193,46 @@ export interface GoldPredictResponse {
     name: string
     feature_count: number
   }
+}
+
+// 黄金市场视图
+export interface GoldMarketGroup {
+  key: 'ALL' | 'DOMESTIC' | 'FOREIGN' | 'NIGHT'
+  label: string
+  description: string
+  sources: string[]
+}
+
+export interface GoldMarketsResponse {
+  groups: GoldMarketGroup[]
+  default_predict_source: string
+  default_session_source: string
+}
+
+// 黄金对比图点
+export interface GoldComparePoint {
+  date: string
+  [key: string]: string | number | null
+}
+
+export interface GoldCompareResponse {
+  period: string
+  group: 'ALL' | 'DOMESTIC' | 'FOREIGN'
+  session: 'ALL' | 'DAY' | 'NIGHT'
+  sources: string[]
+  data: GoldComparePoint[]
+}
+
+// 黄金白盘/夜盘点位
+export interface GoldSessionPoint {
+  date: string
+  close: number
+  session: 'DAY' | 'NIGHT'
+}
+
+export interface GoldSessionResponse {
+  source: string
+  period: '5min' | '15min' | '30min' | '60min'
+  days: number
+  data: GoldSessionPoint[]
 }

@@ -115,6 +115,21 @@ class PredictRequest(BaseModel):
     lookback: int = Field(default=240, ge=60, le=2000, description="建模历史窗口")
 
 
+class GoldSessionPoint(BaseModel):
+    """黄金时段点位"""
+    date: str
+    close: float
+    session: str
+
+
+class GoldSessionResponse(BaseModel):
+    """黄金时段响应"""
+    source: str
+    period: str
+    days: int
+    data: List[GoldSessionPoint]
+
+
 # ==================== 生命周期管理 ====================
 
 @asynccontextmanager
@@ -465,13 +480,26 @@ async def get_hk_ggt_stocks():
 # ==================== 黄金 API ====================
 
 @app.get("/api/v1/gold/sources", summary="获取黄金数据来源")
-async def get_gold_sources():
+async def get_gold_sources(
+    group: str = Query(default="ALL", enum=["ALL", "DOMESTIC", "FOREIGN"])
+):
     """获取可用黄金数据来源"""
     try:
         collector = get_gold_market_collector()
-        return {"data": collector.get_sources()}
+        return {"data": collector.get_sources(group=group)}
     except Exception as e:
         logger.error(f"获取黄金来源失败: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/v1/gold/markets", summary="获取黄金市场视图")
+async def get_gold_markets():
+    """获取黄金市场分组与默认配置"""
+    try:
+        collector = get_gold_market_collector()
+        return collector.get_markets()
+    except Exception as e:
+        logger.error(f"获取黄金市场视图失败: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -496,14 +524,21 @@ async def get_gold_quote(source: str):
 @app.get("/api/v1/gold/kline/{source}", response_model=KLineResponse, summary="获取黄金K线")
 async def get_gold_kline(
     source: str,
-    period: str = Query(default="daily", enum=["daily", "weekly", "monthly"]),
+    period: str = Query(default="daily", enum=["daily", "weekly", "monthly", "5min", "15min", "30min", "60min"]),
     start_date: Optional[str] = Query(default=None, description="开始日期 YYYYMMDD 或 YYYY-MM-DD"),
     end_date: Optional[str] = Query(default=None, description="结束日期 YYYYMMDD 或 YYYY-MM-DD"),
+    session: str = Query(default="ALL", enum=["ALL", "DAY", "NIGHT"]),
 ):
     """获取黄金 K 线数据"""
     try:
         collector = get_gold_market_collector()
-        df = collector.get_kline(source, period=period, start_date=start_date, end_date=end_date)
+        df = collector.get_kline(
+            source,
+            period=period,
+            start_date=start_date,
+            end_date=end_date,
+            session=session,
+        )
         if df.empty:
             raise HTTPException(status_code=404, detail=f"未找到K线数据: {source}")
 
@@ -511,7 +546,7 @@ async def get_gold_kline(
         for _, row in df.iterrows():
             data.append(
                 KLineData(
-                    date=row["date"].strftime("%Y-%m-%d"),
+                    date=row["date"].strftime("%Y-%m-%d %H:%M") if period in {"5min", "15min", "30min", "60min"} else row["date"].strftime("%Y-%m-%d"),
                     open=float(row["open"]),
                     high=float(row["high"]),
                     low=float(row["low"]),
@@ -541,17 +576,25 @@ async def get_gold_kline(
 @app.get("/api/v1/gold/compare", summary="对比多个黄金来源走势")
 async def compare_gold_sources(
     period: str = Query(default="daily", enum=["daily", "weekly", "monthly"]),
+    group: str = Query(default="ALL", enum=["ALL", "DOMESTIC", "FOREIGN"]),
     start_date: Optional[str] = Query(default=None, description="开始日期 YYYYMMDD 或 YYYY-MM-DD"),
     end_date: Optional[str] = Query(default=None, description="结束日期 YYYYMMDD 或 YYYY-MM-DD"),
+    session: str = Query(default="ALL", enum=["ALL", "DAY", "NIGHT"]),
 ):
     """多来源黄金价格对比（close 对齐）"""
     try:
         collector = get_gold_market_collector()
-        df = collector.compare_sources(period=period, start_date=start_date, end_date=end_date)
+        df = collector.compare_sources(
+            period=period,
+            start_date=start_date,
+            end_date=end_date,
+            group=group,
+            session=session,
+        )
         if df.empty:
             raise HTTPException(status_code=404, detail="未获取到可对比的黄金数据")
 
-        source_codes = collector.list_source_codes()
+        source_codes = collector.list_source_codes(group=group)
         data = []
         for _, row in df.iterrows():
             item: Dict[str, Any] = {"date": row["date"].strftime("%Y-%m-%d")}
@@ -562,6 +605,8 @@ async def compare_gold_sources(
 
         return {
             "period": period,
+            "group": group,
+            "session": session,
             "sources": source_codes,
             "data": data,
         }
@@ -571,6 +616,43 @@ async def compare_gold_sources(
         raise
     except Exception as e:
         logger.error(f"对比黄金来源失败: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/v1/gold/session/{source}", response_model=GoldSessionResponse, summary="获取黄金白盘/夜盘走势")
+async def get_gold_session_data(
+    source: str,
+    period: str = Query(default="5min", enum=["5min", "15min", "30min", "60min"]),
+    days: int = Query(default=5, ge=1, le=30),
+):
+    """获取国内黄金白盘/夜盘分时走势"""
+    try:
+        collector = get_gold_market_collector()
+        df = collector.get_session_data(source=source, period=period, days=days)
+        if df.empty:
+            raise HTTPException(status_code=404, detail=f"未找到夜盘数据: {source}")
+
+        data = [
+            GoldSessionPoint(
+                date=row["date"].strftime("%Y-%m-%d %H:%M"),
+                close=float(row["close"]),
+                session=str(row["session"]),
+            )
+            for _, row in df.iterrows()
+        ]
+
+        return GoldSessionResponse(
+            source=source.upper(),
+            period=period,
+            days=days,
+            data=data,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"获取黄金时段走势失败 {source}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
