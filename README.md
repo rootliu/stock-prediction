@@ -43,6 +43,41 @@ stock-prediction/
 
 ## 🚀 快速启动
 
+### 统一入口
+
+```bash
+cd stock-prediction
+python run.py
+```
+
+默认行为：
+
+- 不带参数：启动图形界面（后端 `8000` + 前端 `3000`）
+- 带 `--bot-output-dir`：不启动图形界面，直接生成机器人可读取的巡检报告包
+
+机器人巡检模式示例：
+
+```bash
+cd stock-prediction
+python run.py --bot-output-dir /path/to/openclaw/stock-prediction
+```
+
+输出目录会生成：
+
+- `manifest.json`
+- `report.md`
+- `gold_quote.json`
+- `gold_prediction.json`
+- `gold_history.csv`
+- `gold_forecast.csv`
+- `gold_compare.csv`
+- `gold_session.csv`
+- `gold_prediction.png`
+- `gold_compare.png`
+- `gold_session.png`
+- `gold_summary_table.png`
+- `gold_forecast_table.png`
+
 ### 前端
 
 ```bash
@@ -92,17 +127,3 @@ python main.py
 ## 📄 许可证
 
 MIT License
-</content>
-<parameter name="task_progress">
-- [ ] Phase 1: 项目初始化 + 数据采集
-  - [x] 创建项目目录结构
-  - [x] 创建项目需求文档
-  - [x] 初始化Python数据采集服务
-  - [x] 初始化前端React项目
-  - [ ] 创建启动脚本和README
-    - [x] 创建postcss配置
-    - [x] 创建README文档
-- [ ] Phase 2: K线图表 + 技术指标
-- [ ] Phase 3: 预测模型训练
-- [ ] Phase 4: 回测系统
-- [ ] Phase 5: 集成优化

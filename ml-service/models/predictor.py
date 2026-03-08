@@ -89,6 +89,25 @@ def _build_feature_from_window(window: List[float]) -> Dict[str, float]:
     return features
 
 
+def _stabilize_prediction(pred_close: float, window: List[float]) -> float:
+    """限制递推预测值，避免线性模型在多步外推时发散"""
+    recent = pd.Series(window[-20:], dtype=float)
+    if recent.empty:
+        return float(pred_close)
+
+    recent_mean = float(recent.tail(5).mean())
+    recent_vol = float(recent.pct_change().tail(10).std() or 0.0)
+    recent_vol = max(recent_vol, 0.01)
+
+    lower_bound = max(float(recent.min()) * 0.85, recent_mean * (1 - 6 * recent_vol))
+    upper_bound = min(float(recent.max()) * 1.15, recent_mean * (1 + 6 * recent_vol))
+
+    if lower_bound > upper_bound:
+        lower_bound, upper_bound = upper_bound, lower_bound
+
+    return float(np.clip(pred_close, lower_bound, upper_bound))
+
+
 def run_price_prediction(
     df: pd.DataFrame,
     horizon: int = 5,
@@ -151,6 +170,7 @@ def run_price_prediction(
         features = _build_feature_from_window(rolling_window)
         x_future = pd.DataFrame([[features[col] for col in FEATURE_COLUMNS]], columns=FEATURE_COLUMNS)
         pred_close = float(model.predict(x_future)[0])
+        pred_close = _stabilize_prediction(pred_close, rolling_window)
         rolling_window.append(pred_close)
         predictions.append(
             {
