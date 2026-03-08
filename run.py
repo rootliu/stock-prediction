@@ -132,6 +132,11 @@ def _build_parser() -> argparse.ArgumentParser:
         description="Stock Prediction launcher: GUI by default, bot report mode when output dir is provided.",
     )
     parser.add_argument("--bot-output-dir", help="Directory where the bot-readable report bundle will be written")
+    parser.add_argument(
+        "--openclaw-output-dir",
+        dest="bot_output_dir",
+        help="Alias of --bot-output-dir for OpenClaw cron and bot integrations",
+    )
     parser.add_argument("--report-source", default="SHFE_AU_MAIN", help="Gold source used in bot mode")
     parser.add_argument("--horizon", type=int, default=5, help="Forecast horizon for bot mode")
     parser.add_argument("--lookback", type=int, default=240, help="Training lookback window for bot mode")
@@ -156,6 +161,8 @@ def main() -> int:
 
     parser = _build_parser()
     args = parser.parse_args()
+    if not args.bot_output_dir:
+        args.bot_output_dir = os.environ.get("OPENCLAW_OUTPUT_DIR")
 
     if args.bot_output_dir:
         return _run_bot_mode(args)

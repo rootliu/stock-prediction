@@ -62,6 +62,19 @@ cd stock-prediction
 python run.py --bot-output-dir /path/to/openclaw/stock-prediction
 ```
 
+OpenClaw 集成也可以直接用：
+
+```bash
+/Users/rootliu/code/stock-prediction/scripts/run_openclaw_report.sh /path/to/openclaw/stock-prediction
+```
+
+或者通过环境变量：
+
+```bash
+export OPENCLAW_OUTPUT_DIR=/path/to/openclaw/stock-prediction
+python run.py
+```
+
 输出目录会生成：
 
 - `manifest.json`
