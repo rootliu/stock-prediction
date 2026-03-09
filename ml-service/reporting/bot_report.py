@@ -15,10 +15,23 @@ from loguru import logger
 
 from data_collector import get_gold_market_collector
 from models.predictor import run_price_prediction
+from reporting.external_gold_consensus import build_external_gold_curve_comparison
+
+plt.rcParams["font.sans-serif"] = [
+    "Hiragino Sans GB",
+    "STHeiti",
+    "Arial Unicode MS",
+    "Arial Unicode",
+    "DejaVu Sans",
+]
+plt.rcParams["axes.unicode_minus"] = False
 
 COLOR_MAP = {
     "actual": "#1677ff",
     "forecast": "#fa8c16",
+    "external_main": "#a35a00",
+    "internal_model": "#fa8c16",
+    "blended_curve": "#2f855a",
     "SHFE_AU_MAIN": "#f5222d",
     "COMEX": "#1677ff",
     "LBMA_SPOT": "#13c2c2",
@@ -163,6 +176,23 @@ def _normalize_compare_frame(frame: pd.DataFrame) -> pd.DataFrame:
     return normalized
 
 
+def _build_deviation_summary(comparison_frame: pd.DataFrame) -> Dict[str, Any]:
+    if comparison_frame.empty:
+        return {
+            "t1_label": "UNKNOWN",
+            "max_abs_deviation_pct": None,
+            "dominant_label": "UNKNOWN",
+        }
+
+    deviation_series = comparison_frame["Internal vs External %"].astype(float)
+    labels = comparison_frame["Deviation Label"].astype(str)
+    return {
+        "t1_label": labels.iloc[0],
+        "max_abs_deviation_pct": round(float(deviation_series.abs().max()), 2),
+        "dominant_label": labels.value_counts().idxmax(),
+    }
+
+
 def generate_gold_report_bundle(
     output_dir: str | Path,
     source: str = "SHFE_AU_MAIN",
@@ -211,13 +241,31 @@ def generate_gold_report_bundle(
         session_frame["date"] = pd.to_datetime(session_frame["date"])
 
     latest_price = float(quote["price"]) if quote and quote.get("price") is not None else None
+    if latest_price is None and not history_df.empty:
+        latest_price = float(history_df.iloc[-1]["close"])
     assessment = _build_assessment(latest_price, forecast_frame, predict_result["metrics"])
+
+    prediction_chart = output_path / "gold_prediction.png"
+    compare_chart = output_path / "gold_compare.png"
+    session_chart = output_path / "gold_session.png"
+    curve_chart = output_path / "gold_curve_comparison.png"
+    summary_table_chart = output_path / "gold_summary_table.png"
+    forecast_table_chart = output_path / "gold_forecast_table.png"
+    survey_table_chart = output_path / "gold_external_survey_table.png"
+    curve_table_chart = output_path / "gold_curve_comparison_table.png"
+
+    curve_bundle = build_external_gold_curve_comparison(latest_price=latest_price, forecast_frame=forecast_frame)
+    survey_frame = _round_frame(curve_bundle["survey_frame"])
+    curve_compare_frame = _round_frame(curve_bundle["comparison_frame"])
+    curve_frame = _round_frame(curve_bundle["curve_frame"])
+    external_summary = curve_bundle["summary"]
+    deviation_summary = _build_deviation_summary(curve_compare_frame)
 
     summary_frame = pd.DataFrame(
         [
             {"Metric": "Generated At", "Value": generated_at},
             {"Metric": "Source", "Value": source},
-            {"Metric": "Latest Price", "Value": round(float(quote.get("price", 0.0)), 2) if quote else "--"},
+            {"Metric": "Latest Price", "Value": round(float(latest_price), 2) if latest_price is not None else "--"},
             {"Metric": "Latest Session", "Value": quote.get("session", "ALL") if quote else "--"},
             {"Metric": "Predict Horizon", "Value": horizon},
             {"Metric": "Lookback", "Value": lookback},
@@ -227,14 +275,10 @@ def generate_gold_report_bundle(
             {"Metric": "T+N Forecast", "Value": round(float(forecast_frame.iloc[-1]["close"]), 2) if not forecast_frame.empty else "--"},
             {"Metric": "T+1 Gap %", "Value": _display_metric(assessment["t1_gap_pct"], 2)},
             {"Metric": "Assessment", "Value": assessment["risk_level"]},
+            {"Metric": "External 5D Return %", "Value": _display_metric(external_summary["external_5d_return_pct"], 2)},
+            {"Metric": "T+1 Deviation Label", "Value": deviation_summary["t1_label"]},
         ]
     )
-
-    prediction_chart = output_path / "gold_prediction.png"
-    compare_chart = output_path / "gold_compare.png"
-    session_chart = output_path / "gold_session.png"
-    summary_table_chart = output_path / "gold_summary_table.png"
-    forecast_table_chart = output_path / "gold_forecast_table.png"
 
     history_tail = history_frame.tail(min(len(history_frame), 60)).copy()
     _save_line_chart(
@@ -294,6 +338,26 @@ def generate_gold_report_bundle(
         _round_frame(forecast_frame.rename(columns={"date": "Date", "close": "Forecast Close"})),
         title="Gold Forecast Table",
     )
+    _save_line_chart(
+        curve_chart,
+        [
+            ("External Main", pd.to_datetime(curve_frame["date"]), curve_frame["external_main"], COLOR_MAP["external_main"], "-"),
+            ("Internal Model", pd.to_datetime(curve_frame["date"]), curve_frame["internal_model"], COLOR_MAP["internal_model"], "--"),
+            ("Blended Curve", pd.to_datetime(curve_frame["date"]), curve_frame["blended_curve"], COLOR_MAP["blended_curve"], "-."),
+        ],
+        title="Gold External Main vs Internal Forecast",
+        ylabel="Price",
+    )
+    _save_table_chart(
+        survey_table_chart,
+        survey_frame[["Source", "Published", "Weight", "Bias", "Implied 5D Return %", "Anchor"]],
+        title="External English Site Survey",
+    )
+    _save_table_chart(
+        curve_table_chart,
+        curve_compare_frame,
+        title="Curve Comparison and Deviation",
+    )
 
     quote_payload = {
         "generated_at": generated_at,
@@ -306,6 +370,11 @@ def generate_gold_report_bundle(
         "quote": quote,
         "prediction": predict_result,
         "assessment": assessment,
+        "external_consensus": {
+            "summary": external_summary,
+            "survey": survey_frame.to_dict(orient="records"),
+            "comparison": curve_compare_frame.to_dict(orient="records"),
+        },
     }
 
     _write_json(output_path / "gold_quote.json", quote_payload)
@@ -322,6 +391,10 @@ def generate_gold_report_bundle(
     if not session_output.empty:
         session_output["date"] = session_output["date"].dt.strftime("%Y-%m-%d %H:%M")
     _write_csv(output_path / "gold_session.csv", session_output)
+    _write_csv(output_path / "external_gold_survey.csv", survey_frame)
+    _write_csv(output_path / "gold_curve_comparison.csv", curve_compare_frame)
+    curve_output = curve_frame.copy()
+    _write_csv(output_path / "gold_external_main_curve.csv", curve_output)
 
     report_lines = [
         "# 黄金巡检报告",
@@ -345,21 +418,56 @@ def generate_gold_report_bundle(
         f"- 评估结论: {assessment['summary']}",
         f"- 说明: {assessment['note']}",
         "",
-        "## 产出文件",
+        "## 外部英文网站主曲线",
         "",
-        "- manifest.json",
-        "- gold_quote.json",
-        "- gold_prediction.json",
-        "- gold_history.csv",
-        "- gold_forecast.csv",
-        "- gold_compare.csv",
-        "- gold_session.csv",
-        "- gold_prediction.png",
-        "- gold_compare.png",
-        "- gold_session.png",
-        "- gold_summary_table.png",
-        "- gold_forecast_table.png",
+        f"- Survey 日期: {external_summary['survey_as_of']}",
+        f"- 站点数量: {external_summary['source_count']}",
+        f"- 主曲线角色: {external_summary['external_curve_role']}",
+        f"- 5日主曲线收益率: {_display_metric(external_summary['external_5d_return_pct'], 2)}%",
+        "- 说明: 外部英文网站曲线作为主曲线，内部模型只作为短期局部修正输入。",
+        "",
+        "## 曲线对比",
+        "",
+        f"- T+1 偏离标签: {deviation_summary['t1_label']}",
+        f"- 最大绝对偏离: {_display_metric(deviation_summary['max_abs_deviation_pct'], 2)}%",
+        f"- 主导偏离标签: {deviation_summary['dominant_label']}",
+        "",
+        "### 外部 survey 样本",
+        "",
     ]
+    for row in survey_frame.to_dict(orient="records"):
+        report_lines.extend(
+            [
+                f"- {row['Source']} ({row['Published']}): {row['Bias']}, 5日隐含收益 {row['Implied 5D Return %']}%, 权重 {row['Weight']}, 锚点 {row['Anchor']}",
+                f"  链接: {row['URL']}",
+            ]
+        )
+
+    report_lines.extend(
+        [
+            "",
+            "## 产出文件",
+            "",
+            "- manifest.json",
+            "- gold_quote.json",
+            "- gold_prediction.json",
+            "- gold_history.csv",
+            "- gold_forecast.csv",
+            "- gold_compare.csv",
+            "- gold_session.csv",
+            "- external_gold_survey.csv",
+            "- gold_curve_comparison.csv",
+            "- gold_external_main_curve.csv",
+            "- gold_prediction.png",
+            "- gold_compare.png",
+            "- gold_session.png",
+            "- gold_curve_comparison.png",
+            "- gold_summary_table.png",
+            "- gold_forecast_table.png",
+            "- gold_external_survey_table.png",
+            "- gold_curve_comparison_table.png",
+        ]
+    )
     (output_path / "report.md").write_text("\n".join(report_lines), encoding="utf-8")
 
     manifest = {
@@ -369,6 +477,10 @@ def generate_gold_report_bundle(
         "quote": quote,
         "metrics": predict_result["metrics"],
         "assessment": assessment,
+        "external_consensus": {
+            "summary": external_summary,
+            "deviation": deviation_summary,
+        },
         "files": {
             "manifest_json": "manifest.json",
             "report_markdown": "report.md",
@@ -378,11 +490,17 @@ def generate_gold_report_bundle(
             "forecast_csv": "gold_forecast.csv",
             "compare_csv": "gold_compare.csv",
             "session_csv": "gold_session.csv",
+            "external_survey_csv": "external_gold_survey.csv",
+            "curve_comparison_csv": "gold_curve_comparison.csv",
+            "external_curve_csv": "gold_external_main_curve.csv",
             "prediction_chart": prediction_chart.name,
             "compare_chart": compare_chart.name,
             "session_chart": session_chart.name,
+            "curve_chart": curve_chart.name,
             "summary_table_chart": summary_table_chart.name,
             "forecast_table_chart": forecast_table_chart.name,
+            "survey_table_chart": survey_table_chart.name,
+            "curve_table_chart": curve_table_chart.name,
         },
     }
     _write_json(output_path / "manifest.json", manifest)

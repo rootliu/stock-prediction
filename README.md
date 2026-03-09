@@ -85,11 +85,29 @@ python run.py
 - `gold_forecast.csv`
 - `gold_compare.csv`
 - `gold_session.csv`
+- `external_gold_survey.csv`
+- `gold_curve_comparison.csv`
+- `gold_external_main_curve.csv`
 - `gold_prediction.png`
 - `gold_compare.png`
 - `gold_session.png`
+- `gold_curve_comparison.png`
 - `gold_summary_table.png`
 - `gold_forecast_table.png`
+- `gold_external_survey_table.png`
+- `gold_curve_comparison_table.png`
+
+机器人模式里的黄金报告现在包含 3 条曲线：
+
+- 外部英文金融网站主曲线：基于英文金融网站 survey 的主线判断，作为主曲线
+- 内部模型曲线：程序短期预测结果
+- 融合曲线：以外部主曲线为主、内部模型为辅的折中结果
+
+同时会输出逐日偏离表，并把内部模型相对外部主线的偏离标记为：
+
+- `接近外部主线`
+- `偏离较大(偏多/偏空)`
+- `过于激进(偏多/偏空)`
 
 ### 前端
 
@@ -116,6 +134,7 @@ python main.py
 - 🔔 买卖信号提示
 - 🤖 AI 预测模型
 - 📉 回测系统
+- 🌐 外部英文金融网站黄金共识曲线对比
 
 ## 🛠️ 技术栈
 
