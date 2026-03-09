@@ -51,7 +51,7 @@ def _build_feature_frame(close: pd.Series) -> pd.DataFrame:
     df["ma_gap_20"] = df["close"] / df["ma_20"] - 1
 
     df["vol_5"] = df["ret_1"].rolling(5).std()
-    df["target"] = df["close"].shift(-1)
+    df["target"] = df["close"].shift(-1) / df["close"] - 1
 
     return df
 
@@ -89,23 +89,14 @@ def _build_feature_from_window(window: List[float]) -> Dict[str, float]:
     return features
 
 
-def _stabilize_prediction(pred_close: float, window: List[float]) -> float:
-    """限制递推预测值，避免线性模型在多步外推时发散"""
-    recent = pd.Series(window[-20:], dtype=float)
-    if recent.empty:
-        return float(pred_close)
-
-    recent_mean = float(recent.tail(5).mean())
-    recent_vol = float(recent.pct_change().tail(10).std() or 0.0)
-    recent_vol = max(recent_vol, 0.01)
-
-    lower_bound = max(float(recent.min()) * 0.85, recent_mean * (1 - 6 * recent_vol))
-    upper_bound = min(float(recent.max()) * 1.15, recent_mean * (1 + 6 * recent_vol))
-
-    if lower_bound > upper_bound:
-        lower_bound, upper_bound = upper_bound, lower_bound
-
-    return float(np.clip(pred_close, lower_bound, upper_bound))
+def _clip_predicted_return(pred_return: float, volatility: float) -> float:
+    """
+    对预测收益率加风险上限。
+    目标不是消除方向判断，而是避免单日预测出现明显失真的极端跳变。
+    """
+    base_vol = max(float(volatility or 0.0), 0.005)
+    cap = max(0.012, min(0.03, 2.5 * base_vol))
+    return float(np.clip(pred_return, -cap, cap))
 
 
 def run_price_prediction(
@@ -144,10 +135,12 @@ def run_price_prediction(
 
     x = feature_df[FEATURE_COLUMNS]
     y = feature_df["target"]
+    current_close = feature_df["close"]
 
     split_idx = max(int(len(feature_df) * 0.8), 1)
     x_train, y_train = x.iloc[:split_idx], y.iloc[:split_idx]
     x_test, y_test = x.iloc[split_idx:], y.iloc[split_idx:]
+    current_close_test = current_close.iloc[split_idx:]
 
     model = LinearRegression()
     model.fit(x_train, y_train)
@@ -155,10 +148,18 @@ def run_price_prediction(
     mae = None
     mape = None
     if len(x_test) > 0:
-        y_pred_test = model.predict(x_test)
-        mae = float(mean_absolute_error(y_test, y_pred_test))
-        safe_denominator = np.where(np.abs(y_test.values) < 1e-8, np.nan, y_test.values)
-        mape_arr = np.abs((y_test.values - y_pred_test) / safe_denominator) * 100
+        y_pred_ret = model.predict(x_test)
+        y_pred_ret = np.array(
+            [
+                _clip_predicted_return(pred_ret, vol_5)
+                for pred_ret, vol_5 in zip(y_pred_ret, x_test["vol_5"].values)
+            ]
+        )
+        y_pred_test = current_close_test.values * (1 + y_pred_ret)
+        y_true_test = current_close_test.values * (1 + y_test.values)
+        mae = float(mean_absolute_error(y_true_test, y_pred_test))
+        safe_denominator = np.where(np.abs(y_true_test) < 1e-8, np.nan, y_true_test)
+        mape_arr = np.abs((y_true_test - y_pred_test) / safe_denominator) * 100
         mape = float(np.nanmean(mape_arr))
 
     rolling_window = history_data["close"].tolist()
@@ -169,8 +170,9 @@ def run_price_prediction(
     for future_date in future_dates:
         features = _build_feature_from_window(rolling_window)
         x_future = pd.DataFrame([[features[col] for col in FEATURE_COLUMNS]], columns=FEATURE_COLUMNS)
-        pred_close = float(model.predict(x_future)[0])
-        pred_close = _stabilize_prediction(pred_close, rolling_window)
+        pred_return = float(model.predict(x_future)[0])
+        pred_return = _clip_predicted_return(pred_return, features["vol_5"])
+        pred_close = float(rolling_window[-1] * (1 + pred_return))
         rolling_window.append(pred_close)
         predictions.append(
             {
@@ -197,7 +199,7 @@ def run_price_prediction(
             "test_size": int(len(x_test)),
         },
         "model": {
-            "name": "linear_regression_baseline",
+            "name": "linear_regression_return_baseline",
             "feature_count": len(FEATURE_COLUMNS),
         },
     }

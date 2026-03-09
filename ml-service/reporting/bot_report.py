@@ -34,6 +34,40 @@ def _display_metric(value: Any, decimals: int = 4) -> str:
     return str(round(float(value), decimals))
 
 
+def _build_assessment(latest_price: float | None, forecast_frame: pd.DataFrame, metrics: Dict[str, Any]) -> Dict[str, Any]:
+    t1_forecast = None
+    t1_gap_pct = None
+    if latest_price and not forecast_frame.empty:
+        t1_forecast = float(forecast_frame.iloc[0]["close"])
+        t1_gap_pct = (t1_forecast / latest_price - 1) * 100
+
+    mape = metrics.get("mape")
+    if t1_gap_pct is None:
+        risk_level = "UNKNOWN"
+        summary = "预测结果不足，无法完成模型评估。"
+    else:
+        abs_gap = abs(t1_gap_pct)
+        if abs_gap >= 5:
+            risk_level = "AGGRESSIVE"
+            summary = "模型当前预测偏激进，T+1 相对最新价偏离较大，预测值仅供参考。"
+        elif abs_gap >= 2:
+            risk_level = "ELEVATED"
+            summary = "模型当前预测存在一定进攻性，建议结合人工判断使用。"
+        else:
+            risk_level = "BALANCED"
+            summary = "模型当前预测相对平衡，但仍需结合市场波动理解。"
+
+    return {
+        "latest_price": latest_price,
+        "t1_forecast": round(t1_forecast, 2) if t1_forecast is not None else None,
+        "t1_gap_pct": round(t1_gap_pct, 2) if t1_gap_pct is not None else None,
+        "mape": round(float(mape), 4) if mape is not None else None,
+        "risk_level": risk_level,
+        "summary": summary,
+        "note": "MAPE 基于历史回测，不代表当前市场状态下的未来稳定性。",
+    }
+
+
 def _ensure_dir(path: Path) -> Path:
     path.mkdir(parents=True, exist_ok=True)
     return path
@@ -176,6 +210,9 @@ def generate_gold_report_bundle(
     if not session_frame.empty:
         session_frame["date"] = pd.to_datetime(session_frame["date"])
 
+    latest_price = float(quote["price"]) if quote and quote.get("price") is not None else None
+    assessment = _build_assessment(latest_price, forecast_frame, predict_result["metrics"])
+
     summary_frame = pd.DataFrame(
         [
             {"Metric": "Generated At", "Value": generated_at},
@@ -188,6 +225,8 @@ def generate_gold_report_bundle(
             {"Metric": "MAPE", "Value": _display_metric(predict_result["metrics"].get("mape"))},
             {"Metric": "T+1 Forecast", "Value": round(float(forecast_frame.iloc[0]["close"]), 2) if not forecast_frame.empty else "--"},
             {"Metric": "T+N Forecast", "Value": round(float(forecast_frame.iloc[-1]["close"]), 2) if not forecast_frame.empty else "--"},
+            {"Metric": "T+1 Gap %", "Value": _display_metric(assessment["t1_gap_pct"], 2)},
+            {"Metric": "Assessment", "Value": assessment["risk_level"]},
         ]
     )
 
@@ -266,6 +305,7 @@ def generate_gold_report_bundle(
         "source": source,
         "quote": quote,
         "prediction": predict_result,
+        "assessment": assessment,
     }
 
     _write_json(output_path / "gold_quote.json", quote_payload)
@@ -299,6 +339,12 @@ def generate_gold_report_bundle(
         f"- T+1 预测: {round(float(forecast_frame.iloc[0]['close']), 2) if not forecast_frame.empty else '--'}",
         f"- T+N 预测: {round(float(forecast_frame.iloc[-1]['close']), 2) if not forecast_frame.empty else '--'}",
         "",
+        "## 模型评估",
+        "",
+        f"- T+1 相对最新价偏离: {_display_metric(assessment['t1_gap_pct'], 2)}%",
+        f"- 评估结论: {assessment['summary']}",
+        f"- 说明: {assessment['note']}",
+        "",
         "## 产出文件",
         "",
         "- manifest.json",
@@ -322,6 +368,7 @@ def generate_gold_report_bundle(
         "source": source,
         "quote": quote,
         "metrics": predict_result["metrics"],
+        "assessment": assessment,
         "files": {
             "manifest_json": "manifest.json",
             "report_markdown": "report.md",
