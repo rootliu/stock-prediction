@@ -88,15 +88,15 @@ def _business_days_between(start_date: str, end_date: str) -> int:
     return max(len(pd.bdate_range(start=start, end=end)), 1)
 
 
-def _compound_curve(total_return: float, horizon_days: int) -> np.ndarray:
-    if horizon_days <= 0:
+def _compound_curve(total_return: float, step_count: int) -> np.ndarray:
+    if step_count <= 0:
         return np.array([1.0])
-    daily_return = (1 + total_return) ** (1 / horizon_days) - 1
-    day_index = np.arange(0, horizon_days + 1)
+    daily_return = (1 + total_return) ** (1 / step_count) - 1
+    day_index = np.arange(0, step_count + 1)
     return np.power(1 + daily_return, day_index)
 
 
-def _curve_from_support_resistance(source: Dict[str, Any], horizon_days: int) -> Dict[str, Any]:
+def _curve_from_support_resistance(source: Dict[str, Any], step_count: int) -> Dict[str, Any]:
     support = float(source["support"])
     resistance = float(source["resistance"])
     center = (support + resistance) / 2
@@ -104,14 +104,14 @@ def _curve_from_support_resistance(source: Dict[str, Any], horizon_days: int) ->
     target = support * (1 - bias_weight) + resistance * bias_weight
     implied_return = target / center - 1
     return {
-        "curve_ratio": _compound_curve(implied_return, horizon_days),
+        "curve_ratio": _compound_curve(implied_return, step_count),
         "implied_return_pct": implied_return * 100,
         "bias": "Bullish" if implied_return > 0 else "Bearish" if implied_return < 0 else "Neutral",
         "anchor": round(target, 2),
     }
 
 
-def _curve_from_signal_mix(source: Dict[str, Any], horizon_days: int) -> Dict[str, Any]:
+def _curve_from_signal_mix(source: Dict[str, Any], step_count: int) -> Dict[str, Any]:
     weights = {
         "30m": 0.05,
         "hourly": 0.3,
@@ -126,20 +126,20 @@ def _curve_from_signal_mix(source: Dict[str, Any], horizon_days: int) -> Dict[st
 
     implied_return = float(np.clip(weighted_score * 0.01, -0.015, 0.015))
     return {
-        "curve_ratio": _compound_curve(implied_return, horizon_days),
+        "curve_ratio": _compound_curve(implied_return, step_count),
         "implied_return_pct": implied_return * 100,
         "bias": "Bullish" if implied_return > 0 else "Bearish" if implied_return < 0 else "Neutral",
         "anchor": round(weighted_score, 3),
     }
 
 
-def _curve_from_dated_target(source: Dict[str, Any], horizon_days: int) -> Dict[str, Any]:
+def _curve_from_dated_target(source: Dict[str, Any], step_count: int, horizon_days: float) -> Dict[str, Any]:
     total_days = _business_days_between(source["published_at"], source["target_date"])
     target_return = float(source["target_ref"]) / float(source["current_ref"]) - 1
     log_daily_return = log(1 + target_return) / total_days
     total_horizon_return = exp(log_daily_return * horizon_days) - 1
     return {
-        "curve_ratio": _compound_curve(total_horizon_return, horizon_days),
+        "curve_ratio": _compound_curve(total_horizon_return, step_count),
         "implied_return_pct": total_horizon_return * 100,
         "bias": "Bullish" if total_horizon_return > 0 else "Bearish" if total_horizon_return < 0 else "Neutral",
         "anchor": round(float(source["target_ref"]), 2),
@@ -168,26 +168,41 @@ def _classify_deviation(internal_price: float, external_price: float) -> str:
     return "接近外部主线"
 
 
+def _format_timestamp(ts: pd.Timestamp) -> str:
+    return ts.strftime("%Y-%m-%d %H:%M")
+
+
 def build_external_gold_curve_comparison(
     latest_price: float,
     forecast_frame: pd.DataFrame,
+    reference_time: pd.Timestamp | None = None,
+    horizon_days: float | None = None,
     blend_weight_external: float = 0.7,
 ) -> Dict[str, Any]:
     if forecast_frame.empty:
         raise ValueError("forecast_frame 不能为空")
 
-    horizon_days = len(forecast_frame)
+    forecast_dates = pd.to_datetime(forecast_frame["date"])
+    step_count = len(forecast_frame)
+    if reference_time is None:
+        if len(forecast_dates) > 1:
+            reference_time = forecast_dates.iloc[0] - (forecast_dates.iloc[1] - forecast_dates.iloc[0])
+        else:
+            reference_time = pd.Timestamp(datetime.now())
+    if horizon_days is None:
+        horizon_days = max((forecast_dates.iloc[-1] - reference_time).total_seconds() / 86400, 1 / 6)
+
     survey_rows: List[Dict[str, Any]] = []
     curve_stack: List[np.ndarray] = []
     weight_stack: List[float] = []
 
     for source in EXTERNAL_SURVEY_SNAPSHOT:
         if source["type"] == "support_resistance":
-            result = _curve_from_support_resistance(source, horizon_days)
+            result = _curve_from_support_resistance(source, step_count)
         elif source["type"] == "signal_mix":
-            result = _curve_from_signal_mix(source, horizon_days)
+            result = _curve_from_signal_mix(source, step_count)
         else:
-            result = _curve_from_dated_target(source, horizon_days)
+            result = _curve_from_dated_target(source, step_count, horizon_days)
 
         curve_stack.append(result["curve_ratio"])
         weight_stack.append(float(source["weight"]))
@@ -198,7 +213,7 @@ def build_external_gold_curve_comparison(
                 "Type": source["type"],
                 "Weight": round(float(source["weight"]), 2),
                 "Bias": result["bias"],
-                "Implied 5D Return %": round(float(result["implied_return_pct"]), 2),
+                "Implied Horizon Return %": round(float(result["implied_return_pct"]), 2),
                 "Anchor": result["anchor"],
                 "Summary": source["summary"],
                 "URL": source["url"],
@@ -217,7 +232,6 @@ def build_external_gold_curve_comparison(
     blended_fitted = _fit_curve(blended_raw)
 
     compare_rows: List[Dict[str, Any]] = []
-    forecast_dates = pd.to_datetime(forecast_frame["date"])
     for idx, current_date in enumerate(forecast_dates, start=1):
         external_price = float(external_fitted[idx])
         internal_price = float(internal_fitted[idx])
@@ -225,7 +239,7 @@ def build_external_gold_curve_comparison(
         deviation_pct = (internal_price / external_price - 1) * 100 if external_price else np.nan
         compare_rows.append(
             {
-                "Date": current_date.strftime("%Y-%m-%d"),
+                "Date": _format_timestamp(current_date),
                 "External Main": round(external_price, 2),
                 "Internal Model": round(internal_price, 2),
                 "Blended Curve": round(blended_price, 2),
@@ -239,7 +253,9 @@ def build_external_gold_curve_comparison(
         "survey_as_of": datetime.now().strftime("%Y-%m-%d"),
         "external_curve_role": "primary",
         "blend_weight_external": blend_weight_external,
-        "external_5d_return_pct": round(float(consensus_return_pct), 2),
+        "external_horizon_return_pct": round(float(consensus_return_pct), 2),
+        "horizon_days": round(float(horizon_days), 2),
+        "step_count": step_count,
         "source_count": len(survey_rows),
     }
 
@@ -248,8 +264,8 @@ def build_external_gold_curve_comparison(
         "comparison_frame": pd.DataFrame(compare_rows),
         "curve_frame": pd.DataFrame(
             {
-                "day": np.arange(0, horizon_days + 1),
-                "date": [pd.Timestamp(datetime.now().date()).strftime("%Y-%m-%d")] + [d.strftime("%Y-%m-%d") for d in forecast_dates],
+                "step": np.arange(0, step_count + 1),
+                "date": [_format_timestamp(reference_time)] + [_format_timestamp(d) for d in forecast_dates],
                 "external_main": np.round(external_fitted, 2),
                 "internal_model": np.round(internal_fitted, 2),
                 "blended_curve": np.round(blended_fitted, 2),

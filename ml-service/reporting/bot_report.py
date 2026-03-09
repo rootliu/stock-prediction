@@ -10,6 +10,7 @@ import matplotlib
 matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 from loguru import logger
 
@@ -193,6 +194,39 @@ def _build_deviation_summary(comparison_frame: pd.DataFrame) -> Dict[str, Any]:
     }
 
 
+def _resample_close_to_four_hour(frame: pd.DataFrame) -> pd.DataFrame:
+    if frame.empty:
+        return pd.DataFrame(columns=["date", "close"])
+
+    resampled = (
+        frame.sort_values("date")
+        .set_index("date")
+        .resample("4h", label="right", closed="right")
+        .agg({"close": "last"})
+        .dropna(subset=["close"])
+        .reset_index()
+    )
+    return resampled[["date", "close"]]
+
+
+def _build_four_hour_forecast_frame(
+    latest_price: float,
+    forecast_frame: pd.DataFrame,
+    reference_time: pd.Timestamp,
+    step_hours: int = 4,
+) -> pd.DataFrame:
+    if forecast_frame.empty:
+        return pd.DataFrame(columns=["date", "close"])
+
+    horizon_days = len(forecast_frame)
+    anchor_offsets = np.arange(0, horizon_days + 1) * 24
+    anchor_values = np.concatenate(([latest_price], forecast_frame["close"].astype(float).values))
+    target_offsets = np.arange(step_hours, horizon_days * 24 + step_hours, step_hours)
+    target_values = np.interp(target_offsets, anchor_offsets, anchor_values)
+    target_dates = [reference_time + pd.Timedelta(hours=int(offset)) for offset in target_offsets]
+    return pd.DataFrame({"date": target_dates, "close": np.round(target_values, 2)})
+
+
 def generate_gold_report_bundle(
     output_dir: str | Path,
     source: str = "SHFE_AU_MAIN",
@@ -210,6 +244,7 @@ def generate_gold_report_bundle(
 
     history_start = (today - timedelta(days=max(compare_days, lookback * 3))).strftime("%Y-%m-%d")
     compare_start = (today - timedelta(days=compare_days)).strftime("%Y-%m-%d")
+    intraday_start = (today - timedelta(days=7)).strftime("%Y-%m-%d")
 
     history_df = collector.get_kline(source, period="daily", start_date=history_start, end_date=today_str)
     if history_df.empty:
@@ -225,6 +260,7 @@ def generate_gold_report_bundle(
         session="ALL",
     )
     session_df = collector.get_session_data(source=source, period=session_period, days=session_days)
+    intraday_context_df = collector.get_kline(source, period="60min", start_date=intraday_start, end_date=today_str, session="ALL")
 
     history_frame = _round_frame(pd.DataFrame(predict_result["history"]))
     forecast_frame = _round_frame(pd.DataFrame(predict_result["prediction"]))
@@ -245,6 +281,13 @@ def generate_gold_report_bundle(
         latest_price = float(history_df.iloc[-1]["close"])
     assessment = _build_assessment(latest_price, forecast_frame, predict_result["metrics"])
 
+    intraday_context_frame = _resample_close_to_four_hour(intraday_context_df[["date", "close"]]) if not intraday_context_df.empty else pd.DataFrame(columns=["date", "close"])
+    if intraday_context_frame.empty and not history_frame.empty:
+        intraday_context_frame = history_frame.tail(7)[["date", "close"]].copy()
+
+    reference_time = pd.to_datetime(intraday_context_frame["date"]).max() if not intraday_context_frame.empty else pd.Timestamp(today.replace(minute=0, second=0, microsecond=0))
+    forecast_4h_frame = _build_four_hour_forecast_frame(latest_price=latest_price, forecast_frame=forecast_frame, reference_time=reference_time)
+
     prediction_chart = output_path / "gold_prediction.png"
     compare_chart = output_path / "gold_compare.png"
     session_chart = output_path / "gold_session.png"
@@ -254,7 +297,12 @@ def generate_gold_report_bundle(
     survey_table_chart = output_path / "gold_external_survey_table.png"
     curve_table_chart = output_path / "gold_curve_comparison_table.png"
 
-    curve_bundle = build_external_gold_curve_comparison(latest_price=latest_price, forecast_frame=forecast_frame)
+    curve_bundle = build_external_gold_curve_comparison(
+        latest_price=latest_price,
+        forecast_frame=forecast_4h_frame,
+        reference_time=reference_time,
+        horizon_days=float(len(forecast_frame)),
+    )
     survey_frame = _round_frame(curve_bundle["survey_frame"])
     curve_compare_frame = _round_frame(curve_bundle["comparison_frame"])
     curve_frame = _round_frame(curve_bundle["curve_frame"])
@@ -275,7 +323,9 @@ def generate_gold_report_bundle(
             {"Metric": "T+N Forecast", "Value": round(float(forecast_frame.iloc[-1]["close"]), 2) if not forecast_frame.empty else "--"},
             {"Metric": "T+1 Gap %", "Value": _display_metric(assessment["t1_gap_pct"], 2)},
             {"Metric": "Assessment", "Value": assessment["risk_level"]},
-            {"Metric": "External 5D Return %", "Value": _display_metric(external_summary["external_5d_return_pct"], 2)},
+            {"Metric": "Context Window", "Value": "Past 7 days / 4h"},
+            {"Metric": "Curve Horizon", "Value": f"Next {int(round(external_summary['horizon_days']))} days / 4h"},
+            {"Metric": "External Horizon Return %", "Value": _display_metric(external_summary["external_horizon_return_pct"], 2)},
             {"Metric": "T+1 Deviation Label", "Value": deviation_summary["t1_label"]},
         ]
     )
@@ -341,16 +391,17 @@ def generate_gold_report_bundle(
     _save_line_chart(
         curve_chart,
         [
+            ("Actual 4H", intraday_context_frame["date"], intraday_context_frame["close"], COLOR_MAP["actual"], "-"),
             ("External Main", pd.to_datetime(curve_frame["date"]), curve_frame["external_main"], COLOR_MAP["external_main"], "-"),
             ("Internal Model", pd.to_datetime(curve_frame["date"]), curve_frame["internal_model"], COLOR_MAP["internal_model"], "--"),
             ("Blended Curve", pd.to_datetime(curve_frame["date"]), curve_frame["blended_curve"], COLOR_MAP["blended_curve"], "-."),
         ],
-        title="Gold External Main vs Internal Forecast",
+        title="Gold Past Week + Next 5 Days (4H)",
         ylabel="Price",
     )
     _save_table_chart(
         survey_table_chart,
-        survey_frame[["Source", "Published", "Weight", "Bias", "Implied 5D Return %", "Anchor"]],
+        survey_frame[["Source", "Published", "Weight", "Bias", "Implied Horizon Return %", "Anchor"]],
         title="External English Site Survey",
     )
     _save_table_chart(
@@ -393,7 +444,13 @@ def generate_gold_report_bundle(
     _write_csv(output_path / "gold_session.csv", session_output)
     _write_csv(output_path / "external_gold_survey.csv", survey_frame)
     _write_csv(output_path / "gold_curve_comparison.csv", curve_compare_frame)
-    curve_output = curve_frame.copy()
+    curve_output = pd.merge(
+        intraday_context_frame.rename(columns={"close": "actual_4h"}),
+        curve_frame.assign(date=pd.to_datetime(curve_frame["date"])),
+        on="date",
+        how="outer",
+    ).sort_values("date")
+    curve_output["date"] = curve_output["date"].dt.strftime("%Y-%m-%d %H:%M")
     _write_csv(output_path / "gold_external_main_curve.csv", curve_output)
 
     report_lines = [
@@ -423,7 +480,9 @@ def generate_gold_report_bundle(
         f"- Survey 日期: {external_summary['survey_as_of']}",
         f"- 站点数量: {external_summary['source_count']}",
         f"- 主曲线角色: {external_summary['external_curve_role']}",
-        f"- 5日主曲线收益率: {_display_metric(external_summary['external_5d_return_pct'], 2)}%",
+        f"- 图像窗口: 过去 7 天实际走势 + 未来 {int(round(external_summary['horizon_days']))} 天预测",
+        "- 时间粒度: 4 小时",
+        f"- 主曲线区间收益率: {_display_metric(external_summary['external_horizon_return_pct'], 2)}%",
         "- 说明: 外部英文网站曲线作为主曲线，内部模型只作为短期局部修正输入。",
         "",
         "## 曲线对比",
@@ -438,7 +497,7 @@ def generate_gold_report_bundle(
     for row in survey_frame.to_dict(orient="records"):
         report_lines.extend(
             [
-                f"- {row['Source']} ({row['Published']}): {row['Bias']}, 5日隐含收益 {row['Implied 5D Return %']}%, 权重 {row['Weight']}, 锚点 {row['Anchor']}",
+                f"- {row['Source']} ({row['Published']}): {row['Bias']}, 区间隐含收益 {row['Implied Horizon Return %']}%, 权重 {row['Weight']}, 锚点 {row['Anchor']}",
                 f"  链接: {row['URL']}",
             ]
         )
