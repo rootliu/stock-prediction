@@ -1,6 +1,6 @@
 import { FC, useEffect, useState, useRef } from 'react'
 import ReactECharts from 'echarts-for-react'
-import { Spin, Radio, Space, message } from 'antd'
+import { Spin, Radio, message } from 'antd'
 import { stockApi } from '../services/api'
 import type { KLineData, MarketType, KLinePeriod } from '../types'
 

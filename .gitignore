@@ -32,3 +32,8 @@ pip-delete-this-directory.txt
 # Temporary files
 *.tmp
 *.temp
+
+# Separate git repos (managed independently)
+enterprise-information/
+pan_cleaner/
+short-drama-translation/

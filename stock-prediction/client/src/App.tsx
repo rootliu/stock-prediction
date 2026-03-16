@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Layout, Menu, Input, Tabs, message, Spin } from 'antd'
+import { Layout, Input, Tabs, message, Spin } from 'antd'
 import {
   StockOutlined,
   LineChartOutlined,
@@ -7,13 +7,14 @@ import {
   SearchOutlined,
   GlobalOutlined,
   RiseOutlined,
-  FallOutlined,
+  FireOutlined,
 } from '@ant-design/icons'
 import { useAppStore } from './store'
 import { stockApi } from './services/api'
 import StockList from './components/StockList'
 import KLineChart from './components/KLineChart'
 import IndexBar from './components/IndexBar'
+import GoldTrendChart from './components/GoldTrendChart'
 import type { MarketType } from './types'
 
 const { Header, Sider, Content } = Layout
@@ -54,6 +55,11 @@ function App() {
   // 搜索股票
   const handleSearch = async (value: string) => {
     if (!value.trim()) return
+    if (currentMarket === 'GOLD') {
+      message.info('黄金模块不支持股票代码搜索，请直接选择黄金数据来源')
+      return
+    }
+
     setLoading(true)
     try {
       // 尝试根据代码直接获取行情
@@ -78,7 +84,9 @@ function App() {
   const marketTabs = [
     { key: 'CN', label: 'A股', icon: <RiseOutlined /> },
     { key: 'HK', label: '港股', icon: <GlobalOutlined /> },
+    { key: 'GOLD', label: '黄金', icon: <FireOutlined /> },
   ]
+  const stockMarket: 'CN' | 'HK' = currentMarket === 'HK' ? 'HK' : 'CN'
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -114,119 +122,136 @@ function App() {
         </div>
 
         {/* 搜索框 */}
-        <Search
-          placeholder="输入股票代码或名称"
-          allowClear
-          style={{ width: 300 }}
-          value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
-          onSearch={handleSearch}
-          prefix={<SearchOutlined />}
-        />
+        {currentMarket !== 'GOLD' && (
+          <Search
+            placeholder="输入股票代码或名称"
+            allowClear
+            style={{ width: 300 }}
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            onSearch={handleSearch}
+            prefix={<SearchOutlined />}
+          />
+        )}
       </Header>
 
       {/* 指数行情条 */}
-      <IndexBar indexes={indexes} />
+      {currentMarket !== 'GOLD' && <IndexBar indexes={indexes} />}
 
-      <Layout>
-        {/* 左侧边栏 - 股票列表 */}
-        <Sider
-          width={320}
-          style={{ background: '#fff', borderRight: '1px solid #f0f0f0' }}
-        >
-          <Tabs
-            defaultActiveKey="list"
-            style={{ height: '100%' }}
-            items={[
-              {
-                key: 'list',
-                label: (
-                  <span>
-                    <StockOutlined />
-                    行情列表
-                  </span>
-                ),
-                children: <StockList market={currentMarket} />,
-              },
-              {
-                key: 'watchlist',
-                label: (
-                  <span>
-                    <StarOutlined />
-                    自选股 ({watchlist.length})
-                  </span>
-                ),
-                children: <StockList market={currentMarket} isWatchlist />,
-              },
-            ]}
-          />
-        </Sider>
-
-        {/* 主内容区 - K线图 */}
+      {currentMarket === 'GOLD' ? (
         <Content style={{ padding: 16, background: '#f5f5f5' }}>
-          <Spin spinning={loading}>
-            {currentStock ? (
-              <div style={{ 
-                background: '#fff', 
-                borderRadius: 8,
-                padding: 16,
-                height: 'calc(100vh - 180px)'
-              }}>
-                <div style={{ 
-                  marginBottom: 16,
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center'
-                }}>
-                  <div>
-                    <span style={{ fontSize: 20, fontWeight: 'bold', marginRight: 8 }}>
-                      {currentStock.name}
-                    </span>
-                    <span style={{ color: '#8c8c8c' }}>
-                      {currentStock.code}
-                    </span>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ 
-                      fontSize: 24, 
-                      fontWeight: 'bold',
-                      color: currentStock.pct_change >= 0 ? '#f5222d' : '#52c41a'
-                    }}>
-                      {currentStock.price?.toFixed(2)}
-                    </div>
-                    <div style={{ 
-                      color: currentStock.pct_change >= 0 ? '#f5222d' : '#52c41a'
-                    }}>
-                      {currentStock.pct_change >= 0 ? '+' : ''}
-                      {currentStock.pct_change?.toFixed(2)}%
-                      ({currentStock.change >= 0 ? '+' : ''}{currentStock.change?.toFixed(2)})
-                    </div>
-                  </div>
-                </div>
-                <KLineChart 
-                  symbol={currentStock.code} 
-                  market={currentStock.market || currentMarket}
-                />
-              </div>
-            ) : (
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                height: 'calc(100vh - 180px)',
-                background: '#fff',
-                borderRadius: 8,
-                color: '#8c8c8c'
-              }}>
-                <div style={{ textAlign: 'center' }}>
-                  <LineChartOutlined style={{ fontSize: 64, marginBottom: 16 }} />
-                  <div style={{ fontSize: 16 }}>请选择一只股票查看详情</div>
-                </div>
-              </div>
-            )}
-          </Spin>
+          <div
+            style={{
+              background: '#fff',
+              borderRadius: 8,
+              padding: 16,
+              height: 'calc(100vh - 130px)',
+            }}
+          >
+            <GoldTrendChart />
+          </div>
         </Content>
-      </Layout>
+      ) : (
+        <Layout>
+          {/* 左侧边栏 - 股票列表 */}
+          <Sider
+            width={320}
+            style={{ background: '#fff', borderRight: '1px solid #f0f0f0' }}
+          >
+            <Tabs
+              defaultActiveKey="list"
+              style={{ height: '100%' }}
+              items={[
+                {
+                  key: 'list',
+                  label: (
+                    <span>
+                      <StockOutlined />
+                      行情列表
+                    </span>
+                  ),
+                  children: <StockList market={stockMarket} />,
+                },
+                {
+                  key: 'watchlist',
+                  label: (
+                    <span>
+                      <StarOutlined />
+                      自选股 ({watchlist.length})
+                    </span>
+                  ),
+                  children: <StockList market={stockMarket} isWatchlist />,
+                },
+              ]}
+            />
+          </Sider>
+
+          {/* 主内容区 - K线图 */}
+          <Content style={{ padding: 16, background: '#f5f5f5' }}>
+            <Spin spinning={loading}>
+              {currentStock ? (
+                <div style={{ 
+                  background: '#fff', 
+                  borderRadius: 8,
+                  padding: 16,
+                  height: 'calc(100vh - 180px)'
+                }}>
+                  <div style={{ 
+                    marginBottom: 16,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}>
+                    <div>
+                      <span style={{ fontSize: 20, fontWeight: 'bold', marginRight: 8 }}>
+                        {currentStock.name}
+                      </span>
+                      <span style={{ color: '#8c8c8c' }}>
+                        {currentStock.code}
+                      </span>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ 
+                        fontSize: 24, 
+                        fontWeight: 'bold',
+                        color: currentStock.pct_change >= 0 ? '#f5222d' : '#52c41a'
+                      }}>
+                        {currentStock.price?.toFixed(2)}
+                      </div>
+                      <div style={{ 
+                        color: currentStock.pct_change >= 0 ? '#f5222d' : '#52c41a'
+                      }}>
+                        {currentStock.pct_change >= 0 ? '+' : ''}
+                        {currentStock.pct_change?.toFixed(2)}%
+                        ({currentStock.change >= 0 ? '+' : ''}{currentStock.change?.toFixed(2)})
+                      </div>
+                    </div>
+                  </div>
+                  <KLineChart 
+                    symbol={currentStock.code} 
+                    market={currentStock.market || currentMarket}
+                  />
+                </div>
+              ) : (
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  height: 'calc(100vh - 180px)',
+                  background: '#fff',
+                  borderRadius: 8,
+                  color: '#8c8c8c'
+                }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <LineChartOutlined style={{ fontSize: 64, marginBottom: 16 }} />
+                    <div style={{ fontSize: 16 }}>请选择一只股票查看详情</div>
+                  </div>
+                </div>
+              )}
+            </Spin>
+          </Content>
+        </Layout>
+      )}
     </Layout>
   )
 }

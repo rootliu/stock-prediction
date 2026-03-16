@@ -3,7 +3,6 @@
 FastAPI 服务提供股票数据、技术分析和预测API
 """
 
-import os
 from datetime import datetime
 from typing import List, Optional, Dict, Any
 from contextlib import asynccontextmanager
@@ -13,7 +12,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from loguru import logger
 
-from data_collector import get_a_stock_collector, get_hk_stock_collector
+from data_collector import (
+    get_a_stock_collector,
+    get_hk_stock_collector,
+    get_gold_market_collector,
+)
+from models.predictor import run_price_prediction
 from utils.indicators import calculate_all_indicators, TechnicalIndicators
 
 # 配置日志
@@ -105,6 +109,27 @@ class IndicatorResponse(BaseModel):
     indicators: Dict[str, List[Optional[float]]]
 
 
+class PredictRequest(BaseModel):
+    """预测请求参数"""
+    horizon: int = Field(default=5, ge=1, le=30, description="预测未来天数")
+    lookback: int = Field(default=240, ge=60, le=2000, description="建模历史窗口")
+
+
+class GoldSessionPoint(BaseModel):
+    """黄金时段点位"""
+    date: str
+    close: float
+    session: str
+
+
+class GoldSessionResponse(BaseModel):
+    """黄金时段响应"""
+    source: str
+    period: str
+    days: int
+    data: List[GoldSessionPoint]
+
+
 # ==================== 生命周期管理 ====================
 
 @asynccontextmanager
@@ -114,6 +139,7 @@ async def lifespan(app: FastAPI):
     # 初始化数据采集器
     get_a_stock_collector()
     get_hk_stock_collector()
+    get_gold_market_collector()
     logger.info("数据采集器初始化完成")
     yield
     logger.info("ML服务关闭")
@@ -448,6 +474,215 @@ async def get_hk_ggt_stocks():
         return {"data": df.to_dict(orient="records")}
     except Exception as e:
         logger.error(f"获取港股通标的失败: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ==================== 黄金 API ====================
+
+@app.get("/api/v1/gold/sources", summary="获取黄金数据来源")
+async def get_gold_sources(
+    group: str = Query(default="ALL", enum=["ALL", "DOMESTIC", "FOREIGN"])
+):
+    """获取可用黄金数据来源"""
+    try:
+        collector = get_gold_market_collector()
+        return {"data": collector.get_sources(group=group)}
+    except Exception as e:
+        logger.error(f"获取黄金来源失败: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/v1/gold/markets", summary="获取黄金市场视图")
+async def get_gold_markets():
+    """获取黄金市场分组与默认配置"""
+    try:
+        collector = get_gold_market_collector()
+        return collector.get_markets()
+    except Exception as e:
+        logger.error(f"获取黄金市场视图失败: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/v1/gold/quote/{source}", summary="获取黄金行情快照")
+async def get_gold_quote(source: str):
+    """获取单来源黄金最新行情"""
+    try:
+        collector = get_gold_market_collector()
+        data = collector.get_latest_quote(source)
+        if not data:
+            raise HTTPException(status_code=404, detail=f"未找到黄金行情: {source}")
+        return data
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"获取黄金行情失败 {source}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/v1/gold/kline/{source}", response_model=KLineResponse, summary="获取黄金K线")
+async def get_gold_kline(
+    source: str,
+    period: str = Query(default="daily", enum=["daily", "weekly", "monthly", "5min", "15min", "30min", "60min"]),
+    start_date: Optional[str] = Query(default=None, description="开始日期 YYYYMMDD 或 YYYY-MM-DD"),
+    end_date: Optional[str] = Query(default=None, description="结束日期 YYYYMMDD 或 YYYY-MM-DD"),
+    session: str = Query(default="ALL", enum=["ALL", "DAY", "NIGHT"]),
+):
+    """获取黄金 K 线数据"""
+    try:
+        collector = get_gold_market_collector()
+        df = collector.get_kline(
+            source,
+            period=period,
+            start_date=start_date,
+            end_date=end_date,
+            session=session,
+        )
+        if df.empty:
+            raise HTTPException(status_code=404, detail=f"未找到K线数据: {source}")
+
+        data = []
+        for _, row in df.iterrows():
+            data.append(
+                KLineData(
+                    date=row["date"].strftime("%Y-%m-%d %H:%M") if period in {"5min", "15min", "30min", "60min"} else row["date"].strftime("%Y-%m-%d"),
+                    open=float(row["open"]),
+                    high=float(row["high"]),
+                    low=float(row["low"]),
+                    close=float(row["close"]),
+                    volume=int(row["volume"]) if row["volume"] == row["volume"] else 0,
+                    amount=float(row["amount"]) if row["amount"] == row["amount"] else None,
+                    pct_change=float(row["pct_change"]) if row["pct_change"] == row["pct_change"] else None,
+                )
+            )
+
+        return KLineResponse(
+            code=source.upper(),
+            name=collector.get_source_name(source),
+            market="GOLD",
+            period=period,
+            data=data,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"获取黄金K线失败 {source}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/v1/gold/compare", summary="对比多个黄金来源走势")
+async def compare_gold_sources(
+    period: str = Query(default="daily", enum=["daily", "weekly", "monthly"]),
+    group: str = Query(default="ALL", enum=["ALL", "DOMESTIC", "FOREIGN"]),
+    start_date: Optional[str] = Query(default=None, description="开始日期 YYYYMMDD 或 YYYY-MM-DD"),
+    end_date: Optional[str] = Query(default=None, description="结束日期 YYYYMMDD 或 YYYY-MM-DD"),
+    session: str = Query(default="ALL", enum=["ALL", "DAY", "NIGHT"]),
+):
+    """多来源黄金价格对比（close 对齐）"""
+    try:
+        collector = get_gold_market_collector()
+        df = collector.compare_sources(
+            period=period,
+            start_date=start_date,
+            end_date=end_date,
+            group=group,
+            session=session,
+        )
+        if df.empty:
+            raise HTTPException(status_code=404, detail="未获取到可对比的黄金数据")
+
+        source_codes = collector.list_source_codes(group=group)
+        data = []
+        for _, row in df.iterrows():
+            item: Dict[str, Any] = {"date": row["date"].strftime("%Y-%m-%d")}
+            for source in source_codes:
+                value = row[source] if source in row else None
+                item[source] = float(value) if value is not None and value == value else None
+            data.append(item)
+
+        return {
+            "period": period,
+            "group": group,
+            "session": session,
+            "sources": source_codes,
+            "data": data,
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"对比黄金来源失败: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/v1/gold/session/{source}", response_model=GoldSessionResponse, summary="获取黄金白盘/夜盘走势")
+async def get_gold_session_data(
+    source: str,
+    period: str = Query(default="5min", enum=["5min", "15min", "30min", "60min"]),
+    days: int = Query(default=5, ge=1, le=30),
+):
+    """获取国内黄金白盘/夜盘分时走势"""
+    try:
+        collector = get_gold_market_collector()
+        df = collector.get_session_data(source=source, period=period, days=days)
+        if df.empty:
+            raise HTTPException(status_code=404, detail=f"未找到夜盘数据: {source}")
+
+        data = [
+            GoldSessionPoint(
+                date=row["date"].strftime("%Y-%m-%d %H:%M"),
+                close=float(row["close"]),
+                session=str(row["session"]),
+            )
+            for _, row in df.iterrows()
+        ]
+
+        return GoldSessionResponse(
+            source=source.upper(),
+            period=period,
+            days=days,
+            data=data,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"获取黄金时段走势失败 {source}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v1/gold/predict/{source}", summary="预测黄金未来走势")
+async def predict_gold(source: str, request: PredictRequest):
+    """预测指定黄金来源未来收盘走势"""
+    try:
+        collector = get_gold_market_collector()
+        df = collector.get_kline(source, period="daily")
+        if df.empty:
+            raise HTTPException(status_code=404, detail=f"未找到可预测数据: {source}")
+
+        result = run_price_prediction(
+            df=df[["date", "close"]],
+            horizon=request.horizon,
+            lookback=request.lookback,
+        )
+
+        return {
+            "source": source.upper(),
+            "symbol": collector.get_symbol(source),
+            "name": collector.get_source_name(source),
+            **result,
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"预测黄金失败 {source}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

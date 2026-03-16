@@ -1,0 +1,175 @@
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+  <root>
+    <mxCell id="0"/>
+    <mxCell id="1" parent="0"/>
+
+    <!-- User browses -->
+    <mxCell id="2" value="User Browses Website / App" style="rounded=1;whiteSpace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+      <mxGeometry x="440" y="30" width="220" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- Ad Platform serves ad -->
+    <mxCell id="3" value="Ad Platform Serves Ad&#xa;(Google / Meta / TikTok)" style="rounded=1;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="440" y="120" width="220" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- Ad displayed -->
+    <mxCell id="4" value="Ad Displayed&#xa;(Banner / Feed / Search)" style="rounded=1;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="440" y="210" width="220" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- Impression tracked -->
+    <mxCell id="5" value="Impression Tracked&#xa;(Pixel / SDK fires)" style="rounded=0;whiteSpace=wrap;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;dashed=1;" vertex="1" parent="1">
+      <mxGeometry x="720" y="215" width="160" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- User clicks? -->
+    <mxCell id="6" value="User Clicks Ad?" style="rhombus;whiteSpace=wrap;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="470" y="310" width="160" height="80" as="geometry"/>
+    </mxCell>
+
+    <!-- No click - exits -->
+    <mxCell id="7" value="User Ignores / Scrolls Away" style="rounded=1;whiteSpace=wrap;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="720" y="320" width="180" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- Click tracked -->
+    <mxCell id="8" value="Click Event Tracked&#xa;(CPC charged)" style="rounded=0;whiteSpace=wrap;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="180" y="335" width="160" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- Redirect -->
+    <mxCell id="9" value="Redirect via Tracking URL&#xa;(UTM params / click ID)" style="rounded=1;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="440" y="440" width="220" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- Landing page -->
+    <mxCell id="10" value="Landing Page Loaded&#xa;(Product / Promo page)" style="rounded=1;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="440" y="530" width="220" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- Landing page pixel -->
+    <mxCell id="11" value="Page View Pixel Fires&#xa;(Attribution recorded)" style="rounded=0;whiteSpace=wrap;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;dashed=1;" vertex="1" parent="1">
+      <mxGeometry x="720" y="535" width="170" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- User engages? -->
+    <mxCell id="12" value="User Engages?" style="rhombus;whiteSpace=wrap;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="470" y="620" width="160" height="80" as="geometry"/>
+    </mxCell>
+
+    <!-- Bounce -->
+    <mxCell id="13" value="Bounce&#xa;(Leaves page)" style="rounded=1;whiteSpace=wrap;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="720" y="635" width="140" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- Add to cart -->
+    <mxCell id="14" value="Add to Cart / Wishlist" style="rounded=1;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="440" y="740" width="220" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- ATC event -->
+    <mxCell id="15" value="Add-to-Cart Event&#xa;(Conversion pixel)" style="rounded=0;whiteSpace=wrap;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;dashed=1;" vertex="1" parent="1">
+      <mxGeometry x="720" y="745" width="160" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- Checkout -->
+    <mxCell id="16" value="Proceed to Checkout" style="rounded=1;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="440" y="830" width="220" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- Purchase? -->
+    <mxCell id="17" value="Purchase&#xa;Completed?" style="rhombus;whiteSpace=wrap;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="470" y="920" width="160" height="80" as="geometry"/>
+    </mxCell>
+
+    <!-- Abandon -->
+    <mxCell id="18" value="Cart Abandoned&#xa;(Retargeting triggered)" style="rounded=1;whiteSpace=wrap;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="720" y="935" width="180" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- Retarget arrow back -->
+    <mxCell id="19" value="Retarget Ad" style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#b85450;fontColor=#b85450;fontSize=10;" edge="1" source="18" target="3" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="950" y="955"/>
+          <mxPoint x="950" y="145"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Purchase success -->
+    <mxCell id="20" value="Order Confirmed&#xa;(Thank You page)" style="rounded=1;whiteSpace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+      <mxGeometry x="440" y="1040" width="220" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- Purchase event -->
+    <mxCell id="21" value="Purchase Event Fires&#xa;(Revenue / ROAS tracked)" style="rounded=0;whiteSpace=wrap;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;dashed=1;" vertex="1" parent="1">
+      <mxGeometry x="720" y="1045" width="180" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- Post purchase -->
+    <mxCell id="22" value="Post-Purchase&#xa;(Email / Lookalike Audience / LTV)" style="rounded=1;whiteSpace=wrap;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="440" y="1130" width="220" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- Edges -->
+    <mxCell id="e1" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="2" target="3" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e2" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="3" target="4" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e3" value="" style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#d6b656;" edge="1" source="4" target="5" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e4" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="4" target="6" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e5" value="No" style="edgeStyle=orthogonalEdgeStyle;fontStyle=1;fontSize=11;" edge="1" source="6" target="7" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e6" value="Yes" style="edgeStyle=orthogonalEdgeStyle;fontStyle=1;fontSize=11;" edge="1" source="6" target="9" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e6b" value="" style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#d6b656;" edge="1" source="6" target="8" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e7" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="9" target="10" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e8" value="" style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#d6b656;" edge="1" source="10" target="11" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e9" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="10" target="12" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e10" value="No" style="edgeStyle=orthogonalEdgeStyle;fontStyle=1;fontSize=11;" edge="1" source="12" target="13" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e11" value="Yes" style="edgeStyle=orthogonalEdgeStyle;fontStyle=1;fontSize=11;" edge="1" source="12" target="14" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e12" value="" style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#d6b656;" edge="1" source="14" target="15" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e13" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="14" target="16" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e14" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="16" target="17" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e15" value="No" style="edgeStyle=orthogonalEdgeStyle;fontStyle=1;fontSize=11;" edge="1" source="17" target="18" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e16" value="Yes" style="edgeStyle=orthogonalEdgeStyle;fontStyle=1;fontSize=11;" edge="1" source="17" target="20" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e17" value="" style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#d6b656;" edge="1" source="20" target="21" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e18" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="20" target="22" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+  </root>
+</mxGraphModel>

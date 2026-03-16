@@ -6,7 +6,13 @@ import type {
   ApiResponse,
   MarketType,
   KLinePeriod,
-  AdjustType 
+  AdjustType,
+  GoldSource,
+  GoldQuote,
+  GoldPredictResponse,
+  GoldMarketsResponse,
+  GoldCompareResponse,
+  GoldSessionResponse,
 } from '../types'
 
 // API基础配置
@@ -132,6 +138,50 @@ export const hkStockApi = {
     api.get('/hk-stock/ggt'),
 }
 
+// ==================== 黄金 API ====================
+
+export const goldApi = {
+  // 获取可用黄金来源
+  getSources: (group: 'ALL' | 'DOMESTIC' | 'FOREIGN' = 'ALL'): Promise<ApiResponse<GoldSource[]>> =>
+    api.get(`/gold/sources?group=${group}`),
+
+  // 获取黄金市场分组
+  getMarkets: (): Promise<GoldMarketsResponse> =>
+    api.get('/gold/markets'),
+
+  // 获取黄金快照
+  getQuote: (source: string): Promise<GoldQuote> =>
+    api.get(`/gold/quote/${source}`),
+
+  // 获取黄金日线（非K线展示场景也可复用）
+  getKline: (
+    source: string,
+    period: 'daily' | 'weekly' | 'monthly' | '5min' | '15min' | '30min' | '60min' = 'daily',
+    session: 'ALL' | 'DAY' | 'NIGHT' = 'ALL'
+  ): Promise<KLineResponse> =>
+    api.get(`/gold/kline/${source}?period=${period}&session=${session}`),
+
+  // 国内/国外黄金对比
+  getCompare: (
+    group: 'ALL' | 'DOMESTIC' | 'FOREIGN' = 'ALL',
+    period: 'daily' | 'weekly' | 'monthly' = 'daily',
+    session: 'ALL' | 'DAY' | 'NIGHT' = 'ALL'
+  ): Promise<GoldCompareResponse> =>
+    api.get(`/gold/compare?group=${group}&period=${period}&session=${session}`),
+
+  // 黄金白盘/夜盘走势
+  getSession: (
+    source: string,
+    period: '5min' | '15min' | '30min' | '60min' = '5min',
+    days = 5
+  ): Promise<GoldSessionResponse> =>
+    api.get(`/gold/session/${source}?period=${period}&days=${days}`),
+
+  // 获取黄金预测
+  predict: (source: string, horizon = 5, lookback = 240): Promise<GoldPredictResponse> =>
+    api.post(`/gold/predict/${source}`, { horizon, lookback }),
+}
+
 // ==================== 技术指标 API ====================
 
 export const indicatorApi = {
@@ -148,12 +198,20 @@ export const indicatorApi = {
 
 export const stockApi = {
   // 根据市场类型获取股票列表
-  getList: (market: MarketType, limit = 100) => 
-    market === 'CN' ? aStockApi.getList(limit) : hkStockApi.getList(limit),
+  getList: (market: MarketType, limit = 100) => {
+    if (market === 'GOLD') {
+      return Promise.reject(new Error('GOLD 市场不支持股票列表接口'))
+    }
+    return market === 'CN' ? aStockApi.getList(limit) : hkStockApi.getList(limit)
+  },
 
   // 根据市场类型获取股票行情
-  getQuote: (symbol: string, market: MarketType) => 
-    market === 'CN' ? aStockApi.getQuote(symbol) : hkStockApi.getQuote(symbol),
+  getQuote: (symbol: string, market: MarketType) => {
+    if (market === 'GOLD') {
+      return Promise.reject(new Error('GOLD 市场不支持股票行情接口'))
+    }
+    return market === 'CN' ? aStockApi.getQuote(symbol) : hkStockApi.getQuote(symbol)
+  },
 
   // 根据市场类型获取K线
   getKline: (
@@ -163,9 +221,14 @@ export const stockApi = {
     startDate?: string,
     endDate?: string,
     adjust: AdjustType = 'qfq'
-  ) => market === 'CN' 
-    ? aStockApi.getKline(symbol, period, startDate, endDate, adjust)
-    : hkStockApi.getKline(symbol, period, startDate, endDate, adjust),
+  ) => {
+    if (market === 'GOLD') {
+      return Promise.reject(new Error('GOLD 市场不支持股票K线接口'))
+    }
+    return market === 'CN'
+      ? aStockApi.getKline(symbol, period, startDate, endDate, adjust)
+      : hkStockApi.getKline(symbol, period, startDate, endDate, adjust)
+  },
 
   // 获取主要指数
   getMainIndexes: async () => {

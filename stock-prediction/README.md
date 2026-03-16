@@ -43,6 +43,78 @@ stock-prediction/
 
 ## 🚀 快速启动
 
+### 统一入口
+
+```bash
+cd stock-prediction
+python run.py
+```
+
+默认行为：
+
+- 不带参数：启动图形界面（后端 `8000` + 前端 `3000`）
+- 带 `--bot-output-dir`：不启动图形界面，直接生成机器人可读取的巡检报告包
+
+机器人巡检模式示例：
+
+```bash
+cd stock-prediction
+python run.py --bot-output-dir /path/to/openclaw/stock-prediction
+```
+
+OpenClaw 集成也可以直接用：
+
+```bash
+/Users/rootliu/code/stock-prediction/scripts/run_openclaw_report.sh /path/to/openclaw/stock-prediction
+```
+
+或者通过环境变量：
+
+```bash
+export OPENCLAW_OUTPUT_DIR=/path/to/openclaw/stock-prediction
+python run.py
+```
+
+输出目录会生成：
+
+- `manifest.json`
+- `report.md`
+- `gold_quote.json`
+- `gold_prediction.json`
+- `gold_history.csv`
+- `gold_forecast.csv`
+- `gold_compare.csv`
+- `gold_session.csv`
+- `external_gold_survey.csv`
+- `gold_curve_comparison.csv`
+- `gold_external_main_curve.csv`
+- `gold_prediction.png`
+- `gold_compare.png`
+- `gold_session.png`
+- `gold_curve_comparison.png`
+- `gold_summary_table.png`
+- `gold_forecast_table.png`
+- `gold_external_survey_table.png`
+- `gold_curve_comparison_table.png`
+
+机器人模式里的黄金报告现在包含 3 条曲线：
+
+- 外部英文金融网站主曲线：基于英文金融网站 survey 的主线判断，作为主曲线
+- 内部模型曲线：程序短期预测结果
+- 融合曲线：以外部主曲线为主、内部模型为辅的折中结果
+
+黄金主图默认使用：
+
+- 过去 7 天真实走势
+- 未来 5 天预测走势
+- 每 4 小时一个时间点
+
+同时会输出逐日偏离表，并把内部模型相对外部主线的偏离标记为：
+
+- `接近外部主线`
+- `偏离较大(偏多/偏空)`
+- `过于激进(偏多/偏空)`
+
 ### 前端
 
 ```bash
@@ -68,6 +140,7 @@ python main.py
 - 🔔 买卖信号提示
 - 🤖 AI 预测模型
 - 📉 回测系统
+- 🌐 外部英文金融网站黄金共识曲线对比
 
 ## 🛠️ 技术栈
 
@@ -92,17 +165,3 @@ python main.py
 ## 📄 许可证
 
 MIT License
-</content>
-<parameter name="task_progress">
-- [ ] Phase 1: 项目初始化 + 数据采集
-  - [x] 创建项目目录结构
-  - [x] 创建项目需求文档
-  - [x] 初始化Python数据采集服务
-  - [x] 初始化前端React项目
-  - [ ] 创建启动脚本和README
-    - [x] 创建postcss配置
-    - [x] 创建README文档
-- [ ] Phase 2: K线图表 + 技术指标
-- [ ] Phase 3: 预测模型训练
-- [ ] Phase 4: 回测系统
-- [ ] Phase 5: 集成优化

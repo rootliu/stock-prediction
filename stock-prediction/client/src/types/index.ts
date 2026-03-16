@@ -96,7 +96,7 @@ export interface WatchlistItem {
 }
 
 // 市场类型
-export type MarketType = 'CN' | 'HK'
+export type MarketType = 'CN' | 'HK' | 'GOLD'
 
 // K线周期
 export type KLinePeriod = 'daily' | 'weekly' | 'monthly' | '5min' | '15min' | '30min' | '60min'
@@ -136,4 +136,103 @@ export interface SearchResult {
   name: string
   market: 'CN' | 'HK'
   type: 'stock' | 'index' | 'etf'
+}
+
+// 黄金来源
+export interface GoldSource {
+  source: string
+  symbol: string
+  name: string
+  exchange: string
+  description: string
+  market_group: 'DOMESTIC' | 'FOREIGN'
+  supports_intraday: boolean
+  supports_session: boolean
+}
+
+// 黄金行情快照
+export interface GoldQuote {
+  source: string
+  symbol: string
+  name: string
+  price: number
+  change: number
+  pct_change: number
+  high: number
+  low: number
+  open: number
+  volume: number
+  timestamp: string
+  market_group?: 'DOMESTIC' | 'FOREIGN'
+  session?: 'ALL' | 'DAY' | 'NIGHT'
+}
+
+// 预测点
+export interface PredictionPoint {
+  date: string
+  close: number
+}
+
+// 预测评估指标
+export interface PredictionMetrics {
+  mae: number | null
+  mape: number | null
+  train_size: number
+  test_size: number
+}
+
+// 黄金预测响应
+export interface GoldPredictResponse {
+  source: string
+  symbol: string
+  name: string
+  history: PredictionPoint[]
+  prediction: PredictionPoint[]
+  metrics: PredictionMetrics
+  model: {
+    name: string
+    feature_count: number
+  }
+}
+
+// 黄金市场视图
+export interface GoldMarketGroup {
+  key: 'ALL' | 'DOMESTIC' | 'FOREIGN' | 'NIGHT'
+  label: string
+  description: string
+  sources: string[]
+}
+
+export interface GoldMarketsResponse {
+  groups: GoldMarketGroup[]
+  default_predict_source: string
+  default_session_source: string
+}
+
+// 黄金对比图点
+export interface GoldComparePoint {
+  date: string
+  [key: string]: string | number | null
+}
+
+export interface GoldCompareResponse {
+  period: string
+  group: 'ALL' | 'DOMESTIC' | 'FOREIGN'
+  session: 'ALL' | 'DAY' | 'NIGHT'
+  sources: string[]
+  data: GoldComparePoint[]
+}
+
+// 黄金白盘/夜盘点位
+export interface GoldSessionPoint {
+  date: string
+  close: number
+  session: 'DAY' | 'NIGHT'
+}
+
+export interface GoldSessionResponse {
+  source: string
+  period: '5min' | '15min' | '30min' | '60min'
+  days: number
+  data: GoldSessionPoint[]
 }

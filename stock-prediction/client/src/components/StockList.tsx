@@ -1,12 +1,12 @@
 import { FC, useState, useEffect } from 'react'
-import { List, Space, Tag, Empty, Spin, Button } from 'antd'
+import { List, Space, Empty, Spin, Button } from 'antd'
 import { StarOutlined, StarFilled } from '@ant-design/icons'
 import { useAppStore } from '../store'
 import { stockApi } from '../services/api'
-import type { StockQuote, MarketType } from '../types'
+import type { StockQuote } from '../types'
 
 interface StockListProps {
-  market: MarketType
+  market: 'CN' | 'HK'
   isWatchlist?: boolean
 }
 
