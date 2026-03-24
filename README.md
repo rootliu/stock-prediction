@@ -109,6 +109,20 @@ python run.py
 - 未来 5 天预测走势
 - 每 4 小时一个时间点
 
+外部方向因子支持本地 CSV 手动更新，默认路径：
+
+- `/Users/rootliu/code/stock-prediction/ml-service/data/external_direction_signal.csv`
+
+CSV 列格式：
+
+- `published_at,source,direction_score,confidence,half_life_days`
+
+说明：
+
+- `direction_score` 范围 `[-1, 1]`，正值偏多，负值偏空
+- `confidence` 范围 `[0, 1]`
+- `half_life_days` 为观点衰减半衰期（天）
+
 同时会输出逐日偏离表，并把内部模型相对外部主线的偏离标记为：
 
 - `接近外部主线`
@@ -130,6 +144,26 @@ cd stock-prediction/ml-service
 pip install -r requirements.txt
 python main.py
 ```
+
+### 分钟级实盘回测（黄金）
+
+支持 `5min/15min/30min/60min` 分时窗口，以及 `ALL/DAY/NIGHT` 时段过滤。
+
+```bash
+/Users/rootliu/code/stock-prediction/.venv/bin/python \
+  /Users/rootliu/code/stock-prediction/ml-service/backtest/gold_rolling_backtest.py \
+  --source SHFE_AU_MAIN \
+  --period 15min \
+  --session ALL \
+  --lookback 120 \
+  --max-horizon 8 \
+  --stride 2 \
+  --start-date 2026-03-01 \
+  --end-date 2026-03-23 \
+  --output-dir /tmp/gold-backtest-15min
+```
+
+如需 30 分钟窗口，仅把 `--period` 改为 `30min`。
 
 ## ✨ 功能特性
 
