@@ -206,6 +206,13 @@ def run_gold_rolling_backtest(
             "enable_direction_head": True,
             "enable_bias_correction": True,
         },
+        {
+            "model_label": "ensemble_fusion",
+            "model_type": "ensemble",
+            "use_external_direction": False,
+            "enable_direction_head": False,
+            "enable_bias_correction": False,
+        },
     ]
 
     records: List[Dict[str, Any]] = []
@@ -364,7 +371,7 @@ def main() -> int:
     parser.add_argument(
         "--period",
         default="daily",
-        choices=["daily", "weekly", "monthly", "5min", "15min", "30min", "60min"],
+        choices=["daily", "weekly", "monthly", "4h", "5min", "15min", "30min", "60min"],
     )
     parser.add_argument("--session", default="ALL", choices=["ALL", "DAY", "NIGHT"])
     parser.add_argument("--lookback", type=int, default=240)

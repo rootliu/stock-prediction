@@ -156,7 +156,7 @@ export const goldApi = {
   // 获取黄金日线（非K线展示场景也可复用）
   getKline: (
     source: string,
-    period: 'daily' | 'weekly' | 'monthly' | '5min' | '15min' | '30min' | '60min' = 'daily',
+    period: 'daily' | 'weekly' | 'monthly' | '4h' | '5min' | '15min' | '30min' | '60min' = 'daily',
     session: 'ALL' | 'DAY' | 'NIGHT' = 'ALL'
   ): Promise<KLineResponse> =>
     api.get(`/gold/kline/${source}?period=${period}&session=${session}`),
@@ -172,7 +172,7 @@ export const goldApi = {
   // 黄金白盘/夜盘走势
   getSession: (
     source: string,
-    period: '5min' | '15min' | '30min' | '60min' = '5min',
+    period: '4h' | '5min' | '15min' | '30min' | '60min' = '4h',
     days = 5
   ): Promise<GoldSessionResponse> =>
     api.get(`/gold/session/${source}?period=${period}&days=${days}`),

@@ -67,6 +67,10 @@ INTRADAY_PERIOD_MAP = {
     "60min": "60",
 }
 
+DERIVED_INTRADAY_RULE_MAP = {
+    "4h": "4h",
+}
+
 DAY_SESSION_RANGES = [
     (dt_time(9, 0), dt_time(10, 15)),
     (dt_time(10, 30), dt_time(11, 30)),
@@ -366,6 +370,55 @@ class GoldMarketCollector:
         aggregated["pct_change"] = aggregated["close"].pct_change() * 100
         return aggregated
 
+    def _resample_intraday_frame(
+        self,
+        df: pd.DataFrame,
+        rule: str,
+        by_session: bool = False,
+    ) -> pd.DataFrame:
+        """把分时数据聚合到更高周期，例如 4h"""
+        if df.empty:
+            return df
+
+        def _aggregate(frame: pd.DataFrame) -> pd.DataFrame:
+            resampled = (
+                frame.sort_values("date")
+                .set_index("date")
+                .resample(rule, label="right", closed="right")
+                .agg(
+                    {
+                        "open": "first",
+                        "high": "max",
+                        "low": "min",
+                        "close": "last",
+                        "volume": "sum",
+                        "amount": "sum",
+                    }
+                )
+                .dropna(subset=["open", "high", "low", "close"])
+                .reset_index()
+            )
+            resampled["pct_change"] = resampled["close"].pct_change() * 100
+            return resampled
+
+        if by_session and "session" in df.columns:
+            chunks: List[pd.DataFrame] = []
+            for session_name, current in df.groupby("session"):
+                aggregated = _aggregate(current)
+                if aggregated.empty:
+                    continue
+                aggregated["session"] = session_name
+                chunks.append(aggregated)
+            if not chunks:
+                return pd.DataFrame(columns=df.columns)
+            return pd.concat(chunks, ignore_index=True).sort_values("date").reset_index(drop=True)
+
+        aggregated = _aggregate(df)
+        if "session" in df.columns:
+            aggregated["session"] = aggregated["date"].apply(_classify_au_session)
+            aggregated = aggregated[aggregated["session"] != "OFF"].reset_index(drop=True)
+        return aggregated
+
     def get_kline(
         self,
         source: str,
@@ -390,6 +443,9 @@ class GoldMarketCollector:
         else:
             if period in INTRADAY_PERIOD_MAP:
                 df = self._get_shfe_intraday(symbol, period, start_date, end_date, session=session)
+            elif period in DERIVED_INTRADAY_RULE_MAP:
+                base_frame = self._get_shfe_intraday(symbol, "60min", start_date, end_date, session=session)
+                df = self._resample_intraday_frame(base_frame, DERIVED_INTRADAY_RULE_MAP[period])
             else:
                 df = self._get_shfe_daily(symbol, start_date, end_date)
                 if period == "weekly":
@@ -483,7 +539,11 @@ class GoldMarketCollector:
         if not meta["supports_session"]:
             raise ValueError(f"{source_key} 不支持夜盘数据")
 
-        frame = self.get_kline(source_key, period=period, session="ALL")
+        if period == "4h":
+            base_frame = self.get_kline(source_key, period="60min", session="ALL")
+            frame = self._resample_intraday_frame(base_frame, "4h", by_session=True)
+        else:
+            frame = self.get_kline(source_key, period=period, session="ALL")
         if frame.empty:
             return frame
 

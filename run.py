@@ -117,6 +117,7 @@ def _run_bot_mode(args: argparse.Namespace) -> int:
         source=args.report_source,
         horizon=args.horizon,
         lookback=args.lookback,
+        predict_model=args.predict_model,
         compare_days=args.compare_days,
         session_days=args.session_days,
         session_period=args.session_period,
@@ -139,13 +140,19 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--report-source", default="SHFE_AU_MAIN", help="Gold source used in bot mode")
     parser.add_argument("--horizon", type=int, default=5, help="Forecast horizon for bot mode")
-    parser.add_argument("--lookback", type=int, default=240, help="Training lookback window for bot mode")
+    parser.add_argument("--lookback", type=int, default=120, help="Training lookback window for bot mode")
+    parser.add_argument(
+        "--predict-model",
+        default="ensemble",
+        choices=["ensemble", "boosting", "linear"],
+        help="Prediction strategy for gold bot mode",
+    )
     parser.add_argument("--compare-days", type=int, default=180, help="Compare chart lookback in days")
     parser.add_argument("--session-days", type=int, default=5, help="Session chart lookback in days")
     parser.add_argument(
         "--session-period",
-        default="15min",
-        choices=["5min", "15min", "30min", "60min"],
+        default="4h",
+        choices=["4h", "5min", "15min", "30min", "60min"],
         help="Session chart granularity for bot mode",
     )
     parser.add_argument("--host", default="127.0.0.1", help="GUI mode host")

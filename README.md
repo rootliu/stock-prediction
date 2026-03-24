@@ -145,25 +145,67 @@ pip install -r requirements.txt
 python main.py
 ```
 
-### 分钟级实盘回测（黄金）
+### 4 小时预测与回测（黄金）
 
-支持 `5min/15min/30min/60min` 分时窗口，以及 `ALL/DAY/NIGHT` 时段过滤。
+当前默认预测粒度为 `4h`。`15min/30min` 仍可用于研究，但不是主流程默认配置。
 
 ```bash
 /Users/rootliu/code/stock-prediction/.venv/bin/python \
   /Users/rootliu/code/stock-prediction/ml-service/backtest/gold_rolling_backtest.py \
   --source SHFE_AU_MAIN \
-  --period 15min \
+  --period 4h \
   --session ALL \
   --lookback 120 \
-  --max-horizon 8 \
+  --max-horizon 5 \
   --stride 2 \
   --start-date 2026-03-01 \
   --end-date 2026-03-23 \
-  --output-dir /tmp/gold-backtest-15min
+  --output-dir /tmp/gold-backtest-4h
 ```
 
-如需 30 分钟窗口，仅把 `--period` 改为 `30min`。
+Bot 模式默认也会使用 `4h` 作为黄金巡检图表与预测粒度。
+
+当前黄金预测默认策略为 `ensemble`，保留两种回退方式：
+
+- `boosting`
+- `linear`
+
+### Agent 调用索引
+
+如果需要让其它 agent 直接调用黄金预测流程，优先看这两份文档：
+
+- `docs/GOLD_AGENT_USAGE.md`：黄金预测 agent 调用手册，包含默认参数、回退方式、HTTP API 和输出契约
+- `docs/OPENCLAW_INTEGRATION.md`：OpenClaw/cron 无界面巡检接入方式
+
+推荐调用约定：
+
+- 默认粒度使用 `4h`
+- 默认模型使用 `ensemble`
+- 需要回退时显式指定 `boosting` 或 `linear`
+- 机器人模式以下游读取 `manifest.json` 作为完成标记
+- 现阶段不要把 `15min/30min` 作为 agent 默认入口
+
+最小调用示例：
+
+```bash
+/Users/rootliu/code/stock-prediction/scripts/run_openclaw_report.sh /tmp/agent-gold-report
+```
+
+需要显式指定模型时：
+
+```bash
+OPENCLAW_PREDICT_MODEL=ensemble /Users/rootliu/code/stock-prediction/scripts/run_openclaw_report.sh /tmp/agent-gold-report
+OPENCLAW_PREDICT_MODEL=boosting /Users/rootliu/code/stock-prediction/scripts/run_openclaw_report.sh /tmp/agent-gold-report
+OPENCLAW_PREDICT_MODEL=linear /Users/rootliu/code/stock-prediction/scripts/run_openclaw_report.sh /tmp/agent-gold-report
+```
+
+直接调用 API：
+
+```bash
+curl -sS -X POST http://127.0.0.1:8000/api/v1/gold/predict/SHFE_AU_MAIN \
+  -H 'Content-Type: application/json' \
+  -d '{"horizon": 5, "lookback": 120, "model_type": "ensemble"}'
+```
 
 ## ✨ 功能特性
 

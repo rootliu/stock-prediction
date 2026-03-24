@@ -42,6 +42,13 @@ def _resolve_feature_columns(use_external_direction: bool) -> List[str]:
     return BASE_FEATURE_COLUMNS
 
 
+def _format_prediction_date(value: pd.Timestamp) -> str:
+    ts = pd.Timestamp(value)
+    if ts.hour == 0 and ts.minute == 0 and ts.second == 0:
+        return ts.strftime("%Y-%m-%d")
+    return ts.strftime("%Y-%m-%d %H:%M")
+
+
 def _build_feature_frame(
     close: pd.Series,
     dates: pd.Series,
@@ -195,6 +202,49 @@ def _apply_bias_correction(pred_close: float, bias_pct: float) -> float:
     return float(pred_close / denom)
 
 
+def _safe_metric(value: Any, default: float) -> float:
+    if value is None:
+        return float(default)
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return float(default)
+    if np.isnan(numeric):
+        return float(default)
+    return numeric
+
+
+def _close_to_direction_probability(pred_close: float, anchor_close: float) -> float:
+    if pred_close > anchor_close:
+        return 1.0
+    if pred_close < anchor_close:
+        return 0.0
+    return 0.5
+
+
+def _resolve_ensemble_weights(
+    linear_metrics: Dict[str, Any],
+    boosting_metrics: Dict[str, Any],
+) -> Tuple[float, float]:
+    linear_mape = max(_safe_metric(linear_metrics.get("mape"), 5.0), 0.05)
+    boosting_mape = max(_safe_metric(boosting_metrics.get("mape"), 5.0), 0.05)
+    linear_dir = _safe_metric(linear_metrics.get("direction_accuracy"), 50.0)
+    boosting_dir = _safe_metric(boosting_metrics.get("direction_accuracy"), 50.0)
+
+    inv_linear = 1.0 / linear_mape
+    inv_boosting = 1.0 / boosting_mape
+    weight_boosting = inv_boosting / (inv_linear + inv_boosting)
+
+    # Keep the blend reversible and avoid collapsing into a single component.
+    weight_boosting = float(np.clip(weight_boosting, 0.25, 0.75))
+    if linear_dir - boosting_dir >= 5:
+        weight_boosting = min(weight_boosting, 0.6)
+    elif boosting_dir - linear_dir >= 5:
+        weight_boosting = max(weight_boosting, 0.4)
+
+    return float(1.0 - weight_boosting), float(weight_boosting)
+
+
 def _build_bias_calibration_map(
     history_data: pd.DataFrame,
     reg_model: Any,
@@ -306,6 +356,158 @@ def _build_bias_calibration_map(
     return result
 
 
+def _run_ensemble_prediction(
+    df: pd.DataFrame,
+    horizon: int,
+    lookback: int,
+    external_direction_csv: str | None,
+    calibration_origin_cap: int,
+    future_step_hours: int | None,
+) -> Dict[str, Any]:
+    linear_result = run_price_prediction(
+        df=df,
+        horizon=horizon,
+        lookback=lookback,
+        model_type="linear",
+        use_external_direction=False,
+        external_direction_csv=external_direction_csv,
+        enable_direction_head=False,
+        enable_bias_correction=False,
+        calibration_origin_cap=calibration_origin_cap,
+        future_step_hours=future_step_hours,
+    )
+    boosting_result = run_price_prediction(
+        df=df,
+        horizon=horizon,
+        lookback=lookback,
+        model_type="boosting",
+        use_external_direction=True,
+        external_direction_csv=external_direction_csv,
+        enable_direction_head=True,
+        enable_bias_correction=True,
+        calibration_origin_cap=calibration_origin_cap,
+        future_step_hours=future_step_hours,
+    )
+
+    anchor_close = float(linear_result["history"][-1]["close"])
+    linear_weight, boosting_weight = _resolve_ensemble_weights(
+        linear_result["metrics"],
+        boosting_result["metrics"],
+    )
+    linear_dir_acc = _safe_metric(linear_result["metrics"].get("direction_accuracy"), 50.0)
+    boosting_dir_acc = _safe_metric(boosting_result["metrics"].get("direction_accuracy"), 50.0)
+
+    forecast_dates = pd.to_datetime([item["date"] for item in boosting_result["prediction"]])
+    external_future = build_external_direction_features(
+        pd.Series(forecast_dates),
+        csv_path=external_direction_csv,
+        allow_fallback=True,
+    ).reset_index(drop=True)
+
+    predictions: List[Dict[str, Any]] = []
+    for idx in range(horizon):
+        linear_point = linear_result["prediction"][idx]
+        boosting_point = boosting_result["prediction"][idx]
+
+        linear_close = float(linear_point["close"])
+        boosting_close = float(boosting_point["close"])
+        linear_delta = linear_close - anchor_close
+        boosting_delta = boosting_close - anchor_close
+
+        linear_prob = _close_to_direction_probability(linear_close, anchor_close)
+        boosting_prob = boosting_point.get("up_probability")
+        if boosting_prob is None:
+            boosting_prob = _close_to_direction_probability(boosting_close, anchor_close)
+        else:
+            boosting_prob = float(boosting_prob)
+
+        blended_close = (linear_weight * linear_close) + (boosting_weight * boosting_close)
+        blended_prob = (linear_weight * linear_prob) + (boosting_weight * boosting_prob)
+
+        linear_sign = np.sign(linear_delta)
+        boosting_sign = np.sign(boosting_delta)
+        if linear_sign != 0 and boosting_sign != 0 and linear_sign != boosting_sign:
+            if linear_dir_acc - boosting_dir_acc >= 5:
+                blended_close = anchor_close + (linear_sign * abs(boosting_delta))
+                blended_prob = (0.65 * linear_prob) + (0.35 * boosting_prob)
+            else:
+                blended_close = anchor_close + ((blended_close - anchor_close) * 0.35)
+                blended_prob = 0.5 + ((blended_prob - 0.5) * 0.6)
+
+        ext_level = float(external_future.iloc[idx]["ext_dir_level"])
+        ext_conf = float(np.clip(external_future.iloc[idx]["ext_conf_level"] / 1.5, 0.0, 1.0))
+        ext_sign = np.sign(ext_level)
+        blended_sign = np.sign(blended_close - anchor_close)
+        if ext_sign != 0 and blended_sign != 0 and blended_sign != ext_sign and abs(ext_level) >= 0.08 and ext_conf >= 0.25:
+            clamp = 0.55 if ext_conf >= 0.5 else 0.7
+            blended_close = anchor_close + ((blended_close - anchor_close) * clamp)
+            blended_prob = 0.5 + ((blended_prob - 0.5) * clamp)
+
+        blended_prob = float(np.clip(blended_prob, 0.0, 1.0))
+        predictions.append(
+            {
+                "date": boosting_point["date"],
+                "close": float(blended_close),
+                "up_probability": blended_prob,
+                "bias_correction_pct": boosting_point.get("bias_correction_pct"),
+                "regime": boosting_point.get("regime", "normal"),
+            }
+        )
+
+    metrics = {
+        "mae": round(
+            (linear_weight * _safe_metric(linear_result["metrics"].get("mae"), 0.0))
+            + (boosting_weight * _safe_metric(boosting_result["metrics"].get("mae"), 0.0)),
+            6,
+        ),
+        "mape": round(
+            (linear_weight * _safe_metric(linear_result["metrics"].get("mape"), 0.0))
+            + (boosting_weight * _safe_metric(boosting_result["metrics"].get("mape"), 0.0)),
+            6,
+        ),
+        "direction_accuracy": round(
+            (linear_weight * linear_dir_acc) + (boosting_weight * boosting_dir_acc),
+            6,
+        ),
+        "direction_head_accuracy": boosting_result["metrics"].get("direction_head_accuracy"),
+        "train_size": max(
+            int(_safe_metric(linear_result["metrics"].get("train_size"), 0)),
+            int(_safe_metric(boosting_result["metrics"].get("train_size"), 0)),
+        ),
+        "test_size": max(
+            int(_safe_metric(linear_result["metrics"].get("test_size"), 0)),
+            int(_safe_metric(boosting_result["metrics"].get("test_size"), 0)),
+        ),
+    }
+
+    return {
+        "history": boosting_result["history"],
+        "prediction": predictions,
+        "metrics": metrics,
+        "model": {
+            "name": "ensemble_linear_boosting_external_v1",
+            "feature_count": int(
+                _safe_metric(linear_result["model"].get("feature_count"), 0)
+                + _safe_metric(boosting_result["model"].get("feature_count"), 0)
+            ),
+            "use_external_direction": True,
+            "enable_direction_head": True,
+            "enable_bias_correction": True,
+            "ensemble": {
+                "linear_weight": round(linear_weight, 4),
+                "boosting_weight": round(boosting_weight, 4),
+                "disagreement_policy": "linear_sign_or_shrink",
+                "external_veto": True,
+                "fallback_models": ["boosting", "linear"],
+            },
+            "components": {
+                "linear": linear_result["model"],
+                "boosting": boosting_result["model"],
+            },
+        },
+    }
+
+
 def run_price_prediction(
     df: pd.DataFrame,
     horizon: int = 5,
@@ -316,6 +518,7 @@ def run_price_prediction(
     enable_direction_head: bool = True,
     enable_bias_correction: bool = True,
     calibration_origin_cap: int = 8,
+    future_step_hours: int | None = None,
 ) -> Dict[str, Any]:
     if "date" not in df.columns or "close" not in df.columns:
         raise ValueError("输入数据缺少 date 或 close 列")
@@ -323,6 +526,15 @@ def run_price_prediction(
         raise ValueError("horizon 取值范围应为 1~30")
     if lookback < 60:
         raise ValueError("lookback 不能小于 60")
+    if model_type.lower() == "ensemble":
+        return _run_ensemble_prediction(
+            df=df,
+            horizon=horizon,
+            lookback=lookback,
+            external_direction_csv=external_direction_csv,
+            calibration_origin_cap=calibration_origin_cap,
+            future_step_hours=future_step_hours,
+        )
 
     data = df[["date", "close"]].copy()
     data["date"] = pd.to_datetime(data["date"])
@@ -430,7 +642,12 @@ def run_price_prediction(
 
     rolling_window = history_data["close"].tolist()
     last_date = history_data["date"].iloc[-1]
-    future_dates = pd.bdate_range(last_date + timedelta(days=1), periods=horizon)
+    if future_step_hours is not None:
+        future_dates = pd.DatetimeIndex(
+            [pd.Timestamp(last_date) + timedelta(hours=future_step_hours * step) for step in range(1, horizon + 1)]
+        )
+    else:
+        future_dates = pd.bdate_range(last_date + timedelta(days=1), periods=horizon)
 
     external_timeline = None
     if use_external_direction:
@@ -466,7 +683,7 @@ def run_price_prediction(
         rolling_window.append(pred_close)
         predictions.append(
             {
-                "date": future_date.strftime("%Y-%m-%d"),
+                "date": _format_prediction_date(future_date),
                 "close": pred_close,
                 "up_probability": up_prob,
                 "bias_correction_pct": bias_pct,
@@ -476,7 +693,7 @@ def run_price_prediction(
 
     history = [
         {
-            "date": row["date"].strftime("%Y-%m-%d"),
+            "date": _format_prediction_date(pd.Timestamp(row["date"])),
             "close": float(row["close"]),
         }
         for _, row in history_data.iterrows()
