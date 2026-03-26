@@ -381,20 +381,25 @@ class GoldMarketCollector:
             return df
 
         def _aggregate(frame: pd.DataFrame) -> pd.DataFrame:
+            agg_map = {
+                "open": "first",
+                "high": "max",
+                "low": "min",
+                "close": "last",
+                "volume": "sum",
+                "amount": "sum",
+            }
+            if "session" in frame.columns:
+                # Preserve the source session instead of reclassifying on the
+                # resampled timestamp, otherwise the 16:00 day-close bucket is
+                # incorrectly dropped as OFF.
+                agg_map["session"] = "last"
+
             resampled = (
                 frame.sort_values("date")
                 .set_index("date")
                 .resample(rule, label="right", closed="right")
-                .agg(
-                    {
-                        "open": "first",
-                        "high": "max",
-                        "low": "min",
-                        "close": "last",
-                        "volume": "sum",
-                        "amount": "sum",
-                    }
-                )
+                .agg(agg_map)
                 .dropna(subset=["open", "high", "low", "close"])
                 .reset_index()
             )
@@ -414,7 +419,7 @@ class GoldMarketCollector:
             return pd.concat(chunks, ignore_index=True).sort_values("date").reset_index(drop=True)
 
         aggregated = _aggregate(df)
-        if "session" in df.columns:
+        if "session" not in aggregated.columns and "session" in df.columns:
             aggregated["session"] = aggregated["date"].apply(_classify_au_session)
             aggregated = aggregated[aggregated["session"] != "OFF"].reset_index(drop=True)
         return aggregated

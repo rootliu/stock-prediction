@@ -4,3 +4,9 @@ node_modules/
 .venv/
 client/dist/
 bot-output/
+__pycache__/
+*.pyc
+*.pyo
+.python312/
+.tmp/
+analysis_outputs/

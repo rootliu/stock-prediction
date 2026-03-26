@@ -5,7 +5,7 @@ Price prediction baseline with optional boosting and external direction factors.
 from __future__ import annotations
 
 from datetime import timedelta
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 import pandas as pd
@@ -363,6 +363,7 @@ def _run_ensemble_prediction(
     external_direction_csv: str | None,
     calibration_origin_cap: int,
     future_step_hours: int | None,
+    future_dates: Sequence[pd.Timestamp] | None = None,
 ) -> Dict[str, Any]:
     linear_result = run_price_prediction(
         df=df,
@@ -375,6 +376,7 @@ def _run_ensemble_prediction(
         enable_bias_correction=False,
         calibration_origin_cap=calibration_origin_cap,
         future_step_hours=future_step_hours,
+        future_dates=future_dates,
     )
     boosting_result = run_price_prediction(
         df=df,
@@ -387,6 +389,7 @@ def _run_ensemble_prediction(
         enable_bias_correction=True,
         calibration_origin_cap=calibration_origin_cap,
         future_step_hours=future_step_hours,
+        future_dates=future_dates,
     )
 
     anchor_close = float(linear_result["history"][-1]["close"])
@@ -397,7 +400,7 @@ def _run_ensemble_prediction(
     linear_dir_acc = _safe_metric(linear_result["metrics"].get("direction_accuracy"), 50.0)
     boosting_dir_acc = _safe_metric(boosting_result["metrics"].get("direction_accuracy"), 50.0)
 
-    forecast_dates = pd.to_datetime([item["date"] for item in boosting_result["prediction"]])
+    forecast_dates = pd.to_datetime([item["date"] for item in boosting_result["prediction"]], format="mixed")
     external_future = build_external_direction_features(
         pd.Series(forecast_dates),
         csv_path=external_direction_csv,
@@ -519,6 +522,7 @@ def run_price_prediction(
     enable_bias_correction: bool = True,
     calibration_origin_cap: int = 8,
     future_step_hours: int | None = None,
+    future_dates: Sequence[pd.Timestamp] | None = None,
 ) -> Dict[str, Any]:
     if "date" not in df.columns or "close" not in df.columns:
         raise ValueError("输入数据缺少 date 或 close 列")
@@ -534,6 +538,7 @@ def run_price_prediction(
             external_direction_csv=external_direction_csv,
             calibration_origin_cap=calibration_origin_cap,
             future_step_hours=future_step_hours,
+            future_dates=future_dates,
         )
 
     data = df[["date", "close"]].copy()
@@ -642,7 +647,11 @@ def run_price_prediction(
 
     rolling_window = history_data["close"].tolist()
     last_date = history_data["date"].iloc[-1]
-    if future_step_hours is not None:
+    if future_dates is not None:
+        future_dates = pd.DatetimeIndex(pd.to_datetime(list(future_dates)))
+        if len(future_dates) != horizon:
+            raise ValueError("future_dates 的长度必须与 horizon 一致")
+    elif future_step_hours is not None:
         future_dates = pd.DatetimeIndex(
             [pd.Timestamp(last_date) + timedelta(hours=future_step_hours * step) for step in range(1, horizon + 1)]
         )
