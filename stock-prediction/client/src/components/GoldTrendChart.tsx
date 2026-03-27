@@ -32,7 +32,7 @@ const GoldTrendChart: FC = () => {
   const [sources, setSources] = useState<GoldSource[]>([])
   const [selectedSource, setSelectedSource] = useState<string>('')
   const [horizon, setHorizon] = useState<number>(5)
-  const [sessionPeriod, setSessionPeriod] = useState<'5min' | '15min' | '30min' | '60min'>('5min')
+  const [sessionPeriod, setSessionPeriod] = useState<'4h' | '5min' | '15min' | '30min' | '60min'>('4h')
 
   const [loadingPredict, setLoadingPredict] = useState(false)
   const [loadingCompare, setLoadingCompare] = useState(false)
@@ -70,7 +70,7 @@ const GoldTrendChart: FC = () => {
       try {
         const [quoteRes, predictRes] = await Promise.all([
           goldApi.getQuote(selectedSource),
-          goldApi.predict(selectedSource, horizon, 240),
+          goldApi.predict(selectedSource, horizon, 120),
         ])
         setQuote(quoteRes)
         setPredictData(predictRes)
@@ -443,7 +443,7 @@ const GoldTrendChart: FC = () => {
               type="info"
               showIcon
               message="国内黄金白盘 / 夜盘"
-              description="当前展示 SHFE 黄金主力连续合约最近 5 天的白盘与夜盘分时走势。"
+              description="当前展示 SHFE 黄金主力连续合约最近 5 天的白盘与夜盘走势，默认按 4 小时聚合。"
               style={{ flex: 1 }}
             />
             <Radio.Group
@@ -453,9 +453,8 @@ const GoldTrendChart: FC = () => {
               buttonStyle="solid"
               size="small"
             >
+              <Radio.Button value="4h">4 小时</Radio.Button>
               <Radio.Button value="5min">5 分钟</Radio.Button>
-              <Radio.Button value="15min">15 分钟</Radio.Button>
-              <Radio.Button value="30min">30 分钟</Radio.Button>
               <Radio.Button value="60min">60 分钟</Radio.Button>
             </Radio.Group>
           </div>

@@ -102,6 +102,17 @@ def _round_frame(frame: pd.DataFrame, decimals: int = 2) -> pd.DataFrame:
     return rounded
 
 
+def _format_timestamp_value(value: Any) -> str:
+    ts = pd.Timestamp(value)
+    if ts.hour == 0 and ts.minute == 0 and ts.second == 0:
+        return ts.strftime("%Y-%m-%d")
+    return ts.strftime("%Y-%m-%d %H:%M")
+
+
+def _format_timestamp_series(series: pd.Series) -> pd.Series:
+    return pd.to_datetime(series).map(_format_timestamp_value)
+
+
 def _save_line_chart(
     path: Path,
     series: Iterable[tuple[str, pd.Series, pd.Series, str, str]],
@@ -227,14 +238,43 @@ def _build_four_hour_forecast_frame(
     return pd.DataFrame({"date": target_dates, "close": np.round(target_values, 2)})
 
 
+def _resolve_prediction_source_frame(
+    collector: Any,
+    source: str,
+    lookback: int,
+    end_date: str,
+) -> tuple[pd.DataFrame, str, int, int | None]:
+    source_meta = next(
+        (item for item in collector.get_sources("ALL") if item["source"] == source.upper()),
+        {},
+    )
+    if source_meta.get("supports_intraday"):
+        intraday_start = (datetime.now() - timedelta(days=max(lookback * 3, 120))).strftime("%Y-%m-%d")
+        intraday_df = collector.get_kline(
+            source,
+            period="4h",
+            start_date=intraday_start,
+            end_date=end_date,
+            session="ALL",
+        )
+        if not intraday_df.empty and len(intraday_df) >= 80:
+            resolved_lookback = min(lookback, max(len(intraday_df) - 6, 60))
+            return intraday_df[["date", "close"]].copy(), "4h", resolved_lookback, 4
+
+    daily_start = (datetime.now() - timedelta(days=max(180, lookback * 3))).strftime("%Y-%m-%d")
+    daily_df = collector.get_kline(source, period="daily", start_date=daily_start, end_date=end_date)
+    return daily_df[["date", "close"]].copy(), "daily", lookback, None
+
+
 def generate_gold_report_bundle(
     output_dir: str | Path,
     source: str = "SHFE_AU_MAIN",
     horizon: int = 5,
     lookback: int = 240,
+    predict_model: str = "ensemble",
     compare_days: int = 180,
     session_days: int = 5,
-    session_period: str = "15min",
+    session_period: str = "4h",
 ) -> Dict[str, Any]:
     collector = get_gold_market_collector()
     output_path = _ensure_dir(Path(output_dir).expanduser().resolve())
@@ -246,12 +286,26 @@ def generate_gold_report_bundle(
     compare_start = (today - timedelta(days=compare_days)).strftime("%Y-%m-%d")
     intraday_start = (today - timedelta(days=7)).strftime("%Y-%m-%d")
 
-    history_df = collector.get_kline(source, period="daily", start_date=history_start, end_date=today_str)
-    if history_df.empty:
+    predict_input_df, predict_period, resolved_lookback, future_step_hours = _resolve_prediction_source_frame(
+        collector=collector,
+        source=source,
+        lookback=lookback,
+        end_date=today_str,
+    )
+    if predict_input_df.empty:
         raise RuntimeError(f"无法获取 {source} 的历史数据，无法生成巡检报告")
 
     quote = collector.get_latest_quote(source)
-    predict_result = run_price_prediction(history_df[["date", "close"]], horizon=horizon, lookback=lookback)
+    predict_result = run_price_prediction(
+        predict_input_df,
+        horizon=horizon,
+        lookback=resolved_lookback,
+        model_type=predict_model,
+        use_external_direction=(predict_model == "boosting" and predict_period == "4h"),
+        enable_direction_head=(predict_model == "boosting" and predict_period == "4h"),
+        enable_bias_correction=(predict_model == "boosting" and predict_period == "4h"),
+        future_step_hours=future_step_hours,
+    )
     compare_df = collector.compare_sources(
         period="daily",
         start_date=compare_start,
@@ -260,7 +314,7 @@ def generate_gold_report_bundle(
         session="ALL",
     )
     session_df = collector.get_session_data(source=source, period=session_period, days=session_days)
-    intraday_context_df = collector.get_kline(source, period="60min", start_date=intraday_start, end_date=today_str, session="ALL")
+    intraday_context_df = collector.get_kline(source, period="4h", start_date=intraday_start, end_date=today_str, session="ALL")
 
     history_frame = _round_frame(pd.DataFrame(predict_result["history"]))
     forecast_frame = _round_frame(pd.DataFrame(predict_result["prediction"]))
@@ -268,25 +322,34 @@ def generate_gold_report_bundle(
     session_frame = _round_frame(session_df[["date", "close", "session"]].copy()) if not session_df.empty else pd.DataFrame(columns=["date", "close", "session"])
 
     if not history_frame.empty:
-        history_frame["date"] = pd.to_datetime(history_frame["date"])
+        history_frame["date"] = pd.to_datetime(history_frame["date"], format="mixed")
     if not forecast_frame.empty:
-        forecast_frame["date"] = pd.to_datetime(forecast_frame["date"])
+        forecast_frame["date"] = pd.to_datetime(forecast_frame["date"], format="mixed")
     if not compare_frame.empty:
-        compare_frame["date"] = pd.to_datetime(compare_frame["date"])
+        compare_frame["date"] = pd.to_datetime(compare_frame["date"], format="mixed")
     if not session_frame.empty:
-        session_frame["date"] = pd.to_datetime(session_frame["date"])
+        session_frame["date"] = pd.to_datetime(session_frame["date"], format="mixed")
 
     latest_price = float(quote["price"]) if quote and quote.get("price") is not None else None
-    if latest_price is None and not history_df.empty:
-        latest_price = float(history_df.iloc[-1]["close"])
+    if latest_price is None and not predict_input_df.empty:
+        latest_price = float(predict_input_df.iloc[-1]["close"])
     assessment = _build_assessment(latest_price, forecast_frame, predict_result["metrics"])
 
-    intraday_context_frame = _resample_close_to_four_hour(intraday_context_df[["date", "close"]]) if not intraday_context_df.empty else pd.DataFrame(columns=["date", "close"])
+    intraday_context_frame = intraday_context_df[["date", "close"]].copy() if not intraday_context_df.empty else pd.DataFrame(columns=["date", "close"])
     if intraday_context_frame.empty and not history_frame.empty:
         intraday_context_frame = history_frame.tail(7)[["date", "close"]].copy()
 
-    reference_time = pd.to_datetime(intraday_context_frame["date"]).max() if not intraday_context_frame.empty else pd.Timestamp(today.replace(minute=0, second=0, microsecond=0))
-    forecast_4h_frame = _build_four_hour_forecast_frame(latest_price=latest_price, forecast_frame=forecast_frame, reference_time=reference_time)
+    reference_time = pd.to_datetime(intraday_context_frame["date"], format="mixed").max() if not intraday_context_frame.empty else pd.Timestamp(today.replace(minute=0, second=0, microsecond=0))
+    if predict_period == "4h":
+        forecast_4h_frame = forecast_frame.copy()
+        if not forecast_4h_frame.empty:
+            forecast_4h_frame["date"] = pd.to_datetime(forecast_4h_frame["date"], format="mixed")
+    else:
+        forecast_4h_frame = _build_four_hour_forecast_frame(
+            latest_price=latest_price,
+            forecast_frame=forecast_frame,
+            reference_time=reference_time,
+        )
 
     prediction_chart = output_path / "gold_prediction.png"
     compare_chart = output_path / "gold_compare.png"
@@ -316,7 +379,10 @@ def generate_gold_report_bundle(
             {"Metric": "Latest Price", "Value": round(float(latest_price), 2) if latest_price is not None else "--"},
             {"Metric": "Latest Session", "Value": quote.get("session", "ALL") if quote else "--"},
             {"Metric": "Predict Horizon", "Value": horizon},
+            {"Metric": "Predict Period", "Value": predict_period},
+            {"Metric": "Predict Model", "Value": predict_model},
             {"Metric": "Lookback", "Value": lookback},
+            {"Metric": "Resolved Lookback", "Value": resolved_lookback},
             {"Metric": "MAE", "Value": _display_metric(predict_result["metrics"].get("mae"))},
             {"Metric": "MAPE", "Value": _display_metric(predict_result["metrics"].get("mape"))},
             {"Metric": "T+1 Forecast", "Value": round(float(forecast_frame.iloc[0]["close"]), 2) if not forecast_frame.empty else "--"},
@@ -392,9 +458,9 @@ def generate_gold_report_bundle(
         curve_chart,
         [
             ("Actual 4H", intraday_context_frame["date"], intraday_context_frame["close"], COLOR_MAP["actual"], "-"),
-            ("External Main", pd.to_datetime(curve_frame["date"]), curve_frame["external_main"], COLOR_MAP["external_main"], "-"),
-            ("Internal Model", pd.to_datetime(curve_frame["date"]), curve_frame["internal_model"], COLOR_MAP["internal_model"], "--"),
-            ("Blended Curve", pd.to_datetime(curve_frame["date"]), curve_frame["blended_curve"], COLOR_MAP["blended_curve"], "-."),
+            ("External Main", pd.to_datetime(curve_frame["date"], format="mixed"), curve_frame["external_main"], COLOR_MAP["external_main"], "-"),
+            ("Internal Model", pd.to_datetime(curve_frame["date"], format="mixed"), curve_frame["internal_model"], COLOR_MAP["internal_model"], "--"),
+            ("Blended Curve", pd.to_datetime(curve_frame["date"], format="mixed"), curve_frame["blended_curve"], COLOR_MAP["blended_curve"], "-."),
         ],
         title="Gold Past Week + Next 5 Days (4H)",
         ylabel="Price",
@@ -430,8 +496,15 @@ def generate_gold_report_bundle(
 
     _write_json(output_path / "gold_quote.json", quote_payload)
     _write_json(output_path / "gold_prediction.json", prediction_payload)
-    _write_csv(output_path / "gold_history.csv", _round_frame(history_frame.assign(date=history_frame["date"].dt.strftime("%Y-%m-%d"))))
-    _write_csv(output_path / "gold_forecast.csv", _round_frame(forecast_frame.assign(date=forecast_frame["date"].dt.strftime("%Y-%m-%d"))))
+    history_output = history_frame.copy()
+    if not history_output.empty:
+        history_output["date"] = _format_timestamp_series(history_output["date"])
+    _write_csv(output_path / "gold_history.csv", _round_frame(history_output))
+
+    forecast_output = forecast_frame.copy()
+    if not forecast_output.empty:
+        forecast_output["date"] = _format_timestamp_series(forecast_output["date"])
+    _write_csv(output_path / "gold_forecast.csv", _round_frame(forecast_output))
 
     compare_output = compare_frame.copy()
     if not compare_output.empty:
@@ -446,7 +519,7 @@ def generate_gold_report_bundle(
     _write_csv(output_path / "gold_curve_comparison.csv", curve_compare_frame)
     curve_output = pd.merge(
         intraday_context_frame.rename(columns={"close": "actual_4h"}),
-        curve_frame.assign(date=pd.to_datetime(curve_frame["date"])),
+        curve_frame.assign(date=pd.to_datetime(curve_frame["date"], format="mixed")),
         on="date",
         how="outer",
     ).sort_values("date")
@@ -461,6 +534,8 @@ def generate_gold_report_bundle(
         f"- 最新价格: {quote.get('price', '--') if quote else '--'}",
         f"- 最新时段: {quote.get('session', '--') if quote else '--'}",
         f"- 预测步长: {horizon}",
+        f"- 预测粒度: {predict_period}",
+        f"- 预测模型: {predict_model}",
         "",
         "## 预测摘要",
         "",

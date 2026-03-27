@@ -1,0 +1,2 @@
+﻿source_id,issue
+SGE_AU9999_SPOT,"Current accessible feed only provides daily historical spot bars, not reproducible 4h history. Excluded from strict 4h rerun rather than approximated."

@@ -1,0 +1,7 @@
+﻿source_id,source_name,exchange,market_type,model,recent_origin_count,forecast_day_close_count,samples,mae,rmse,mape_pct,bias_pct,directional_accuracy_pct
+COMEX_GC,"COMEX Gold Futures (4h, Asia/Shanghai bins)",COMEX,futures,boosting,20,7,140,238.6779,326.6163,4.7932,0.2656,44.29
+COMEX_GC,"COMEX Gold Futures (4h, Asia/Shanghai bins)",COMEX,futures,ensemble,20,7,140,199.7698,272.262,3.9965,0.6285,52.86
+COMEX_GC,"COMEX Gold Futures (4h, Asia/Shanghai bins)",COMEX,futures,linear,20,7,140,392.4479,631.9641,7.7536,1.4252,57.14
+SHFE_AU_MAIN,SHFE Gold Main Futures,SHFE,futures,boosting,20,7,140,59.5618,84.2238,5.3701,0.7749,50.0
+SHFE_AU_MAIN,SHFE Gold Main Futures,SHFE,futures,ensemble,20,7,140,55.8068,79.6478,4.996,2.1556,51.43
+SHFE_AU_MAIN,SHFE Gold Main Futures,SHFE,futures,linear,20,7,140,56.6455,70.632,5.093,1.6592,62.14

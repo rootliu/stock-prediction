@@ -99,7 +99,7 @@ export interface WatchlistItem {
 export type MarketType = 'CN' | 'HK' | 'GOLD'
 
 // K线周期
-export type KLinePeriod = 'daily' | 'weekly' | 'monthly' | '5min' | '15min' | '30min' | '60min'
+export type KLinePeriod = 'daily' | 'weekly' | 'monthly' | '4h' | '5min' | '15min' | '30min' | '60min'
 
 // 复权类型
 export type AdjustType = 'qfq' | 'hfq' | ''
@@ -171,12 +171,17 @@ export interface GoldQuote {
 export interface PredictionPoint {
   date: string
   close: number
+  up_probability?: number | null
+  bias_correction_pct?: number | null
+  regime?: string
 }
 
 // 预测评估指标
 export interface PredictionMetrics {
   mae: number | null
   mape: number | null
+  direction_accuracy?: number | null
+  direction_head_accuracy?: number | null
   train_size: number
   test_size: number
 }
@@ -186,12 +191,17 @@ export interface GoldPredictResponse {
   source: string
   symbol: string
   name: string
+  period?: string
+  lookback?: number
   history: PredictionPoint[]
   prediction: PredictionPoint[]
   metrics: PredictionMetrics
   model: {
     name: string
     feature_count: number
+    use_external_direction?: boolean
+    enable_direction_head?: boolean
+    enable_bias_correction?: boolean
   }
 }
 
@@ -232,7 +242,7 @@ export interface GoldSessionPoint {
 
 export interface GoldSessionResponse {
   source: string
-  period: '5min' | '15min' | '30min' | '60min'
+  period: '4h' | '5min' | '15min' | '30min' | '60min'
   days: number
   data: GoldSessionPoint[]
 }

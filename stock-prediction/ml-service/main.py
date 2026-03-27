@@ -3,7 +3,7 @@
 FastAPI 服务提供股票数据、技术分析和预测API
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Any
 from contextlib import asynccontextmanager
 
@@ -11,6 +11,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from loguru import logger
+import pandas as pd
 
 from data_collector import (
     get_a_stock_collector,
@@ -113,6 +114,7 @@ class PredictRequest(BaseModel):
     """预测请求参数"""
     horizon: int = Field(default=5, ge=1, le=30, description="预测未来天数")
     lookback: int = Field(default=240, ge=60, le=2000, description="建模历史窗口")
+    model_type: str = Field(default="ensemble", pattern="^(linear|boosting|ensemble)$", description="预测模型策略")
 
 
 class GoldSessionPoint(BaseModel):
@@ -524,7 +526,7 @@ async def get_gold_quote(source: str):
 @app.get("/api/v1/gold/kline/{source}", response_model=KLineResponse, summary="获取黄金K线")
 async def get_gold_kline(
     source: str,
-    period: str = Query(default="daily", enum=["daily", "weekly", "monthly", "5min", "15min", "30min", "60min"]),
+    period: str = Query(default="daily", enum=["daily", "weekly", "monthly", "4h", "5min", "15min", "30min", "60min"]),
     start_date: Optional[str] = Query(default=None, description="开始日期 YYYYMMDD 或 YYYY-MM-DD"),
     end_date: Optional[str] = Query(default=None, description="结束日期 YYYYMMDD 或 YYYY-MM-DD"),
     session: str = Query(default="ALL", enum=["ALL", "DAY", "NIGHT"]),
@@ -546,7 +548,7 @@ async def get_gold_kline(
         for _, row in df.iterrows():
             data.append(
                 KLineData(
-                    date=row["date"].strftime("%Y-%m-%d %H:%M") if period in {"5min", "15min", "30min", "60min"} else row["date"].strftime("%Y-%m-%d"),
+                    date=row["date"].strftime("%Y-%m-%d %H:%M") if period in {"4h", "5min", "15min", "30min", "60min"} else row["date"].strftime("%Y-%m-%d"),
                     open=float(row["open"]),
                     high=float(row["high"]),
                     low=float(row["low"]),
@@ -622,7 +624,7 @@ async def compare_gold_sources(
 @app.get("/api/v1/gold/session/{source}", response_model=GoldSessionResponse, summary="获取黄金白盘/夜盘走势")
 async def get_gold_session_data(
     source: str,
-    period: str = Query(default="5min", enum=["5min", "15min", "30min", "60min"]),
+    period: str = Query(default="4h", enum=["4h", "5min", "15min", "30min", "60min"]),
     days: int = Query(default=5, ge=1, le=30),
 ):
     """获取国内黄金白盘/夜盘分时走势"""
@@ -661,20 +663,55 @@ async def predict_gold(source: str, request: PredictRequest):
     """预测指定黄金来源未来收盘走势"""
     try:
         collector = get_gold_market_collector()
-        df = collector.get_kline(source, period="daily")
+        source_meta = next(
+            (item for item in collector.get_sources("ALL") if item["source"] == source.upper()),
+            {},
+        )
+        predict_period = "daily"
+        future_step_hours = None
+        resolved_lookback = request.lookback
+
+        df = pd.DataFrame()
+        if source_meta.get("supports_intraday"):
+            intraday_start = (datetime.now() - timedelta(days=max(request.lookback * 3, 120))).strftime("%Y-%m-%d")
+            intraday_df = collector.get_kline(
+                source,
+                period="4h",
+                start_date=intraday_start,
+                end_date=datetime.now().strftime("%Y-%m-%d"),
+                session="ALL",
+            )
+            if not intraday_df.empty and len(intraday_df) >= 80:
+                df = intraday_df
+                predict_period = "4h"
+                future_step_hours = 4
+                resolved_lookback = min(request.lookback, max(len(df) - request.horizon - 1, 60))
+
+        if df.empty:
+            df = collector.get_kline(source, period="daily")
+            resolved_lookback = request.lookback
+
         if df.empty:
             raise HTTPException(status_code=404, detail=f"未找到可预测数据: {source}")
 
         result = run_price_prediction(
             df=df[["date", "close"]],
             horizon=request.horizon,
-            lookback=request.lookback,
+            lookback=resolved_lookback,
+            model_type=request.model_type,
+            use_external_direction=request.model_type == "boosting",
+            external_direction_csv=None,
+            enable_direction_head=request.model_type == "boosting",
+            enable_bias_correction=request.model_type == "boosting",
+            future_step_hours=future_step_hours,
         )
 
         return {
             "source": source.upper(),
             "symbol": collector.get_symbol(source),
             "name": collector.get_source_name(source),
+            "period": predict_period,
+            "lookback": resolved_lookback,
             **result,
         }
     except ValueError as e:
