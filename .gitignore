@@ -10,8 +10,12 @@ __pycache__/
 env/
 venv/
 .venv/
+.python312/
 pip-log.txt
 pip-delete-this-directory.txt
+
+# Node.js
+node_modules/
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -32,6 +36,12 @@ pip-delete-this-directory.txt
 # Temporary files
 *.tmp
 *.temp
+.tmp/
+
+# Build outputs
+client/dist/
+bot-output/
+analysis_outputs/
 
 # Separate git repos (managed independently)
 enterprise-information/
