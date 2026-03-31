@@ -1,0 +1,15 @@
+﻿source_id,source_name,exchange,market_type,forecast_date,forecast_close_time,confidence_pct_boosting,confidence_pct_ensemble,confidence_pct_linear,direction_boosting,direction_ensemble,direction_linear,predicted_close_boosting,predicted_close_ensemble,predicted_close_linear,predicted_return_pct_vs_latest_close_boosting,predicted_return_pct_vs_latest_close_ensemble,predicted_return_pct_vs_latest_close_linear
+COMEX_GC,"COMEX Gold Futures (4h, Asia/Shanghai bins)",COMEX,futures,2026-03-26,16:00,35.21,7.65,17.34,up,down,up,4395.7821,4357.2821,4134.7847,-3.5082,-4.3533,-9.2373
+COMEX_GC,"COMEX Gold Futures (4h, Asia/Shanghai bins)",COMEX,futures,2026-03-27,16:00,31.11,9.54,87.08,up,down,down,4217.6725,4153.8113,3623.4409,-7.4178,-8.8197,-20.4618
+COMEX_GC,"COMEX Gold Futures (4h, Asia/Shanghai bins)",COMEX,futures,2026-03-30,16:00,28.47,10.76,59.13,up,down,down,4038.9368,4006.6073,3349.0075,-11.3413,-12.0509,-26.4859
+COMEX_GC,"COMEX Gold Futures (4h, Asia/Shanghai bins)",COMEX,futures,2026-03-31,16:00,78.43,12.28,42.04,up,up,down,3819.3201,3847.8284,3105.5516,-16.1621,-15.5363,-31.83
+COMEX_GC,"COMEX Gold Futures (4h, Asia/Shanghai bins)",COMEX,futures,2026-04-01,16:00,54.37,1.18,43.69,up,up,down,3585.9515,3686.8885,2879.7937,-21.2848,-19.0691,-36.7856
+COMEX_GC,"COMEX Gold Futures (4h, Asia/Shanghai bins)",COMEX,futures,2026-04-02,16:00,18.91,2.22,53.35,up,down,down,3574.6208,3595.7319,2804.1588,-21.5335,-21.0701,-38.4459
+COMEX_GC,"COMEX Gold Futures (4h, Asia/Shanghai bins)",COMEX,futures,2026-04-03,16:00,0.48,32.25,27.0,down,down,down,3406.2822,3459.7183,2866.4301,-25.2287,-24.0557,-37.079
+SHFE_AU_MAIN,SHFE Gold Main Futures,SHFE,futures,2026-03-26,16:00,27.93,12.66,99.27,down,up,up,993.8209,1021.6013,1121.1536,-1.9862,0.7536,10.5718
+SHFE_AU_MAIN,SHFE Gold Main Futures,SHFE,futures,2026-03-27,16:00,62.1,0.02,99.41,down,up,up,986.6687,1019.7969,1236.3833,-2.6916,0.5757,21.9361
+SHFE_AU_MAIN,SHFE Gold Main Futures,SHFE,futures,2026-03-30,16:00,91.13,10.72,74.06,down,down,up,964.8725,1023.7608,1303.9532,-4.8412,0.9666,28.6001
+SHFE_AU_MAIN,SHFE Gold Main Futures,SHFE,futures,2026-03-31,16:00,31.58,34.68,29.39,up,up,up,934.187,1026.3255,1370.3836,-7.8675,1.2195,35.1516
+SHFE_AU_MAIN,SHFE Gold Main Futures,SHFE,futures,2026-04-01,16:00,10.27,18.76,85.51,up,up,down,875.5174,1014.9987,1336.8069,-13.6537,0.1024,31.8402
+SHFE_AU_MAIN,SHFE Gold Main Futures,SHFE,futures,2026-04-02,16:00,7.56,18.06,99.91,up,up,down,818.0556,1013.1216,1212.8223,-19.3207,-0.0827,19.6124
+SHFE_AU_MAIN,SHFE Gold Main Futures,SHFE,futures,2026-04-03,16:00,34.67,25.08,99.41,up,up,down,772.4785,1005.0106,1113.2747,-23.8157,-0.8826,9.7947

@@ -1,184 +1,259 @@
 # 黄金预测 Agent 调用手册
 
-本文档是 `stock-prediction` 中黄金预测流程的 agent 调用契约，目标是让其它 agent 可以直接发起预测、读取结果、在必要时回退模型。
+本文档是 `stock-prediction` 中黄金预测流程的 agent 调用契约，目标是让其它 agent 可以直接发起预测、生成可展示的汇报版 Markdown，并读取表格、图片与解释。
 
-## 当前变更
+## 当前推荐路径
 
-当前黄金流程已经切换到下面这组默认约定：
+如果是“给用户看结果”的定时任务，默认走：
 
-- 默认预测粒度：`4h`
-- 默认预测策略：`ensemble`
-- 推荐数据源：`SHFE_AU_MAIN`
-- 可回退策略：`boosting`、`linear`
+- `run_gold_analysis.py`
+- `--forecast-mode direct`
+- `--skip-backtest`
+- `--report-dir <输出目录>`
 
-`ensemble` 的角色不是替代回退路径，而是在默认情况下做一个更稳的组合预测：
+原因：
 
-- 线性模型提供更保守的基线
-- boosting 提供更强的短期幅度拟合
-- 外部趋势只做约束和校正，不直接当第三条平均线
+- `direct` 更适合 `T+1 ~ T+5` 的多日外推
+- 程序会自动输出 `bull / base / bear` 三情景
+- 会同时生成 Markdown、CSV、JSON、PNG
+- Markdown 已包含“汇报版”、解释、表格和图片链接
 
-所以其它 agent 默认应调用 `ensemble`，只有在对照实验或回退排障时才显式切到 `boosting` 或 `linear`。
+如果是研究/验证任务，再加：
+
+- `--backtest-stride <N>`
+- 不使用 `--skip-backtest`
+
+## 模型分工
+
+| 路径 | 适合场景 | 默认建议 |
+|------|---------|---------|
+| `multibar` | 同日 16:00 nowcast、看夜盘对白盘的影响 | 保留，用于研究或同日预测 |
+| `direct` | 多日外推、定时汇报、agent 自动化 | 推荐 |
+| `legacy` | 旧版对比、回退 | 仅对比/回退 |
 
 ## 推荐调用方式
 
-对无界面 agent，优先使用 wrapper 脚本：
-
-```bash
-/Users/rootliu/code/stock-prediction/scripts/run_openclaw_report.sh /tmp/agent-gold-report
-```
-
-这会直接生成完整报告包，默认值如下：
-
-- `OPENCLAW_LOOKBACK=120`
-- `OPENCLAW_PREDICT_MODEL=ensemble`
-- `OPENCLAW_SESSION_PERIOD=4h`
-- `OPENCLAW_REPORT_SOURCE=SHFE_AU_MAIN`
-
-如果 agent 只是消费结果，不需要自行拼接多张图表和 CSV，优先走这条路径。
-
-## 回退控制
-
-需要回退时，用环境变量显式指定模型：
-
-```bash
-OPENCLAW_PREDICT_MODEL=ensemble /Users/rootliu/code/stock-prediction/scripts/run_openclaw_report.sh /tmp/agent-gold-report
-OPENCLAW_PREDICT_MODEL=boosting /Users/rootliu/code/stock-prediction/scripts/run_openclaw_report.sh /tmp/agent-gold-report
-OPENCLAW_PREDICT_MODEL=linear /Users/rootliu/code/stock-prediction/scripts/run_openclaw_report.sh /tmp/agent-gold-report
-```
-
-选择建议：
-
-- `ensemble`：默认生产路径，平衡激进度和稳定性
-- `boosting`：更激进，适合做对照
-- `linear`：最保守，适合做基线或排障
-
-## 直接调用 CLI
-
-如果 agent 需要自己控制参数，可以直接调用 `run.py`：
+### 方式 1: CLI 直接调用 (推荐)
 
 ```bash
 cd /Users/rootliu/code/stock-prediction
-python run.py \
-  --bot-output-dir /tmp/agent-gold-report \
-  --report-source SHFE_AU_MAIN \
-  --horizon 5 \
-  --lookback 120 \
-  --predict-model ensemble \
-  --session-period 4h
+
+# 快速预测 + 生成汇报版 Markdown/PNG (推荐)
+.venv/bin/python run_gold_analysis.py \
+  --forecast-mode direct \
+  --skip-backtest \
+  --target-end <截止日期> \
+  --report-dir /Users/rootliu/code/report
+
+# 含回测与事件区间回测 (完整模式, 较慢)
+.venv/bin/python run_gold_analysis.py \
+  --forecast-mode direct \
+  --target-end <截止日期> \
+  --backtest-stride 60 \
+  --report-dir /Users/rootliu/code/report
+
+# 关闭事件层，仅输出基础预测
+.venv/bin/python run_gold_analysis.py \
+  --forecast-mode direct \
+  --skip-backtest \
+  --target-end <截止日期> \
+  --disable-event-scenarios \
+  --report-dir /Users/rootliu/code/report
 ```
 
-注意：
+### 方式 1.0: Agent/cron wrapper (最适合定时调用)
 
-- 只要传了 `--bot-output-dir` 或 `--openclaw-output-dir`，程序就会进入无界面报告模式
-- 不传输出目录时，程序默认进入图形界面模式
-
-## 直接调用 HTTP API
-
-如果 agent 只需要结构化预测值，不需要整包报告，可以直接打接口。
-
-启动 ML 服务：
+如果希望下游 agent 永远只读取固定文件名，直接用这个 wrapper：
 
 ```bash
-cd /Users/rootliu/code/stock-prediction/ml-service
-python main.py
+/Users/rootliu/code/stock-prediction/scripts/run_gold_direct_report.sh /path/to/output 2026-04-03
 ```
 
-获取默认 `4h` 预测：
+如果不传 `target-end`，wrapper 会默认取“未来第 3 个交易日”。
 
-```bash
-curl -sS -X POST http://127.0.0.1:8000/api/v1/gold/predict/SHFE_AU_MAIN \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "horizon": 5,
-    "lookback": 120,
-    "model_type": "ensemble"
-  }'
-```
+产物固定为：
 
-回退示例：
-
-```bash
-curl -sS -X POST http://127.0.0.1:8000/api/v1/gold/predict/SHFE_AU_MAIN \
-  -H 'Content-Type: application/json' \
-  -d '{"horizon": 5, "lookback": 120, "model_type": "boosting"}'
-
-curl -sS -X POST http://127.0.0.1:8000/api/v1/gold/predict/SHFE_AU_MAIN \
-  -H 'Content-Type: application/json' \
-  -d '{"horizon": 5, "lookback": 120, "model_type": "linear"}'
-```
-
-读取辅助数据：
-
-```bash
-curl -sS 'http://127.0.0.1:8000/api/v1/gold/quote/SHFE_AU_MAIN'
-curl -sS 'http://127.0.0.1:8000/api/v1/gold/session/SHFE_AU_MAIN?period=4h&days=5'
-curl -sS 'http://127.0.0.1:8000/api/v1/gold/kline/SHFE_AU_MAIN?period=4h&session=ALL'
-```
-
-## 输出契约
-
-如果使用 bot/report 模式，下游 agent 应遵守以下读取方式：
-
-1. 先等待 `manifest.json`
-2. 再读取 `report.md` 获取人类可读摘要
-3. 再读取结构化文件和图像
-
-核心文件：
-
-- `manifest.json`
 - `report.md`
-- `gold_quote.json`
-- `gold_prediction.json`
-- `gold_history.csv`
-- `gold_forecast.csv`
-- `gold_compare.csv`
-- `gold_session.csv`
-- `external_gold_survey.csv`
-- `gold_curve_comparison.csv`
-- `gold_external_main_curve.csv`
+- `scenario.png`
+- `scenario.csv`
+- `scenario.json`
+- `manifest.json`
 
-图像与表格：
+其中 `manifest.json` 最后写入，可作为完成标记。
 
-- `gold_prediction.png`
-- `gold_compare.png`
-- `gold_session.png`
-- `gold_curve_comparison.png`
-- `gold_summary_table.png`
-- `gold_forecast_table.png`
-- `gold_external_survey_table.png`
-- `gold_curve_comparison_table.png`
+### 方式 1.1: 定时任务 / cron 示例
 
-`manifest.json` 是完成标记。没有它时，不要把目录当成一轮完整输出。
+工作日早上和晚上各跑一次：
 
-## 返回字段说明
+```bash
+0 9,20 * * 1-5 cd /Users/rootliu/code/stock-prediction && .venv/bin/python run_gold_analysis.py --forecast-mode direct --skip-backtest --target-end 2026-04-03 --report-dir /Users/rootliu/code/report >> /tmp/gold-direct-agent.log 2>&1
+```
 
-调用 `/api/v1/gold/predict/...` 时，agent 至少应关注这些字段：
+如果 agent 需要“每天自动预测未来 3 个交易日”，建议由调度器先计算目标日期，再传给 `--target-end`。
 
-- `period`：实际建模粒度。国内黄金主流程默认应为 `4h`
-- `model.name`：实际执行的模型名称
-- `predictions[]`：逐步预测点
-- `metrics.mape`：内部回测误差指标
+更推荐直接用 wrapper：
 
-目前可能出现的 `model.name`：
+```bash
+0 9,20 * * 1-5 /Users/rootliu/code/stock-prediction/scripts/run_gold_direct_report.sh /tmp/gold-direct-agent >> /tmp/gold-direct-agent.log 2>&1
+```
 
-- `ensemble_linear_boosting_external_v1`
-- `gradient_boosting_direction_head`
-- `linear_regression_direction_head`
+### 方式 1.2: 其它 agent 的最小调用约定
 
-如果是 `ensemble`，响应里的元数据会保留回退相关信息，方便 agent 做日志记录或诊断。
+其它 agent 只需要做这三步：
+
+1. 执行命令生成报告
+2. 读取 `report.md`
+3. 展示 `scenario.png`
+
+推荐读取顺序：
+
+1. `manifest.json`
+2. `report.md`
+3. `scenario.png`
+4. `scenario.csv`
+5. `scenario.json`
+
+### 方式 2: Python 函数调用
+
+```python
+import sys
+sys.path.insert(0, "/Users/rootliu/code/stock-prediction")
+from run_gold_analysis import main
+
+predictions = main(
+    target_end="2026-04-10",
+    lookback=240,
+    skip_backtest=True,
+    skip_cross_market=False,
+    forecast_mode="direct",
+    report_dir="/Users/rootliu/code/report",
+)
+
+# predictions: List[Dict], 每个元素包含:
+# {
+#   "date": "2026-03-27",
+#   "close": 987.69,            # 16:00 预测收盘价 (CNY/克)
+#   "direction": "跌",           # 涨/跌/平
+#   "confidence": 72.7,          # 信心度 (0-100)
+#   "range_low": 962.0,          # 波动区间下限
+#   "range_high": 988.0,         # 波动区间上限
+#   "regime": "high",            # 波动率档位
+#   "n_models": 1,               # direct 模型数量
+#   "model_details": {...},      # 该 horizon 的训练摘要
+#   "scenarios": {               # 若开启事件层，会补充三情景
+#       "bear_close": ...,
+#       "base_close": ...,
+#       "bull_close": ...,
+#       "bull_driver": "...",
+#       "bear_driver": "...",
+#   }
+# }
+```
+
+## 旧版模型 (对比/回退)
+
+旧版日线模型保留在 `run_gold_analysis_legacy.py`:
+
+```bash
+.venv/bin/python run_gold_analysis_legacy.py --skip-backtest --source shfe
+```
+
+支持 `--source shfe|comex`，模型类型: linear / boosting / ensemble。
+
+## Agent 调用场景映射
+
+| 用户指令 | 命令 |
+|---------|------|
+| "看看明天金价" | `.venv/bin/python run_gold_analysis.py --forecast-mode direct --skip-backtest --target-end <明天> --report-dir /Users/rootliu/code/report` |
+| "预测到 4/3" | `.venv/bin/python run_gold_analysis.py --forecast-mode direct --skip-backtest --target-end 2026-04-03 --report-dir /Users/rootliu/code/report` |
+| "预测下周金价" | `.venv/bin/python run_gold_analysis.py --forecast-mode direct --skip-backtest --target-end <下周五> --report-dir /Users/rootliu/code/report` |
+| "跑个回测" | `.venv/bin/python run_gold_analysis.py --forecast-mode direct --target-end <截止日期> --backtest-stride 60 --report-dir /Users/rootliu/code/report` |
+| "用旧模型对比" | `.venv/bin/python run_gold_analysis_legacy.py --skip-backtest` |
+| "极速预测" | `.venv/bin/python run_gold_analysis.py --forecast-mode direct --skip-backtest --skip-cross-market --target-end <截止日期> --report-dir /Users/rootliu/code/report` |
+
+## 输出字段说明
+
+### `run_gold_analysis.py` 输出产物
+
+执行 `--report-dir /Users/rootliu/code/report` 后，默认会写入：
+
+- `gold_direct_scenario_<latest_date>.md`
+- `gold_direct_scenario_<latest_date>.png`
+- `gold_direct_scenario_<latest_date>.csv`
+- `gold_direct_scenario_<latest_date>.json`
+- `gold_direct_scenario_<latest_date>_backtest.csv`
+- `gold_direct_scenario_<latest_date>_event_backtest.csv`
+
+如果执行 `scripts/run_gold_direct_report.sh`，则会额外整理为固定文件名：
+
+- `report.md`
+- `scenario.png`
+- `scenario.csv`
+- `scenario.json`
+- `manifest.json`
+
+### 汇报版 Markdown 结构
+
+生成的 Markdown 已经包含：
+
+1. `汇报版`
+2. 三情景表格：`Bear / Base / Bull / 置信度 / 驱动解释`
+3. 曲线图 PNG 引用
+4. 调用说明
+5. 完整预测表
+6. Event Features / Event Calibration / Key Headlines
+7. Base Backtest / Event Interval Backtest
+
+其它 agent 应优先直接转发这个 Markdown，而不是自己重新拼接。
+
+### Direct 模型输出字段
+
+关键字段:
+- `close`: 16:00 预测收盘价 (CNY/克)
+- `direction`: 涨/跌/平
+- `confidence`: 信心度 (0-100)
+- `range_low` / `range_high`: 波动区间
+- `regime`: low/normal/high/extreme
+- `model_details`: 当前 horizon 的 direct 模型摘要
+- `scenarios.bear_close / base_close / bull_close`: 三情景价格
+- `scenarios.bull_driver / bear_driver`: 可解释路径
+
+### 波动率 Regime 说明
+
+| Regime | 年化波动率 | 预测压缩 | Agent 建议 |
+|--------|----------|---------|-----------|
+| low | < 15% | 0% | 正常参考预测值 |
+| normal | 15-30% | 15% | 正常参考 |
+| high | 30-50% | 45% | 降低仓位，扩大止损 |
+| extreme | > 50% | 70% | 仅参考方向，不参考幅度 |
 
 ## 对其它 Agent 的建议
 
-推荐默认策略：
+1. **默认用 `direct + report-dir`**，因为这是最适合自动汇报的产物链路
+2. **优先展示 Markdown 和 PNG**，不要自己二次造表，避免口径漂移
+3. **关注 regime 字段**：`high/extreme` 时幅度更适合看区间，不适合看单点
+4. **关注 confidence**：`< 50%` 时方向信号偏弱，建议强调区间而不是方向
+5. **展示 explanation**：优先使用 `bull_driver / bear_driver` 和 `Event Features`
+6. **旧版 (legacy) 仅用于对比**，不作为生产默认
 
-1. 优先调用 wrapper 脚本生成整包报告
-2. 默认使用 `ensemble`
-3. 只在比对或排障时切到 `boosting` / `linear`
-4. 默认读取 `4h` 结果，不要把 `15min/30min` 当成生产默认入口
+## 文件结构
 
-如果下游 agent 只需要一份简报，最小读取集就足够：
-
-- `report.md`
-- `gold_prediction.json`
-- `gold_forecast.csv`
-- `gold_forecast_table.png`
+```
+stock-prediction/
+├── run_gold_analysis.py              # direct / multibar 统一入口 (推荐)
+├── run_gold_analysis_legacy.py       # 旧版日线模型
+├── GOLD_FORECAST_GUIDE.md            # 详细模型文档
+├── ml-service/models/
+│   ├── multi_bar_predictor.py        # 多时点预测核心
+│   ├── multi_bar_features.py         # checkpoint 聚合 + 特征
+│   ├── multi_day_direct_predictor.py # 多日直推模型
+│   ├── event_sentiment.py            # 事件/新闻/博客情景层
+│   ├── volatility_regime.py          # 波动率 regime
+│   ├── predictor.py                  # 旧版预测器
+│   └── external_direction.py         # 外部方向特征
+├── ml-service/data/
+│   └── event_context.csv             # 本地事件日历模板
+└── docs/
+    ├── GOLD_AGENT_USAGE.md           # 本文件
+    └── OPENCLAW_INTEGRATION.md       # OpenClaw 集成文档
+```

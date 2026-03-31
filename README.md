@@ -184,11 +184,18 @@ Bot 模式默认也会使用 `4h` 作为黄金巡检图表与预测粒度。
 - 需要回退时显式指定 `boosting` 或 `linear`
 - 机器人模式以下游读取 `manifest.json` 作为完成标记
 - 现阶段不要把 `15min/30min` 作为 agent 默认入口
+- 如果需要直接产出“汇报版 + 三情景 + 图片”的新黄金报告，优先使用 `scripts/run_gold_direct_report.sh`
 
 最小调用示例：
 
 ```bash
 /Users/rootliu/code/stock-prediction/scripts/run_openclaw_report.sh /tmp/agent-gold-report
+```
+
+新黄金情景报告的最小调用示例：
+
+```bash
+/Users/rootliu/code/stock-prediction/scripts/run_gold_direct_report.sh /tmp/gold-direct-agent 2026-04-03
 ```
 
 需要显式指定模型时：

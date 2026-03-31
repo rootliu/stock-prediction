@@ -28,6 +28,12 @@ OpenClaw wrapper script:
 /Users/rootliu/code/stock-prediction/scripts/run_openclaw_report.sh /path/to/openclaw/stock-prediction
 ```
 
+Direct scenario wrapper for timed agents:
+
+```bash
+/Users/rootliu/code/stock-prediction/scripts/run_gold_direct_report.sh /path/to/openclaw/gold-direct
+```
+
 ## Supported Conventions
 
 The launcher accepts either:
@@ -68,6 +74,31 @@ Recommended agent read order:
 2. Read `report.md` for the human summary
 3. Read `gold_prediction.json` and `gold_forecast.csv` for structured prediction values
 4. Read PNG assets only if the downstream bot needs charts or tables
+
+## Direct Scenario Bundle
+
+If the downstream bot wants the newer `direct + bull/base/bear` report flow instead of the older patrol bundle, use:
+
+```bash
+/Users/rootliu/code/stock-prediction/scripts/run_gold_direct_report.sh /path/to/openclaw/gold-direct [target-end]
+```
+
+This writes a fixed bundle:
+
+- `manifest.json`
+- `report.md`
+- `scenario.png`
+- `scenario.csv`
+- `scenario.json`
+
+Recommended agent read order:
+
+1. Wait for `manifest.json`
+2. Read `report.md` for the ready-to-send “汇报版”
+3. Read `scenario.png` if the downstream channel supports images
+4. Read `scenario.csv` / `scenario.json` for structured fields
+
+If `target-end` is omitted, the wrapper defaults to the third future trading day.
 
 ## Environment Variables For Cron
 

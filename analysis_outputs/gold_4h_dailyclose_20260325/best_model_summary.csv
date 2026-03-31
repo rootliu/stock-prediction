@@ -1,0 +1,3 @@
+﻿source_id,source_name,exchange,market_type,model,recent_origin_count,forecast_day_close_count,samples,mae,rmse,mape_pct,bias_pct,directional_accuracy_pct
+COMEX_GC,"COMEX Gold Futures (4h, Asia/Shanghai bins)",COMEX,futures,ensemble,20,7,140,199.7698,272.262,3.9965,0.6285,52.86
+SHFE_AU_MAIN,SHFE Gold Main Futures,SHFE,futures,ensemble,20,7,140,55.8068,79.6478,4.996,2.1556,51.43

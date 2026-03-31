@@ -322,13 +322,13 @@ def generate_gold_report_bundle(
     session_frame = _round_frame(session_df[["date", "close", "session"]].copy()) if not session_df.empty else pd.DataFrame(columns=["date", "close", "session"])
 
     if not history_frame.empty:
-        history_frame["date"] = pd.to_datetime(history_frame["date"])
+        history_frame["date"] = pd.to_datetime(history_frame["date"], format="mixed")
     if not forecast_frame.empty:
-        forecast_frame["date"] = pd.to_datetime(forecast_frame["date"])
+        forecast_frame["date"] = pd.to_datetime(forecast_frame["date"], format="mixed")
     if not compare_frame.empty:
-        compare_frame["date"] = pd.to_datetime(compare_frame["date"])
+        compare_frame["date"] = pd.to_datetime(compare_frame["date"], format="mixed")
     if not session_frame.empty:
-        session_frame["date"] = pd.to_datetime(session_frame["date"])
+        session_frame["date"] = pd.to_datetime(session_frame["date"], format="mixed")
 
     latest_price = float(quote["price"]) if quote and quote.get("price") is not None else None
     if latest_price is None and not predict_input_df.empty:
@@ -339,11 +339,11 @@ def generate_gold_report_bundle(
     if intraday_context_frame.empty and not history_frame.empty:
         intraday_context_frame = history_frame.tail(7)[["date", "close"]].copy()
 
-    reference_time = pd.to_datetime(intraday_context_frame["date"]).max() if not intraday_context_frame.empty else pd.Timestamp(today.replace(minute=0, second=0, microsecond=0))
+    reference_time = pd.to_datetime(intraday_context_frame["date"], format="mixed").max() if not intraday_context_frame.empty else pd.Timestamp(today.replace(minute=0, second=0, microsecond=0))
     if predict_period == "4h":
         forecast_4h_frame = forecast_frame.copy()
         if not forecast_4h_frame.empty:
-            forecast_4h_frame["date"] = pd.to_datetime(forecast_4h_frame["date"])
+            forecast_4h_frame["date"] = pd.to_datetime(forecast_4h_frame["date"], format="mixed")
     else:
         forecast_4h_frame = _build_four_hour_forecast_frame(
             latest_price=latest_price,
@@ -458,9 +458,9 @@ def generate_gold_report_bundle(
         curve_chart,
         [
             ("Actual 4H", intraday_context_frame["date"], intraday_context_frame["close"], COLOR_MAP["actual"], "-"),
-            ("External Main", pd.to_datetime(curve_frame["date"]), curve_frame["external_main"], COLOR_MAP["external_main"], "-"),
-            ("Internal Model", pd.to_datetime(curve_frame["date"]), curve_frame["internal_model"], COLOR_MAP["internal_model"], "--"),
-            ("Blended Curve", pd.to_datetime(curve_frame["date"]), curve_frame["blended_curve"], COLOR_MAP["blended_curve"], "-."),
+            ("External Main", pd.to_datetime(curve_frame["date"], format="mixed"), curve_frame["external_main"], COLOR_MAP["external_main"], "-"),
+            ("Internal Model", pd.to_datetime(curve_frame["date"], format="mixed"), curve_frame["internal_model"], COLOR_MAP["internal_model"], "--"),
+            ("Blended Curve", pd.to_datetime(curve_frame["date"], format="mixed"), curve_frame["blended_curve"], COLOR_MAP["blended_curve"], "-."),
         ],
         title="Gold Past Week + Next 5 Days (4H)",
         ylabel="Price",
@@ -519,7 +519,7 @@ def generate_gold_report_bundle(
     _write_csv(output_path / "gold_curve_comparison.csv", curve_compare_frame)
     curve_output = pd.merge(
         intraday_context_frame.rename(columns={"close": "actual_4h"}),
-        curve_frame.assign(date=pd.to_datetime(curve_frame["date"])),
+        curve_frame.assign(date=pd.to_datetime(curve_frame["date"], format="mixed")),
         on="date",
         how="outer",
     ).sort_values("date")
