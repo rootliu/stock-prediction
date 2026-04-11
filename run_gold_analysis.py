@@ -45,6 +45,7 @@ from models.event_sentiment import build_event_scenario_bundle
 from models.volatility_regime import compute_regime_info
 
 TROY_OZ_TO_GRAM = 31.1035
+_TRADE_CALENDAR_CACHE: pd.DatetimeIndex | None = None
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -133,8 +134,14 @@ def fetch_comex_daily() -> pd.DataFrame:
 
 def fetch_usdcny_daily() -> pd.DataFrame:
     print("  [数据] USDCNY ...")
-    raw = yf.download("CNY=X", start="2023-01-01", interval="1d",
-                      auto_adjust=False, progress=False)
+    # CNY=X broke around Apr 2026; try USDCNY=X first, then CNY=X as fallback
+    raw = None
+    for ticker in ("USDCNY=X", "CNY=X"):
+        raw = yf.download(ticker, start="2023-01-01", interval="1d",
+                          auto_adjust=False, progress=False)
+        if raw is not None and not raw.empty:
+            print(f"         (使用 {ticker})")
+            break
     if raw is None or raw.empty:
         raise RuntimeError("USDCNY 数据为空")
     df = _flatten_yf(raw).reset_index()
@@ -170,6 +177,65 @@ def fetch_cross_market() -> pd.DataFrame:
     for f in frames[1:]:
         merged = merged.merge(f, on="date", how="outer")
     return merged.sort_values("date").reset_index(drop=True)
+
+
+def fetch_trade_calendar() -> pd.DatetimeIndex:
+    global _TRADE_CALENDAR_CACHE
+    if _TRADE_CALENDAR_CACHE is not None:
+        return _TRADE_CALENDAR_CACHE
+
+    try:
+        calendar_df = ak.tool_trade_date_hist_sina()
+        if calendar_df is None or calendar_df.empty:
+            raise RuntimeError("trade calendar empty")
+        column = "trade_date" if "trade_date" in calendar_df.columns else calendar_df.columns[0]
+        trade_dates = pd.to_datetime(calendar_df[column]).dt.normalize().sort_values().unique()
+        _TRADE_CALENDAR_CACHE = pd.DatetimeIndex(trade_dates)
+        return _TRADE_CALENDAR_CACHE
+    except Exception as exc:
+        raise RuntimeError(f"交易日历获取失败: {exc}") from exc
+
+
+def build_future_trade_dates(
+    last_trade_date: pd.Timestamp,
+    target_end: str | pd.Timestamp,
+    bars_60min: pd.DataFrame | None = None,
+) -> tuple[pd.DatetimeIndex, Dict[str, Any]]:
+    last_trade_date = pd.Timestamp(last_trade_date).normalize()
+    target_end_ts = pd.Timestamp(target_end).normalize()
+    if target_end_ts <= last_trade_date:
+        return pd.DatetimeIndex([]), {
+            "target_end": target_end_ts,
+            "target_end_is_trade_day": False,
+            "calendar_source": "none",
+        }
+
+    target_end_is_trade_day = False
+    try:
+        trade_calendar = fetch_trade_calendar()
+        target_end_is_trade_day = bool((trade_calendar == target_end_ts).any())
+        future_dates = trade_calendar[(trade_calendar > last_trade_date) & (trade_calendar <= target_end_ts)]
+        return pd.DatetimeIndex(future_dates), {
+            "target_end": target_end_ts,
+            "target_end_is_trade_day": target_end_is_trade_day,
+            "calendar_source": "akshare_trade_calendar",
+        }
+    except Exception:
+        observed: List[pd.Timestamp] = []
+        if bars_60min is not None and not bars_60min.empty:
+            observed = sorted(
+                {
+                    pd.Timestamp(ts).normalize()
+                    for ts in pd.to_datetime(bars_60min["date"])
+                    if last_trade_date < pd.Timestamp(ts).normalize() <= target_end_ts
+                }
+            )
+        future_dates = pd.DatetimeIndex(observed)
+        return future_dates, {
+            "target_end": target_end_ts,
+            "target_end_is_trade_day": bool((future_dates == target_end_ts).any()),
+            "calendar_source": "observed_intraday_fallback",
+        }
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -937,17 +1003,31 @@ def main(
     else:
         print("\n  [跳过] 回测")
 
-    # ── 3. 逐日预测 ──────────────────────────────────────────────────
+    # ── 3. 逐交易日预测 ──────────────────────────────────────────────
     last_date = shfe_daily["date"].iloc[-1]
-    future_dates = pd.bdate_range(last_date + pd.Timedelta(days=1), target_end)
+    future_dates, calendar_meta = build_future_trade_dates(
+        last_trade_date=last_date,
+        target_end=target_end,
+        bars_60min=shfe_60min,
+    )
 
     if len(future_dates) == 0:
         print("\n  无未来交易日需要预测")
         return []
 
+    if not calendar_meta.get("target_end_is_trade_day", False):
+        print(
+            f"\n  [Calendar] 截止日 {pd.Timestamp(target_end).date()} 不是交易日，"
+            f"已按 SHFE 交易日历截断到 {future_dates[-1].date()}"
+        )
+    print(
+        f"  [Calendar] 来源={calendar_meta.get('calendar_source')}，"
+        f"目标交易日数={len(future_dates)}"
+    )
+
     print("\n" + "-" * 85)
     predict_label = "Multi-Bar" if forecast_mode == "multibar" else "Direct Multi-Horizon"
-    print(f"  {predict_label} 逐日预测 ({future_dates[0].date()} ~ {future_dates[-1].date()}, 16:00 收盘)")
+    print(f"  {predict_label} 逐交易日预测 ({future_dates[0].date()} ~ {future_dates[-1].date()}, 16:00 收盘)")
     print("-" * 85)
 
     if forecast_mode == "multibar":

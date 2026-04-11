@@ -1,0 +1,6 @@
+date,bear_close,base_close,bull_close,base_low,base_high,bull_driver,bear_driver,calendar_score,active_events
+2026-04-09,1029.72,1052.64,1079.79,1031.27,1074.01,地缘风险,模型中枢下方波动,0.061,"[{'event_name': 'US CPI Release Window', 'event_type': 'macro', 'event_date': '2026-04-10', 'phase': 'pre', 'pre_bias': 0.2, 'post_bias': -0.2, 'importance': 0.65, 'notes': 'Editable recurring macro example'}]"
+2026-04-10,1012.22,1053.93,1100.27,1013.77,1094.1,地缘风险,模型中枢下方波动,0.13,"[{'event_name': 'US CPI Release Window', 'event_type': 'macro', 'event_date': '2026-04-10', 'phase': 'pre', 'pre_bias': 0.2, 'post_bias': -0.2, 'importance': 0.65, 'notes': 'Editable recurring macro example'}]"
+2026-04-13,994.29,1045.32,1100.23,995.83,1094.82,地缘风险,模型中枢下方波动,0.0,[]
+2026-04-14,981.27,1043.9,1106.53,982.49,1105.32,地缘风险,模型中枢下方波动,0.0,[]
+2026-04-15,978.13,1040.56,1102.99,961.87,1119.26,地缘风险,模型中枢下方波动,0.0,[]

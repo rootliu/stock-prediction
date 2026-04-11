@@ -14,15 +14,29 @@ fi
 
 if [[ -z "${TARGET_END}" ]]; then
   TARGET_END="$("${PYTHON_BIN}" - <<'PY'
+import akshare as ak
+import pandas as pd
 from datetime import date, timedelta
 
-d = date.today()
-count = 0
-while count < 3:
-    d += timedelta(days=1)
-    if d.weekday() < 5:
-        count += 1
-print(d.isoformat())
+today = pd.Timestamp(date.today()).normalize()
+try:
+    calendar = ak.tool_trade_date_hist_sina()
+    trade_dates = pd.to_datetime(calendar["trade_date"]).dt.normalize()
+    future = trade_dates[trade_dates > today]
+    if len(future) >= 3:
+        print(pd.Timestamp(future.iloc[2]).strftime("%Y-%m-%d"))
+    elif len(future) > 0:
+        print(pd.Timestamp(future.iloc[-1]).strftime("%Y-%m-%d"))
+    else:
+        raise RuntimeError("empty future trade calendar")
+except Exception:
+    d = today.date()
+    count = 0
+    while count < 3:
+        d += timedelta(days=1)
+        if d.weekday() < 5:
+            count += 1
+    print(d.isoformat())
 PY
 )"
 fi

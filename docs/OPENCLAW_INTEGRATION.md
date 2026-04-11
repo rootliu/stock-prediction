@@ -98,7 +98,7 @@ Recommended agent read order:
 3. Read `scenario.png` if the downstream channel supports images
 4. Read `scenario.csv` / `scenario.json` for structured fields
 
-If `target-end` is omitted, the wrapper defaults to the third future trading day.
+If `target-end` is omitted, the wrapper defaults to the third future SHFE trading day.
 
 ## Environment Variables For Cron
 

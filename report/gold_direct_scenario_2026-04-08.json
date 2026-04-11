@@ -1,0 +1,447 @@
+{
+  "forecast_mode": "direct",
+  "latest_date": "2026-04-08",
+  "latest_close": 1062.0,
+  "predictions": [
+    {
+      "date": "2026-04-09",
+      "close": 1052.64,
+      "direction": "跌",
+      "confidence": 57.7,
+      "range_low": 1031.27,
+      "range_high": 1074.01,
+      "regime": "high",
+      "n_models": 1,
+      "model_details": {
+        "model_name": "direct_gbm_multi_horizon_v1",
+        "horizon_days": 1,
+        "pred_return_pct": -1.603,
+        "up_probability": 0.2741,
+        "test_mape_pct": 2.0299,
+        "test_direction_accuracy": 72.92,
+        "effective_base": 1062.0
+      },
+      "scenarios": {
+        "bear_close": 1029.72,
+        "base_close": 1052.64,
+        "bull_close": 1079.79,
+        "bull_driver": "地缘风险",
+        "bear_driver": "模型中枢下方波动"
+      }
+    },
+    {
+      "date": "2026-04-10",
+      "close": 1053.93,
+      "direction": "跌",
+      "confidence": 56.4,
+      "range_low": 1013.77,
+      "range_high": 1094.1,
+      "regime": "high",
+      "n_models": 1,
+      "model_details": {
+        "model_name": "direct_gbm_multi_horizon_v1",
+        "horizon_days": 2,
+        "pred_return_pct": -1.381,
+        "up_probability": 0.1691,
+        "test_mape_pct": 3.4028,
+        "test_direction_accuracy": 58.33,
+        "effective_base": 1062.0
+      },
+      "scenarios": {
+        "bear_close": 1012.22,
+        "base_close": 1053.93,
+        "bull_close": 1100.27,
+        "bull_driver": "地缘风险",
+        "bear_driver": "模型中枢下方波动"
+      }
+    },
+    {
+      "date": "2026-04-13",
+      "close": 1045.32,
+      "direction": "跌",
+      "confidence": 52.2,
+      "range_low": 995.83,
+      "range_high": 1094.82,
+      "regime": "high",
+      "n_models": 1,
+      "model_details": {
+        "model_name": "direct_gbm_multi_horizon_v1",
+        "horizon_days": 3,
+        "pred_return_pct": -2.855,
+        "up_probability": 0.1113,
+        "test_mape_pct": 3.8185,
+        "test_direction_accuracy": 50.0,
+        "effective_base": 1062.0
+      },
+      "scenarios": {
+        "bear_close": 994.29,
+        "base_close": 1045.32,
+        "bull_close": 1100.23,
+        "bull_driver": "地缘风险",
+        "bear_driver": "模型中枢下方波动"
+      }
+    },
+    {
+      "date": "2026-04-14",
+      "close": 1043.9,
+      "direction": "跌",
+      "confidence": 38.9,
+      "range_low": 982.49,
+      "range_high": 1105.32,
+      "regime": "high",
+      "n_models": 1,
+      "model_details": {
+        "model_name": "direct_gbm_multi_horizon_v1",
+        "horizon_days": 4,
+        "pred_return_pct": -3.098,
+        "up_probability": 0.2243,
+        "test_mape_pct": 4.3259,
+        "test_direction_accuracy": 56.25,
+        "effective_base": 1062.0
+      },
+      "scenarios": {
+        "bear_close": 981.27,
+        "base_close": 1043.9,
+        "bull_close": 1106.53,
+        "bull_driver": "地缘风险",
+        "bear_driver": "模型中枢下方波动"
+      }
+    },
+    {
+      "date": "2026-04-15",
+      "close": 1040.56,
+      "direction": "跌",
+      "confidence": 39.1,
+      "range_low": 961.87,
+      "range_high": 1119.26,
+      "regime": "high",
+      "n_models": 1,
+      "model_details": {
+        "model_name": "direct_gbm_multi_horizon_v1",
+        "horizon_days": 5,
+        "pred_return_pct": -3.67,
+        "up_probability": 0.1369,
+        "test_mape_pct": 5.11,
+        "test_direction_accuracy": 56.25,
+        "effective_base": 1062.0
+      },
+      "scenarios": {
+        "bear_close": 978.13,
+        "base_close": 1040.56,
+        "bull_close": 1102.99,
+        "bull_driver": "地缘风险",
+        "bear_driver": "模型中枢下方波动"
+      }
+    }
+  ],
+  "scenario_bundle": {
+    "feature_summary": {
+      "news_bull_score": 0.9955,
+      "news_bear_score": 0.9285,
+      "blog_bull_score": 0.9538,
+      "blog_bear_score": 0.9126,
+      "article_count": 48,
+      "safe_haven_score": 0.0,
+      "policy_risk_score": 0.1974,
+      "geo_risk_score": 1.0,
+      "sell_the_news_score": 0.0,
+      "usd_pressure_score": 0.0,
+      "rate_pressure_score": 0.0,
+      "oil_shock_score": 0.1088,
+      "structural_support_score": 0.0,
+      "policy_relief_score": 0.6423,
+      "geo_relief_score": 0.9998
+    },
+    "top_bull": [
+      {
+        "title": "Inside India newsletter: Tariffs and Iran war threaten India's $100 billion garments export goal - CNBC",
+        "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxONHBwVkc1eGdMWDFfSmhqUERmc20tTXM2bGFCdXFHRXh0b084Q3dneEZwNW9XMk92cFZVUDltbk5QMnozaFdEaWthU3R0QzMzcHEzUklxZTMyVFBaanZIamVUcmZKWTJMNFZ2a1JzN1B5TVZKcXR4TW9GQ2FSYUpETWljTngtaFlwczM5cENzNGtZLXV1eUtkd05vYWQtdjF6OGNRdUJpQzdtdktXb0HSAbMBQVVfeXFMUEViTl9hTWRtOGMxUUF4bnp0Z3hhS3phZFdNR3Uwb2dTam5keDZjbEUzWEc3YXJoLWpGem4zRHdCSEdLZEtadWtCRWs4Q0hpdFJZLU9QNG52bWx6QkU3aFlXa295dEFGdFZRWTA0OU5vYzh1UlVNaVRkMEtFa3kyN0Voa2ItR1VTdU1rcUxrN2xmcG84Ym5KYVJtYkluZDF5NUU0ckE3cHBRamhkNXNON2FtMGM?oc=5",
+        "published": "2026-04-09 00:06:00",
+        "site": "cnbc.com",
+        "source_type": "news",
+        "bull_score": 1.68,
+        "bear_score": 0.0,
+        "weight": 0.8,
+        "tags": [
+          "tariff",
+          "iran"
+        ],
+        "buckets": {
+          "policy_risk": 1.0,
+          "geo_risk": 1.1
+        }
+      },
+      {
+        "title": "Trump's abrupt Iran reversal exposes limits of his leverage - Reuters",
+        "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxPNFlYNU1RRTJjVE4zZTRkY0k2QTdiOER3YlV1NmF4T0JKMWgwM3BQcFBacE1ZZEpNX202eDZ6azhiM2h3dlY0aHFhUXFhSEFMdFlSanE5SFVraE5GUUFUMzI2R2NmcV9CUFE2R3FJT3JTMVJDbVh1LTRpTkJ4eUoyd213U0RKekR4RWZ5Q1VlZk1wZWtVTnZSWUZxd3lCUQ?oc=5",
+        "published": "2026-04-08 23:15:11",
+        "site": "reuters.com",
+        "source_type": "news",
+        "bull_score": 1.265,
+        "bear_score": 0.0,
+        "weight": 1.15,
+        "tags": [
+          "iran"
+        ],
+        "buckets": {
+          "geo_risk": 1.1
+        }
+      },
+      {
+        "title": "As Trump claims victory, Iran emerges bruised but powerful with leverage over Hormuz - Reuters",
+        "link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxOblo5SXdfUVNZdFNHWWp1RUo3b2JwZHhfNTlJcERVdlJlLXNuU0VpVzlpM0NMUS03T2tKMEV6VGdnUG15aFRxZDUzWXVpUXZTYVNpaVdqWXNFbFVKQmJlRFNLOG40YXFGZDY1QnllLWFrbTJjWS13OXNXSXItNGxhMERzRFUtdl9iVWo0dVp4bW9XZk53VGllcENFUTJpWnJ1ZjVtZk5uNW9jU0pxNUVQVUpkODNPNnVrWjM3ZHNQVDdQS19neHFIeGd3?oc=5",
+        "published": "2026-04-08 23:08:59",
+        "site": "reuters.com",
+        "source_type": "news",
+        "bull_score": 1.265,
+        "bear_score": 0.0,
+        "weight": 1.15,
+        "tags": [
+          "iran"
+        ],
+        "buckets": {
+          "geo_risk": 1.1
+        }
+      }
+    ],
+    "top_bear": [
+      {
+        "title": "Traders place large $950 million bet on oil price falling hours ahead of ceasefire - Reuters",
+        "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxNY1lkQUpuQVdBcnlJQlB6ZmdFS1Bnb3NIeVBPdUUxQUpYTHd5NUNUUkJxWG1Jd1N1eEVSclN5SVVqb3B3LUNTOTU2ZHhjUlNUYU5wcS1xcWRYSkUwT1M5VUEyVmE4emlXQ3dqUDlSOUh5MDZZRTg2YWJ5LUJIcXBWQVBuY1dNNG1TbHhWZF9wYXpJbUFaVHRXV2NyVFlFSU4wek9oMm1ac0xhZUViV1hfTGkwS09IcktJaHZXdnlySGpIS3lqU0E?oc=5",
+        "published": "2026-04-08 17:37:35",
+        "site": "reuters.com",
+        "source_type": "news",
+        "bull_score": 0.0,
+        "bear_score": 1.15,
+        "weight": 1.15,
+        "tags": [
+          "ceasefire"
+        ],
+        "buckets": {
+          "geo_relief": 1.0
+        }
+      },
+      {
+        "title": "Traders place large $950 million bet on oil price falling hours ahead of ceasefire By Reuters - Investing.com",
+        "link": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxPQXEySGk2b2pBaFRRSnQ1OGd1eExaNnRObUNpcGxWc2tJZlBsOVc5cTgxcGRMQkNKYmNJRTRSUkpjelpULU1wTEotS2hhREhMeGlIYzYzVXFKSVZ4ZUlKMTI1ZnF0X1k1elpYYjk5elRzQ0xVLWx4SktFTnhSenNnZmlaQmx0OXRKUnFwME43RHBDcGkzTGNhSFJ5R1dRQ3gtNEV4ck9VTm9yT2pGX1l5SExRUnl0Q04xM0NraTZfX2F6a3pka3F3SXlBRkktVTF1VVlv?oc=5",
+        "published": "2026-04-08 18:29:20",
+        "site": "investing.com",
+        "source_type": "blog",
+        "bull_score": 0.0,
+        "bear_score": 0.574,
+        "weight": 0.574,
+        "tags": [
+          "ceasefire"
+        ],
+        "buckets": {
+          "geo_relief": 1.0
+        }
+      },
+      {
+        "title": "Forex Today: FOMC Minutes reinforce 'higher-for-longer' as markets digest the ceasefire - FXStreet",
+        "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxNSkVPY1UxRndpMFRYazNLQ2RxaUxWWTZhSXh6bmlxelRTQm1mSFhHQUJBUS1jYi13RkJRQzVxM3RKM3ljOC1hZG84ejViX2d2cWlCTWhJWUd2a1hvUkg2UWtqUVhud2c3SlpfLWQwZGZtWHI1a0c4RTFZZzZtdTg4MWRiUHBPRzJrblR3b2JkZUpwbm1sSl9vUzZpdjR0MnRjOXhkbXZRVktuOTFGS3BLNklfamtGMFJDMllRTm51bUpXcWc1NXc?oc=5",
+        "published": "2026-04-08 19:14:58",
+        "site": "fxstreet.com",
+        "source_type": "blog",
+        "bull_score": 0.0,
+        "bear_score": 0.434,
+        "weight": 0.434,
+        "tags": [
+          "ceasefire"
+        ],
+        "buckets": {
+          "geo_relief": 1.0
+        }
+      }
+    ],
+    "scenario_rows": [
+      {
+        "date": "2026-04-09",
+        "bear_close": 1029.72,
+        "base_close": 1052.64,
+        "bull_close": 1079.79,
+        "base_low": 1031.27,
+        "base_high": 1074.01,
+        "bull_driver": "地缘风险",
+        "bear_driver": "模型中枢下方波动",
+        "calendar_score": 0.061,
+        "active_events": [
+          {
+            "event_name": "US CPI Release Window",
+            "event_type": "macro",
+            "event_date": "2026-04-10",
+            "phase": "pre",
+            "pre_bias": 0.2,
+            "post_bias": -0.2,
+            "importance": 0.65,
+            "notes": "Editable recurring macro example"
+          }
+        ]
+      },
+      {
+        "date": "2026-04-10",
+        "bear_close": 1012.22,
+        "base_close": 1053.93,
+        "bull_close": 1100.27,
+        "base_low": 1013.77,
+        "base_high": 1094.1,
+        "bull_driver": "地缘风险",
+        "bear_driver": "模型中枢下方波动",
+        "calendar_score": 0.13,
+        "active_events": [
+          {
+            "event_name": "US CPI Release Window",
+            "event_type": "macro",
+            "event_date": "2026-04-10",
+            "phase": "pre",
+            "pre_bias": 0.2,
+            "post_bias": -0.2,
+            "importance": 0.65,
+            "notes": "Editable recurring macro example"
+          }
+        ]
+      },
+      {
+        "date": "2026-04-13",
+        "bear_close": 994.29,
+        "base_close": 1045.32,
+        "bull_close": 1100.23,
+        "base_low": 995.83,
+        "base_high": 1094.82,
+        "bull_driver": "地缘风险",
+        "bear_driver": "模型中枢下方波动",
+        "calendar_score": 0.0,
+        "active_events": []
+      },
+      {
+        "date": "2026-04-14",
+        "bear_close": 981.27,
+        "base_close": 1043.9,
+        "bull_close": 1106.53,
+        "base_low": 982.49,
+        "base_high": 1105.32,
+        "bull_driver": "地缘风险",
+        "bear_driver": "模型中枢下方波动",
+        "calendar_score": 0.0,
+        "active_events": []
+      },
+      {
+        "date": "2026-04-15",
+        "bear_close": 978.13,
+        "base_close": 1040.56,
+        "bull_close": 1102.99,
+        "base_low": 961.87,
+        "base_high": 1119.26,
+        "bull_driver": "地缘风险",
+        "bear_driver": "模型中枢下方波动",
+        "calendar_score": 0.0,
+        "active_events": []
+      }
+    ],
+    "pathways": [
+      "地缘风险新闻较密集，模型将其映射为短线风险溢价。"
+    ],
+    "article_count": 48,
+    "calibration": {
+      "median_abs_return": 0.012732,
+      "p75_abs_return": 0.030607,
+      "pre_event_scale": 0.008213,
+      "post_event_scale": 0.007374,
+      "sell_the_news_scale": 0.016906
+    }
+  },
+  "backtest_metrics": [
+    {
+      "周期": "T+1",
+      "样本数": 70,
+      "MAE(元/克)": 3.08,
+      "RMSE(元/克)": 4.56,
+      "MAPE%": 0.84,
+      "方向准确率%": 55.7,
+      "平均信心度": 44.1
+    },
+    {
+      "周期": "T+2",
+      "样本数": 70,
+      "MAE(元/克)": 5.45,
+      "RMSE(元/克)": 10.12,
+      "MAPE%": 1.35,
+      "方向准确率%": 45.7,
+      "平均信心度": 41.0
+    },
+    {
+      "周期": "T+3",
+      "样本数": 70,
+      "MAE(元/克)": 6.24,
+      "RMSE(元/克)": 11.09,
+      "MAPE%": 1.56,
+      "方向准确率%": 47.1,
+      "平均信心度": 37.2
+    },
+    {
+      "周期": "T+4",
+      "样本数": 70,
+      "MAE(元/克)": 7.34,
+      "RMSE(元/克)": 14.67,
+      "MAPE%": 1.72,
+      "方向准确率%": 54.3,
+      "平均信心度": 35.8
+    },
+    {
+      "周期": "T+5",
+      "样本数": 70,
+      "MAE(元/克)": 9.07,
+      "RMSE(元/克)": 16.96,
+      "MAPE%": 2.17,
+      "方向准确率%": 48.6,
+      "平均信心度": 30.1
+    }
+  ],
+  "event_backtest_metrics": [
+    {
+      "周期": "T+1",
+      "样本数": 70,
+      "Base区间命中率%": 57.1,
+      "Event区间命中率%": 57.1,
+      "命中率改善%": 0.0,
+      "Base平均宽度%": 1.66,
+      "Event平均宽度%": 1.67
+    },
+    {
+      "周期": "T+2",
+      "样本数": 70,
+      "Base区间命中率%": 60.0,
+      "Event区间命中率%": 60.0,
+      "命中率改善%": 0.0,
+      "Base平均宽度%": 2.81,
+      "Event平均宽度%": 2.81
+    },
+    {
+      "周期": "T+3",
+      "样本数": 70,
+      "Base区间命中率%": 74.3,
+      "Event区间命中率%": 74.3,
+      "命中率改善%": 0.0,
+      "Base平均宽度%": 3.96,
+      "Event平均宽度%": 3.96
+    },
+    {
+      "周期": "T+4",
+      "样本数": 70,
+      "Base区间命中率%": 75.7,
+      "Event区间命中率%": 75.7,
+      "命中率改善%": 0.0,
+      "Base平均宽度%": 5.17,
+      "Event平均宽度%": 5.17
+    },
+    {
+      "周期": "T+5",
+      "样本数": 70,
+      "Base区间命中率%": 74.3,
+      "Event区间命中率%": 74.3,
+      "命中率改善%": 0.0,
+      "Base平均宽度%": 6.42,
+      "Event平均宽度%": 6.27
+    }
+  ]
+}

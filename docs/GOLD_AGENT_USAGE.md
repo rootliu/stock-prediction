@@ -69,7 +69,7 @@ cd /Users/rootliu/code/stock-prediction
 /Users/rootliu/code/stock-prediction/scripts/run_gold_direct_report.sh /path/to/output 2026-04-03
 ```
 
-如果不传 `target-end`，wrapper 会默认取“未来第 3 个交易日”。
+如果不传 `target-end`，wrapper 会默认取“未来第 3 个 SHFE 交易日”，不是普通 weekday。
 
 产物固定为：
 
