@@ -1,0 +1,484 @@
+{
+  "forecast_mode": "direct",
+  "latest_date": "2026-04-03",
+  "latest_close": 1033.0,
+  "predictions": [
+    {
+      "date": "2026-04-06",
+      "close": 1035.73,
+      "direction": "涨",
+      "confidence": 40.6,
+      "range_low": 1015.06,
+      "range_high": 1056.41,
+      "regime": "high",
+      "n_models": 1,
+      "model_details": {
+        "model_name": "direct_gbm_multi_horizon_v1",
+        "horizon_days": 1,
+        "pred_return_pct": 0.481,
+        "up_probability": 0.596,
+        "test_mape_pct": 1.9962,
+        "test_direction_accuracy": 66.67,
+        "effective_base": 1033.0
+      },
+      "scenarios": {
+        "bear_close": 1011.43,
+        "base_close": 1035.73,
+        "bull_close": 1061.65,
+        "bull_driver": "地缘风险",
+        "bear_driver": "事件落地回吐"
+      }
+    },
+    {
+      "date": "2026-04-07",
+      "close": 1041.08,
+      "direction": "涨",
+      "confidence": 56.7,
+      "range_low": 1002.17,
+      "range_high": 1079.99,
+      "regime": "high",
+      "n_models": 1,
+      "model_details": {
+        "model_name": "direct_gbm_multi_horizon_v1",
+        "horizon_days": 2,
+        "pred_return_pct": 1.422,
+        "up_probability": 0.8256,
+        "test_mape_pct": 3.3371,
+        "test_direction_accuracy": 60.42,
+        "effective_base": 1033.0
+      },
+      "scenarios": {
+        "bear_close": 999.13,
+        "base_close": 1041.08,
+        "bull_close": 1085.26,
+        "bull_driver": "地缘风险",
+        "bear_driver": "模型中枢下方波动"
+      }
+    },
+    {
+      "date": "2026-04-08",
+      "close": 1043.73,
+      "direction": "涨",
+      "confidence": 57.1,
+      "range_low": 994.89,
+      "range_high": 1092.57,
+      "regime": "high",
+      "n_models": 1,
+      "model_details": {
+        "model_name": "direct_gbm_multi_horizon_v1",
+        "horizon_days": 3,
+        "pred_return_pct": 1.888,
+        "up_probability": 0.8934,
+        "test_mape_pct": 3.7739,
+        "test_direction_accuracy": 62.5,
+        "effective_base": 1033.0
+      },
+      "scenarios": {
+        "bear_close": 993.6,
+        "base_close": 1043.73,
+        "bull_close": 1098.01,
+        "bull_driver": "地缘风险",
+        "bear_driver": "模型中枢下方波动"
+      }
+    },
+    {
+      "date": "2026-04-09",
+      "close": 1037.53,
+      "direction": "涨",
+      "confidence": 50.3,
+      "range_low": 975.43,
+      "range_high": 1099.64,
+      "regime": "high",
+      "n_models": 1,
+      "model_details": {
+        "model_name": "direct_gbm_multi_horizon_v1",
+        "horizon_days": 4,
+        "pred_return_pct": 0.798,
+        "up_probability": 0.9066,
+        "test_mape_pct": 4.4015,
+        "test_direction_accuracy": 60.42,
+        "effective_base": 1033.0
+      },
+      "scenarios": {
+        "bear_close": 975.28,
+        "base_close": 1037.53,
+        "bull_close": 1099.78,
+        "bull_driver": "地缘风险",
+        "bear_driver": "模型中枢下方波动"
+      }
+    },
+    {
+      "date": "2026-04-10",
+      "close": 1033.54,
+      "direction": "涨",
+      "confidence": 19.6,
+      "range_low": 953.93,
+      "range_high": 1113.16,
+      "regime": "high",
+      "n_models": 1,
+      "model_details": {
+        "model_name": "direct_gbm_multi_horizon_v1",
+        "horizon_days": 5,
+        "pred_return_pct": 0.096,
+        "up_probability": 0.6095,
+        "test_mape_pct": 5.2049,
+        "test_direction_accuracy": 45.83,
+        "effective_base": 1033.0
+      },
+      "scenarios": {
+        "bear_close": 971.53,
+        "base_close": 1033.54,
+        "bull_close": 1095.55,
+        "bull_driver": "地缘风险",
+        "bear_driver": "模型中枢下方波动"
+      }
+    }
+  ],
+  "scenario_bundle": {
+    "feature_summary": {
+      "news_bull_score": 0.9966,
+      "news_bear_score": 0.3774,
+      "blog_bull_score": 0.9729,
+      "blog_bear_score": 0.7435,
+      "article_count": 48,
+      "safe_haven_score": 0.0,
+      "policy_risk_score": 0.108,
+      "geo_risk_score": 1.0,
+      "sell_the_news_score": 0.0,
+      "usd_pressure_score": 0.0,
+      "rate_pressure_score": 0.1295,
+      "oil_shock_score": 0.2797,
+      "structural_support_score": 0.0,
+      "policy_relief_score": 0.5588,
+      "geo_relief_score": 0.8137
+    },
+    "top_bull": [
+      {
+        "title": "Stocks struggle, oil jumps as Trump's Iran deadline looms - reuters.com",
+        "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxPclFHbk5DX2dtMzRqM1I2YzZuakJ1SmVFUm5pdzFSWFBOWE50bXMyWTFkSjhWUnRuTVhjMmlvOXBJdHU5NV93eU8tQmxyeVBUU3ZvYkJCcklqYlN6QXp6WFhUM0pHYXNmclJSR0tNMUR0QktJVF91OHFQQXc1Y3ZKWDNPcw?oc=5",
+        "published": "2026-04-07 02:20:00",
+        "site": "reuters.com",
+        "source_type": "news",
+        "bull_score": 1.84,
+        "bear_score": 0.345,
+        "weight": 1.15,
+        "tags": [
+          "iran",
+          "oil jumps"
+        ],
+        "buckets": {
+          "geo_risk": 1.1,
+          "oil_shock": 0.5
+        }
+      },
+      {
+        "title": "Oil prices extend gains as Trump sharpens rhetoric on Iran - reuters.com",
+        "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOWmtnNUp0TXFkQWVyRzhFVUJTVDBVMmEza3lHTnB5bEtlZnNFSEVFWWhkSTJwZU4yNDNXUXlqMm44MDl5ZGVVTHFxazVKS2plSjhOQkhaVmtUbmFGRFJqXy1TeTRkQnh2VEhIR1VUOHZxdFNNRm5oRXpiSkhkTWlwcnMwUHE4SXpPeXhEejVOc2l4OGZEWjIzVkRvY2RnNkZTLWY5QkU2MmxmaHIzOVRMUmY5NA?oc=5",
+        "published": "2026-04-06 22:49:00",
+        "site": "reuters.com",
+        "source_type": "news",
+        "bull_score": 1.265,
+        "bear_score": 0.0,
+        "weight": 1.15,
+        "tags": [
+          "iran"
+        ],
+        "buckets": {
+          "geo_risk": 1.1
+        }
+      },
+      {
+        "title": "Trump seizes on rescue of downed airman to recast unpopular Iran war - reuters.com",
+        "link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxNYW0yVlFJX3NMVTU1YVlpT3BHR0NpaVI2MmxzOFpZUklRQTZTWUhXUFJJZVJGMFFsTUJCWHFPc2duSXM2V2puMTktNTYtVWRWYXZLcW5HMVZEXzNEOExFTDVEUFFHVVhuZ01mVGVsbFdNWUlRTWZubkhQUUtZZTlyZ1FQZmRKdHYtSWtQdWFxQ1ZUbDUxbl9jeHZCdFNSakw5Ym1IQ3dHT19ZWlNuajRPMHh4cWhLek42ZGc?oc=5",
+        "published": "2026-04-06 23:19:00",
+        "site": "reuters.com",
+        "source_type": "news",
+        "bull_score": 1.265,
+        "bear_score": 0.0,
+        "weight": 1.15,
+        "tags": [
+          "iran"
+        ],
+        "buckets": {
+          "geo_risk": 1.1
+        }
+      }
+    ],
+    "top_bear": [
+      {
+        "title": "Gold remains depressed as Hormuz standoff supports USD amid hawkish Fed rate bets - FXStreet",
+        "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxPY3hxOXFjdmpsdDRpRENBMnp2d1RWWUE0OTgwNU1yOTNPTnRfOXVQeFZ6YWx2c19XLXpLU2RZSUxYaFM2X0lPbENDYTlqeDNjc2JsRG0xaGdiU1dXUkNNVmJYa2toUjdxRWl1a21mT2d6NklUSk1HUXlTRnZVME9CUHZLTFFjeWNMRlVfcHd3b0FxV0ctdllBaEplQUt2dzMwOXNVMzZjRnVyLXlmbjBxNkIteTRpZGtBNk5tVFVvNGRjQQ?oc=5",
+        "published": "2026-04-07 03:29:17",
+        "site": "fxstreet.com",
+        "source_type": "blog",
+        "bull_score": 0.0,
+        "bear_score": 0.3906,
+        "weight": 0.434,
+        "tags": [
+          "hawkish"
+        ],
+        "buckets": {
+          "rate_pressure": 0.9
+        }
+      },
+      {
+        "title": "Asia stocks: Nikkei, KOSPI rise over 1% on report of Iran ceasefire talks - investing.com",
+        "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxPSDZDWmlrOVQzU0ZXc0FDRkhkTllhT0hiR1BwYXJiME5IWHp1TnJVUGdzcDBaZTMxSmNPdlUycDFvVkdSN3p0QlNBLVc0RVc3Y1RoVktwU2lKaXlTb0RqQWZiQkZPY3V2U0xRQ0xEeWFUb3VKNzNfU01fY2toTE5YZTQ3ZG5TOV9NUDdqN3pRb2U2a3Q0d3YtRDI1SXlMOC1LVUR4M1ZoblpMbjNFSnZzczVUNVVsUUJscmZxbk5BOUFzb0JlOVFR?oc=5",
+        "published": "2026-04-06 05:11:48",
+        "site": "investing.com",
+        "source_type": "blog",
+        "bull_score": 0.6314,
+        "bear_score": 0.861,
+        "weight": 0.574,
+        "tags": [
+          "iran",
+          "ceasefire",
+          "talks"
+        ],
+        "buckets": {
+          "geo_risk": 1.1,
+          "geo_relief": 1.0,
+          "policy_relief": 0.5
+        }
+      },
+      {
+        "title": "Indian dealers charge first gold premiums in two months - KITCO",
+        "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPMWkyREw2OC1fTXNqLWNQUkJqU0lMeXRxbE5Nc3JwVmtId3JBUzh4MTN1Q0ZrdFJ0NER2aTdSM0Jzb0JiWWxsUV94Rmd6WmhpU2N1aUs5N3JEUVpHZWtZaVpldFMwYTNvLThpdjBZeWdqdWMwZUJMXzgzanhGRVhTd0Y4QUlMWS12bmg2N0hNUHA1b0xWT0RIanA2a1ZZazFLc0pzaS1R?oc=5",
+        "published": "2026-04-02 18:18:00",
+        "site": "kitco.com",
+        "source_type": "blog",
+        "bull_score": 0.0,
+        "bear_score": 0.1738,
+        "weight": 0.4345,
+        "tags": [
+          "deal"
+        ],
+        "buckets": {
+          "policy_relief": 0.4
+        }
+      }
+    ],
+    "scenario_rows": [
+      {
+        "date": "2026-04-06",
+        "bear_close": 1011.43,
+        "base_close": 1035.73,
+        "bull_close": 1061.65,
+        "base_low": 1015.06,
+        "base_high": 1056.41,
+        "bull_driver": "地缘风险",
+        "bear_driver": "事件落地回吐",
+        "calendar_score": -0.168,
+        "active_events": [
+          {
+            "event_name": "USD Rebound Risk",
+            "event_type": "macro",
+            "event_date": "2026-04-03",
+            "phase": "post",
+            "pre_bias": 0.0,
+            "post_bias": -0.55,
+            "importance": 0.75,
+            "notes": "Seed row for post-event dollar rebound / risk normalization pressure"
+          }
+        ]
+      },
+      {
+        "date": "2026-04-07",
+        "bear_close": 999.13,
+        "base_close": 1041.08,
+        "bull_close": 1085.26,
+        "base_low": 1002.17,
+        "base_high": 1079.99,
+        "bull_driver": "地缘风险",
+        "bear_driver": "模型中枢下方波动",
+        "calendar_score": -0.124,
+        "active_events": [
+          {
+            "event_name": "USD Rebound Risk",
+            "event_type": "macro",
+            "event_date": "2026-04-03",
+            "phase": "post",
+            "pre_bias": 0.0,
+            "post_bias": -0.55,
+            "importance": 0.75,
+            "notes": "Seed row for post-event dollar rebound / risk normalization pressure"
+          }
+        ]
+      },
+      {
+        "date": "2026-04-08",
+        "bear_close": 993.6,
+        "base_close": 1043.73,
+        "bull_close": 1098.01,
+        "base_low": 994.89,
+        "base_high": 1092.57,
+        "bull_driver": "地缘风险",
+        "bear_driver": "模型中枢下方波动",
+        "calendar_score": 0.029,
+        "active_events": [
+          {
+            "event_name": "US CPI Release Window",
+            "event_type": "macro",
+            "event_date": "2026-04-10",
+            "phase": "pre",
+            "pre_bias": 0.2,
+            "post_bias": -0.2,
+            "importance": 0.65,
+            "notes": "Editable recurring macro example"
+          }
+        ]
+      },
+      {
+        "date": "2026-04-09",
+        "bear_close": 975.28,
+        "base_close": 1037.53,
+        "bull_close": 1099.78,
+        "base_low": 975.43,
+        "base_high": 1099.64,
+        "bull_driver": "地缘风险",
+        "bear_driver": "模型中枢下方波动",
+        "calendar_score": 0.061,
+        "active_events": [
+          {
+            "event_name": "US CPI Release Window",
+            "event_type": "macro",
+            "event_date": "2026-04-10",
+            "phase": "pre",
+            "pre_bias": 0.2,
+            "post_bias": -0.2,
+            "importance": 0.65,
+            "notes": "Editable recurring macro example"
+          }
+        ]
+      },
+      {
+        "date": "2026-04-10",
+        "bear_close": 971.53,
+        "base_close": 1033.54,
+        "bull_close": 1095.55,
+        "base_low": 953.93,
+        "base_high": 1113.16,
+        "bull_driver": "地缘风险",
+        "bear_driver": "模型中枢下方波动",
+        "calendar_score": 0.13,
+        "active_events": [
+          {
+            "event_name": "US CPI Release Window",
+            "event_type": "macro",
+            "event_date": "2026-04-10",
+            "phase": "pre",
+            "pre_bias": 0.2,
+            "post_bias": -0.2,
+            "importance": 0.65,
+            "notes": "Editable recurring macro example"
+          }
+        ]
+      }
+    ],
+    "pathways": [
+      "地缘风险新闻较密集，模型将其映射为短线风险溢价。"
+    ],
+    "article_count": 48,
+    "calibration": {
+      "median_abs_return": 0.012732,
+      "p75_abs_return": 0.030607,
+      "pre_event_scale": 0.008213,
+      "post_event_scale": 0.005635,
+      "sell_the_news_scale": 0.016906
+    }
+  },
+  "backtest_metrics": [
+    {
+      "周期": "T+1",
+      "样本数": 70,
+      "MAE(元/克)": 3.08,
+      "RMSE(元/克)": 4.56,
+      "MAPE%": 0.84,
+      "方向准确率%": 55.7,
+      "平均信心度": 44.1
+    },
+    {
+      "周期": "T+2",
+      "样本数": 70,
+      "MAE(元/克)": 5.45,
+      "RMSE(元/克)": 10.12,
+      "MAPE%": 1.35,
+      "方向准确率%": 45.7,
+      "平均信心度": 41.0
+    },
+    {
+      "周期": "T+3",
+      "样本数": 70,
+      "MAE(元/克)": 6.24,
+      "RMSE(元/克)": 11.09,
+      "MAPE%": 1.56,
+      "方向准确率%": 47.1,
+      "平均信心度": 37.2
+    },
+    {
+      "周期": "T+4",
+      "样本数": 70,
+      "MAE(元/克)": 7.34,
+      "RMSE(元/克)": 14.67,
+      "MAPE%": 1.72,
+      "方向准确率%": 54.3,
+      "平均信心度": 35.8
+    },
+    {
+      "周期": "T+5",
+      "样本数": 70,
+      "MAE(元/克)": 9.07,
+      "RMSE(元/克)": 16.96,
+      "MAPE%": 2.17,
+      "方向准确率%": 48.6,
+      "平均信心度": 30.1
+    }
+  ],
+  "event_backtest_metrics": [
+    {
+      "周期": "T+1",
+      "样本数": 70,
+      "Base区间命中率%": 57.1,
+      "Event区间命中率%": 57.1,
+      "命中率改善%": 0.0,
+      "Base平均宽度%": 1.66,
+      "Event平均宽度%": 1.67
+    },
+    {
+      "周期": "T+2",
+      "样本数": 70,
+      "Base区间命中率%": 60.0,
+      "Event区间命中率%": 60.0,
+      "命中率改善%": 0.0,
+      "Base平均宽度%": 2.81,
+      "Event平均宽度%": 2.81
+    },
+    {
+      "周期": "T+3",
+      "样本数": 70,
+      "Base区间命中率%": 74.3,
+      "Event区间命中率%": 74.3,
+      "命中率改善%": 0.0,
+      "Base平均宽度%": 3.96,
+      "Event平均宽度%": 3.96
+    },
+    {
+      "周期": "T+4",
+      "样本数": 70,
+      "Base区间命中率%": 75.7,
+      "Event区间命中率%": 75.7,
+      "命中率改善%": 0.0,
+      "Base平均宽度%": 5.17,
+      "Event平均宽度%": 5.17
+    },
+    {
+      "周期": "T+5",
+      "样本数": 70,
+      "Base区间命中率%": 74.3,
+      "Event区间命中率%": 74.3,
+      "命中率改善%": 0.0,
+      "Base平均宽度%": 6.42,
+      "Event平均宽度%": 6.27
+    }
+  ]
+}

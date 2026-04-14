@@ -10,7 +10,7 @@
 - 首日预测: `2026-04-13` 基础情景 `1053.69` 元/克，方向 `涨`，置信度 `41.6%`
 - 波动区间: `1032.11 ~ 1075.27` 元/克
 - 主 bullish 因子: 地缘风险 (1.00)
-- 主 bearish 因子: 地缘缓和预期 (0.96)
+- 主 bearish 因子: 政策缓和预期 (0.98)
 - 路径解释: 地缘风险新闻较密集，模型将其映射为短线风险溢价。
 
 | date       |   bear_close |   base_close |   bull_close | direction   |   confidence | bull_driver   | bear_driver   |
@@ -67,10 +67,10 @@ cd /Users/rootliu/code/stock-prediction && .venv/bin/python run_gold_analysis.py
 
 ```json
 {
-  "news_bull_score": 0.9967,
-  "news_bear_score": 0.8184,
-  "blog_bull_score": 0.9553,
-  "blog_bear_score": 0.8242,
+  "news_bull_score": 0.9968,
+  "news_bear_score": 0.8832,
+  "blog_bull_score": 0.9709,
+  "blog_bear_score": 0.8142,
   "article_count": 48,
   "safe_haven_score": 0.0,
   "policy_risk_score": 0.0,
@@ -78,10 +78,10 @@ cd /Users/rootliu/code/stock-prediction && .venv/bin/python run_gold_analysis.py
   "sell_the_news_score": 0.0,
   "usd_pressure_score": 0.1295,
   "rate_pressure_score": 0.0,
-  "oil_shock_score": 0.0334,
+  "oil_shock_score": 0.0,
   "structural_support_score": 0.0,
-  "policy_relief_score": 0.9512,
-  "geo_relief_score": 0.9638
+  "policy_relief_score": 0.982,
+  "geo_relief_score": 0.9602
 }
 ```
 
@@ -99,14 +99,14 @@ cd /Users/rootliu/code/stock-prediction && .venv/bin/python run_gold_analysis.py
 
 ## Key Headlines
 
-| site         | published   | title                                                                                                  |
-|:-------------|:------------|:-------------------------------------------------------------------------------------------------------|
-| reuters.com  | 2026-04-11  | Exclusive: Iranian source says US has agreed to unfreeze Iranian funds, Washington denies it - Reuters |
-| reuters.com  | 2026-04-11  | Iran's new supreme leader has severe and disfiguring wounds, sources say - Reuters                     |
-| reuters.com  | 2026-04-11  | US intelligence indicates China preparing weapons shipment to Iran, CNN reports - Reuters              |
-| cnbc.com     | 2026-04-10  | Iran's speaker says negotiations with U.S. can't start without Lebanon ceasefire, asset release - CNBC |
-| kitco.com    | 2026-04-10  | Gold extends three-week rally, but fragile ceasefire and inflation risks cap upside - KITCO            |
-| fxstreet.com | 2026-04-10  | Gold: Slight upside risk with fragile ceasefire – OCBC - FXStreet                                      |
+| site          | published   | title                                                                                                  |
+|:--------------|:------------|:-------------------------------------------------------------------------------------------------------|
+| reuters.com   | 2026-04-11  | Americans weigh in on the Iran war, gas prices and their fears - Reuters                               |
+| reuters.com   | 2026-04-11  | Exclusive: Iranian source says US has agreed to unfreeze Iranian funds, Washington denies it - Reuters |
+| bloomberg.com | 2026-04-12  | US Hasn’t Reached Agreement With Iran, Vance Says - Bloomberg.com                                      |
+| cnbc.com      | 2026-04-10  | Iran's speaker says negotiations with U.S. can't start without Lebanon ceasefire, asset release - CNBC |
+| kitco.com     | 2026-04-10  | Gold extends three-week rally, but fragile ceasefire and inflation risks cap upside - KITCO            |
+| fxstreet.com  | 2026-04-08  | DXY rebounds from 98.50 as ceasefire doubts mount - FXStreet                                           |
 
 ## Base Backtest
 

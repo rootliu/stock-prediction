@@ -1,0 +1,393 @@
+{
+  "forecast_mode": "direct",
+  "latest_date": "2026-04-13",
+  "latest_close": 1043.4,
+  "predictions": [
+    {
+      "date": "2026-04-14",
+      "close": 1047.97,
+      "direction": "涨",
+      "confidence": 48.7,
+      "range_low": 1026.2,
+      "range_high": 1069.73,
+      "regime": "high",
+      "n_models": 1,
+      "model_details": {
+        "model_name": "direct_gbm_multi_horizon_v1",
+        "horizon_days": 1,
+        "pred_return_pct": 0.796,
+        "up_probability": 0.3466,
+        "test_mape_pct": 2.0769,
+        "test_direction_accuracy": 70.83,
+        "effective_base": 1043.4
+      },
+      "scenarios": {
+        "bear_close": 1024.4,
+        "base_close": 1047.97,
+        "bull_close": 1075.14,
+        "bull_driver": "地缘风险",
+        "bear_driver": "利率压力"
+      }
+    },
+    {
+      "date": "2026-04-15",
+      "close": 1056.85,
+      "direction": "涨",
+      "confidence": 45.9,
+      "range_low": 1016.08,
+      "range_high": 1097.63,
+      "regime": "high",
+      "n_models": 1,
+      "model_details": {
+        "model_name": "direct_gbm_multi_horizon_v1",
+        "horizon_days": 2,
+        "pred_return_pct": 2.344,
+        "up_probability": 0.7247,
+        "test_mape_pct": 3.4449,
+        "test_direction_accuracy": 58.33,
+        "effective_base": 1043.4
+      },
+      "scenarios": {
+        "bear_close": 1014.26,
+        "base_close": 1056.85,
+        "bull_close": 1103.09,
+        "bull_driver": "地缘风险",
+        "bear_driver": "利率压力"
+      }
+    },
+    {
+      "date": "2026-04-16",
+      "close": 1057.48,
+      "direction": "涨",
+      "confidence": 47.0,
+      "range_low": 1005.76,
+      "range_high": 1109.2,
+      "regime": "high",
+      "n_models": 1,
+      "model_details": {
+        "model_name": "direct_gbm_multi_horizon_v1",
+        "horizon_days": 3,
+        "pred_return_pct": 2.454,
+        "up_probability": 0.7699,
+        "test_mape_pct": 3.9442,
+        "test_direction_accuracy": 64.58,
+        "effective_base": 1043.4
+      },
+      "scenarios": {
+        "bear_close": 1003.94,
+        "base_close": 1057.48,
+        "bull_close": 1114.66,
+        "bull_driver": "地缘风险",
+        "bear_driver": "利率压力"
+      }
+    },
+    {
+      "date": "2026-04-17",
+      "close": 1056.18,
+      "direction": "涨",
+      "confidence": 28.1,
+      "range_low": 992.81,
+      "range_high": 1119.56,
+      "regime": "high",
+      "n_models": 1,
+      "model_details": {
+        "model_name": "direct_gbm_multi_horizon_v1",
+        "horizon_days": 4,
+        "pred_return_pct": 2.227,
+        "up_probability": 0.5831,
+        "test_mape_pct": 4.4121,
+        "test_direction_accuracy": 68.75,
+        "effective_base": 1043.4
+      },
+      "scenarios": {
+        "bear_close": 992.81,
+        "base_close": 1056.18,
+        "bull_close": 1119.55,
+        "bull_driver": "地缘风险",
+        "bear_driver": "利率压力"
+      }
+    }
+  ],
+  "scenario_bundle": {
+    "feature_summary": {
+      "news_bull_score": 0.9968,
+      "news_bear_score": 0.6607,
+      "blog_bull_score": 0.928,
+      "blog_bear_score": 0.7403,
+      "article_count": 48,
+      "safe_haven_score": 0.0,
+      "policy_risk_score": 0.1974,
+      "geo_risk_score": 1.0,
+      "sell_the_news_score": 0.0,
+      "usd_pressure_score": 0.0,
+      "rate_pressure_score": 0.4221,
+      "oil_shock_score": 0.49,
+      "structural_support_score": 0.0,
+      "policy_relief_score": 0.8846,
+      "geo_relief_score": 0.5966
+    },
+    "top_bull": [
+      {
+        "title": "Trump threatens 50% tariffs on China as report suggests plans for arms shipment to Iran - CNBC",
+        "link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxQRDBCNmhpOU5ZY3ZYZTZZU2FDaHVDc1BhLTl2a2x3c1dOWWd5alQ3SEhlV1VMdjllS19mNXM3a28yMUxtTTJya3EwRTRja0pNNVFPaDMxR0o1NUM2NnlnekV0cGRvaFphbENPYkJLVEs4TlNJSm13ZUJDY3NSWnUxamVZY2QyanlqYkJWZEF5SHpocjVDdDNQTWJfQ1phdUVKSHB5S3BiRzRiM1E2LXRJYUdLU21Nd2l4V1NFYi04cWxUc2NkMDg1S2xn0gHPAUFVX3lxTE84eUxCY1RuTmZ4eWZLbVltZzZKOEJmQmRmM1FNUTZFcTVpWElfR1R3VkVJZFZMazF0dWdLTmYwN1pnY1RVRnZxWDd6am43UDJ4OEtYVjc5bmNjUmJPamVMb0R1TGpNay04Z1NDR1Uyc0Q1Z2tzQ3p0V1JHNDd0WjVWdlBCUnUtVFM0X1dxbnMybHhHN081R2o4a211TUY5NXVIbUpRaVFvdk93UkVCUEZRQzRHSGRqUmJxTXdKR1U2dlV1bWk4N216dTJhQUllQQ?oc=5",
+        "published": "2026-04-13 07:47:49",
+        "site": "cnbc.com",
+        "source_type": "news",
+        "bull_score": 1.68,
+        "bear_score": 0.0,
+        "weight": 0.8,
+        "tags": [
+          "tariff",
+          "iran"
+        ],
+        "buckets": {
+          "policy_risk": 1.0,
+          "geo_risk": 1.1
+        }
+      },
+      {
+        "title": "Morning Bid: Oil surges on US blockade of Iran - Reuters",
+        "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTE9KU0tMVUMtMzlDRThlQk5zQ1E5ZFVMTkIybjJtMEw5Z0xmeGFQZmFZZGtRQW9VbGNwUXIybGFlTWdROXdrU19pTm44TVdMSVFvUTJldHBkM0llaktKLWkyQ0F1emNpdHktVlMxdG5ZQjJxZEtqbFQyM0ZZZzZsQ3M?oc=5",
+        "published": "2026-04-13 04:32:00",
+        "site": "reuters.com",
+        "source_type": "news",
+        "bull_score": 1.84,
+        "bear_score": 0.345,
+        "weight": 1.15,
+        "tags": [
+          "iran",
+          "oil surge"
+        ],
+        "buckets": {
+          "geo_risk": 1.1,
+          "oil_shock": 0.5
+        }
+      },
+      {
+        "title": "What does a US naval blockade of Iran mean for oil flows? - Reuters",
+        "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxPQWl1RFA3RW1leHlOYVRnNDdIcjVubVI3VjhfU1FVN3BvdFNLRFNKY2l0OUxJVVRPR0djcEtBX1hzOWk2TkVTMk4wWGN3N1NINmhfRmtjUGNoRUpPWkdFWk52a013UVFtNVBORnRuRzFQdWUwLWdQTDBYNU1heFN5R24yQnVfZVZJOTk0N1NNbzlQamhGZ0hZcFBoMGJ4c1B0a2dF?oc=5",
+        "published": "2026-04-13 07:39:47",
+        "site": "reuters.com",
+        "source_type": "news",
+        "bull_score": 1.265,
+        "bear_score": 0.0,
+        "weight": 1.15,
+        "tags": [
+          "iran"
+        ],
+        "buckets": {
+          "geo_risk": 1.1
+        }
+      }
+    ],
+    "top_bear": [
+      {
+        "title": "Treasury yields rise as collapse of Iran talks clouds inflation outlook - CNBC",
+        "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxPYUIzQnVRTE04V2lfZU8waVhqN256WHNRN0F0cGh5OVBPa1VFeWdnT3RDUHc1aS1Yektzb1IzVmhaamJwVGFmWGVRSzlEYW9JU1BiTU5WOFFiMXhzNHltNjl6TDJ2dkRvaElHR1RQNEU2YmFmUVhFcGdIcUFjQWNvMVRQTjNUWTB1d2w4TmthUkkwb3hBRjVvai00eElqcXBoWmNrTEw3RndqQdIBrwFBVV95cUxNb2ppYWk2MlI4eXhYb1ZWdUxMYWlxZFV1MHNUejFVQkNNQWR4bHFFaTBlRmxqdEtfNGFJT190OUJRR2F2MENWdXVYQjlqSnNWajNjNEVNTW00ekpPUjgtVm1QOGtiRFlDV3lNZ2d4STd5b05tTy1SOGpoOE5uMTlyejJkUXdVbTFqby1sNDZUQ1BZcUtNVlN4NktEUkxrYm9nWFBmX0dvSDRPaEZ3RWl3?oc=5",
+        "published": "2026-04-13 08:05:06",
+        "site": "cnbc.com",
+        "source_type": "news",
+        "bull_score": 0.88,
+        "bear_score": 1.36,
+        "weight": 0.8,
+        "tags": [
+          "iran",
+          "talks",
+          "yields rise"
+        ],
+        "buckets": {
+          "geo_risk": 1.1,
+          "policy_relief": 0.5,
+          "rate_pressure": 1.2
+        }
+      },
+      {
+        "title": "Gold builds on intraday ascent; hawkish Fed bets cap upside - FXStreet",
+        "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxOMlFCS0NLaDNrTko2WUNSd3JtMHgzSzJabGdvOXBPREJBcGZVMVIzQTdoeE5FTWVObjkzQTFrTktTTTdESzhEc2F5UUZBZUdZZFdoeEwyS0Y5ZjBsZkhFVFRxUTI1b2dmYnFTbXJmd0w1OHVUakhWSWR3d3lwbVBIbGY5SC1ocGRTajkzZmlpd0hhZ3VGdENFTUZwSS0tRFN5RDhYMFFvOXdQVGtGd0tnOGJKSmwwRWZIVS1PcUM4bXpUUQ?oc=5",
+        "published": "2026-04-13 08:40:12",
+        "site": "fxstreet.com",
+        "source_type": "blog",
+        "bull_score": 0.0,
+        "bear_score": 0.3906,
+        "weight": 0.434,
+        "tags": [
+          "hawkish"
+        ],
+        "buckets": {
+          "rate_pressure": 0.9
+        }
+      },
+      {
+        "title": "Gold extends three-week rally, but fragile ceasefire and inflation risks cap upside - KITCO",
+        "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOMjVydUhNUExLdEpfQXFYUW5zYVl1ZkhPOEpxV1dXNVZfT2xzVjB5bzgwaGVwTzJxZlJPMzVKeWJ2SHUxbFl0bFRtT1lvX1ZraERCNUZ4TFl0TTVPVTZhcjBOaUM5VlJMYTZsTThZZno1OWl4ZmUzdVRVM0QzcmJxNWE1TXNGTFI2UTR1UW1GRUh4aFMzTFZPNEFvUGRGcG9aLWoxQV9MMkJYLWNVaWJnSTYzQURWaE1D?oc=5",
+        "published": "2026-04-10 15:50:00",
+        "site": "kitco.com",
+        "source_type": "blog",
+        "bull_score": 0.0,
+        "bear_score": 0.2383,
+        "weight": 0.2383,
+        "tags": [
+          "ceasefire"
+        ],
+        "buckets": {
+          "geo_relief": 1.0
+        }
+      }
+    ],
+    "scenario_rows": [
+      {
+        "date": "2026-04-14",
+        "bear_close": 1024.4,
+        "base_close": 1047.97,
+        "bull_close": 1075.14,
+        "base_low": 1026.2,
+        "base_high": 1069.73,
+        "bull_driver": "地缘风险",
+        "bear_driver": "利率压力",
+        "calendar_score": 0.0,
+        "active_events": []
+      },
+      {
+        "date": "2026-04-15",
+        "bear_close": 1014.26,
+        "base_close": 1056.85,
+        "bull_close": 1103.09,
+        "base_low": 1016.08,
+        "base_high": 1097.63,
+        "bull_driver": "地缘风险",
+        "bear_driver": "利率压力",
+        "calendar_score": 0.0,
+        "active_events": []
+      },
+      {
+        "date": "2026-04-16",
+        "bear_close": 1003.94,
+        "base_close": 1057.48,
+        "bull_close": 1114.66,
+        "base_low": 1005.76,
+        "base_high": 1109.2,
+        "bull_driver": "地缘风险",
+        "bear_driver": "利率压力",
+        "calendar_score": 0.0,
+        "active_events": []
+      },
+      {
+        "date": "2026-04-17",
+        "bear_close": 992.81,
+        "base_close": 1056.18,
+        "bull_close": 1119.55,
+        "base_low": 992.81,
+        "base_high": 1119.56,
+        "bull_driver": "地缘风险",
+        "bear_driver": "利率压力",
+        "calendar_score": 0.0,
+        "active_events": []
+      }
+    ],
+    "pathways": [
+      "地缘风险新闻较密集，模型将其映射为短线风险溢价。"
+    ],
+    "article_count": 48,
+    "calibration": {
+      "median_abs_return": 0.013158,
+      "p75_abs_return": 0.030607,
+      "pre_event_scale": 0.008201,
+      "post_event_scale": 0.006534,
+      "sell_the_news_scale": 0.016906
+    }
+  },
+  "backtest_metrics": [
+    {
+      "周期": "T+1",
+      "样本数": 71,
+      "MAE(元/克)": 3.05,
+      "RMSE(元/克)": 4.53,
+      "MAPE%": 0.83,
+      "方向准确率%": 56.3,
+      "平均信心度": 44.1
+    },
+    {
+      "周期": "T+2",
+      "样本数": 71,
+      "MAE(元/克)": 5.67,
+      "RMSE(元/克)": 10.35,
+      "MAPE%": 1.36,
+      "方向准确率%": 46.5,
+      "平均信心度": 41.3
+    },
+    {
+      "周期": "T+3",
+      "样本数": 71,
+      "MAE(元/克)": 6.19,
+      "RMSE(元/克)": 11.02,
+      "MAPE%": 1.54,
+      "方向准确率%": 47.9,
+      "平均信心度": 37.5
+    },
+    {
+      "周期": "T+4",
+      "样本数": 71,
+      "MAE(元/克)": 7.38,
+      "RMSE(元/克)": 14.62,
+      "MAPE%": 1.71,
+      "方向准确率%": 54.9,
+      "平均信心度": 36.0
+    },
+    {
+      "周期": "T+5",
+      "样本数": 71,
+      "MAE(元/克)": 9.08,
+      "RMSE(元/克)": 16.88,
+      "MAPE%": 2.16,
+      "方向准确率%": 49.3,
+      "平均信心度": 30.0
+    }
+  ],
+  "event_backtest_metrics": [
+    {
+      "周期": "T+1",
+      "样本数": 71,
+      "Base区间命中率%": 57.7,
+      "Event区间命中率%": 57.7,
+      "命中率改善%": 0.0,
+      "Base平均宽度%": 1.69,
+      "Event平均宽度%": 1.7
+    },
+    {
+      "周期": "T+2",
+      "样本数": 71,
+      "Base区间命中率%": 60.6,
+      "Event区间命中率%": 60.6,
+      "命中率改善%": 0.0,
+      "Base平均宽度%": 2.87,
+      "Event平均宽度%": 2.87
+    },
+    {
+      "周期": "T+3",
+      "样本数": 71,
+      "Base区间命中率%": 74.6,
+      "Event区间命中率%": 74.6,
+      "命中率改善%": 0.0,
+      "Base平均宽度%": 4.03,
+      "Event平均宽度%": 4.03
+    },
+    {
+      "周期": "T+4",
+      "样本数": 71,
+      "Base区间命中率%": 76.1,
+      "Event区间命中率%": 76.1,
+      "命中率改善%": 0.0,
+      "Base平均宽度%": 5.27,
+      "Event平均宽度%": 5.27
+    },
+    {
+      "周期": "T+5",
+      "样本数": 71,
+      "Base区间命中率%": 74.6,
+      "Event区间命中率%": 74.6,
+      "命中率改善%": 0.0,
+      "Base平均宽度%": 6.55,
+      "Event平均宽度%": 6.35
+    }
+  ]
+}

@@ -136,10 +136,10 @@
   ],
   "scenario_bundle": {
     "feature_summary": {
-      "news_bull_score": 0.9967,
-      "news_bear_score": 0.8184,
-      "blog_bull_score": 0.9553,
-      "blog_bear_score": 0.8242,
+      "news_bull_score": 0.9968,
+      "news_bear_score": 0.8832,
+      "blog_bull_score": 0.9709,
+      "blog_bear_score": 0.8142,
       "article_count": 48,
       "safe_haven_score": 0.0,
       "policy_risk_score": 0.0,
@@ -147,12 +147,28 @@
       "sell_the_news_score": 0.0,
       "usd_pressure_score": 0.1295,
       "rate_pressure_score": 0.0,
-      "oil_shock_score": 0.0334,
+      "oil_shock_score": 0.0,
       "structural_support_score": 0.0,
-      "policy_relief_score": 0.9512,
-      "geo_relief_score": 0.9638
+      "policy_relief_score": 0.982,
+      "geo_relief_score": 0.9602
     },
     "top_bull": [
+      {
+        "title": "Americans weigh in on the Iran war, gas prices and their fears - Reuters",
+        "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQTEFEbVhyc2hHNG9OUFhtWHU2Yl92YTVEZkR3aFVOcmhfdDQtbWs2UFBmOC05XzRCbXFLYXFjYkUydkVISm5JX1UxcGhsMmduNTRYSTRCSTRNY0xaX1AtRU4wLVQ3ZG9KSkRIOUpSZFhwVHl6Zjk3M1NVQlFWTXJZTExrcXhOUWZuYW83UDZUNGl1NFVZOWs4?oc=5",
+        "published": "2026-04-11 13:24:14",
+        "site": "reuters.com",
+        "source_type": "news",
+        "bull_score": 1.265,
+        "bear_score": 0.0,
+        "weight": 1.15,
+        "tags": [
+          "iran"
+        ],
+        "buckets": {
+          "geo_risk": 1.1
+        }
+      },
       {
         "title": "Exclusive: Iranian source says US has agreed to unfreeze Iranian funds, Washington denies it - Reuters",
         "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxNZ0tYN2FaMjhaN1FlWGJOM25HaUhEOERsaS04VWdHdWEtNmFsMW1peXM4NEpXeUtmX2lLejFaM1lLelpIUUs3VFI0LUdCX09VcFM5WlgtNDBiNW5CM2dGa3BqV1NzeHp3dHA3VFVDTzlELUpsREJPTDktY0poVXhWZUJKUUxNR2dReF9GbVNzVzZuUGNRM21NbTZhS29xREZ2ZHlUWEVHZFlScHdtQjBteHlkV2V5Q0hmMGZUM0dLb1pyV05qWFlr?oc=5",
@@ -170,30 +186,14 @@
         }
       },
       {
-        "title": "Iran's new supreme leader has severe and disfiguring wounds, sources say - Reuters",
-        "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxNdzRGeWZ4RG9NOVB6M1FqR09kN3RVQ0p5TXAtekdlaXoyUlFXbmJVQUVpdElmcGhQdVdEbFpqRWRkZXAxNmJ4OTNwQzhEZlJHaTNxRjlkLXlEd1RFN2paT0FDUUVrX1c1dmM0Ui1DdkF2M0VtZ2lqWUt4QjNUQjVueGZzT3JFQU5lVWVrT1FyTU9oazd4bnAtTFVuTWlCMC05TS1hcHlqTTlzYVBSbG9qc0otY1FNMENIaTVsTw?oc=5",
-        "published": "2026-04-11 06:01:00",
-        "site": "reuters.com",
+        "title": "US Hasn’t Reached Agreement With Iran, Vance Says - Bloomberg.com",
+        "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxOZkoteEJSOE9ic1JZbXZnNnJwMXBuUjRRcm82ZVpNWnhFdzVHdThjSGd2S2VNUk9lN2czQVR4V01NanZFYlRXaXNNbGRJSUZES0RYeGZNZzhkMVhmaFN0Z0dGVmJ0bUp4NWN4XzlOa1ZqZzlvUmJRUjZuWWhBcjFsbjBlNTdPaDVsaWZBYWI1Nk1Ja2RIQktDMXM1bWYxY0RU?oc=5",
+        "published": "2026-04-12 01:57:00",
+        "site": "bloomberg.com",
         "source_type": "news",
-        "bull_score": 1.265,
+        "bull_score": 1.2017,
         "bear_score": 0.0,
-        "weight": 1.15,
-        "tags": [
-          "iran"
-        ],
-        "buckets": {
-          "geo_risk": 1.1
-        }
-      },
-      {
-        "title": "US intelligence indicates China preparing weapons shipment to Iran, CNN reports - Reuters",
-        "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxPRkZfMzl0azhYUk1mSTY3dHVqcEpoSWhySS1sdVQwZzFySmNXeWZobzlKYnB2dHVGeVNjb1F0RE1pdjVRQjZxblotcW84Wnk0UDdMdGFqNFJ4TFo5ZGZ1NUhsejItN3VXSFlSeWhWUlM5SEhZTVZGN3UyUHlkUnFlM3NSNEh2ZTlaQ3dGNjlRZVFnOUl0UGxiODFrRUVnMmR3Q3N6aEVONWhOV1d6WHlxVWpPV3F5cG1mcTYxVWdnRlk?oc=5",
-        "published": "2026-04-11 04:32:00",
-        "site": "reuters.com",
-        "source_type": "news",
-        "bull_score": 1.265,
-        "bear_score": 0.0,
-        "weight": 1.15,
+        "weight": 1.0925,
         "tags": [
           "iran"
         ],
@@ -226,7 +226,7 @@
       {
         "title": "Gold extends three-week rally, but fragile ceasefire and inflation risks cap upside - KITCO",
         "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOMjVydUhNUExLdEpfQXFYUW5zYVl1ZkhPOEpxV1dXNVZfT2xzVjB5bzgwaGVwTzJxZlJPMzVKeWJ2SHUxbFl0bFRtT1lvX1ZraERCNUZ4TFl0TTVPVTZhcjBOaUM5VlJMYTZsTThZZno1OWl4ZmUzdVRVM0QzcmJxNWE1TXNGTFI2UTR1UW1GRUh4aFMzTFZPNEFvUGRGcG9aLWoxQV9MMkJYLWNVaWJnSTYzQURWaE1D?oc=5",
-        "published": "2026-04-10 19:21:21",
+        "published": "2026-04-10 15:50:00",
         "site": "kitco.com",
         "source_type": "blog",
         "bull_score": 0.0,
@@ -240,14 +240,14 @@
         }
       },
       {
-        "title": "Gold: Slight upside risk with fragile ceasefire – OCBC - FXStreet",
-        "link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxPVnI5M0JTSkZaZ0Z4RldDWTdtZzRRUV9maXNyemhuZkJHR3VtZktUdmNsZ1gwS2F5eE12QXdZeXJCRG10UTRrNTdrWjFoam93OVNMTFg3ZlhaeDRTTi05Ti0ydzJ0LUNVcFpNdzVJdkxuX1RvZm9qZWthZEhvdXdwVmwtTmM5U3lSRDZQNFpRdlJhQTJIV2J0ZXl30gGfAUFVX3lxTE1DZ1o3N1J6WDlWckVfS3dYUi1UYldmeEhtMFVkZ2Q0cVI0MTNIWU5DQmpEWm9rS2FnalRFZi0zWjh5ZU5nNEtfZ3dEZ0ZjcU0yRk9TME5rNHJIdDlsLUNuZTlZX0Z3WlhnczByUGxNRXZkNG80OE1HN1JKWnp6RWtGY1hONHpsWTVEajNsQjFjSTFSZlNGZEFnNEpkRTNPYw?oc=5",
-        "published": "2026-04-10 09:50:13",
+        "title": "DXY rebounds from 98.50 as ceasefire doubts mount - FXStreet",
+        "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxQMWZYODhORHpOVnR6MlFQbHh0MEVJS19nZmtaSkJ1YnBreWZ0QjdUTWJTYlRhV3BWcFVfeVF3VTlxR0VWaWNuWXE3YWNvMDdmV1JUa3p6bWU4LXp4YnUwUDVnQS1JcWZoMU9kUC03eVZLdEp6TTdWOXpVQ3dCMzlhRnIyQWhZYkVmV2FZMFZ6X0JxNVU0WjZDWDlvN3l2Y2xFLXBPaExHNFBkQTlQcXfSAbMBQVVfeXFMTmtPemlDZHJhc1ByaXV1anJ6TUY1YU1CT2Zxa3laYWE2eGNTc3ZEOTk2dW5YZ29OVjFLbGo3bGRseHphNWxkQ1A3RmFyR1pUUGxESWE3MUs3bWlTMGEtXzhwRWptLW84M2poZlFESV9IUkxibUhkWGNGU1M0Tm9rWVNpRjd6R2xvNS1zWExjVlN6UGZWYlJsQnBuWGRCNGFXTEpPa1QyNTFuUXJKRmx1Ym9qSnc?oc=5",
+        "published": "2026-04-08 19:00:31",
         "site": "fxstreet.com",
         "source_type": "blog",
         "bull_score": 0.0,
-        "bear_score": 0.434,
-        "weight": 0.434,
+        "bear_score": 0.3073,
+        "weight": 0.3073,
         "tags": [
           "ceasefire"
         ],

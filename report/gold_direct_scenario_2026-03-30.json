@@ -1,0 +1,387 @@
+{
+  "forecast_mode": "direct",
+  "latest_date": "2026-03-30",
+  "latest_close": 1014.88,
+  "predictions": [
+    {
+      "date": "2026-03-31",
+      "close": 1027.16,
+      "direction": "涨",
+      "confidence": 75.4,
+      "range_low": 1006.92,
+      "range_high": 1047.39,
+      "regime": "high",
+      "n_models": 1,
+      "model_details": {
+        "model_name": "direct_gbm_multi_horizon_v1",
+        "horizon_days": 1,
+        "pred_return_pct": 2.199,
+        "up_probability": 0.9046,
+        "test_mape_pct": 1.9702,
+        "test_direction_accuracy": 68.75,
+        "effective_base": 1014.88
+      },
+      "scenarios": {
+        "bear_close": 1006.3,
+        "base_close": 1027.16,
+        "bull_close": 1056.96,
+        "bull_driver": "地缘风险、事件窗口前置",
+        "bear_driver": "模型中枢下方波动"
+      }
+    },
+    {
+      "date": "2026-04-01",
+      "close": 1028.68,
+      "direction": "涨",
+      "confidence": 45.0,
+      "range_low": 992.53,
+      "range_high": 1064.83,
+      "regime": "high",
+      "n_models": 1,
+      "model_details": {
+        "model_name": "direct_gbm_multi_horizon_v1",
+        "horizon_days": 2,
+        "pred_return_pct": 2.472,
+        "up_probability": 0.7155,
+        "test_mape_pct": 3.1379,
+        "test_direction_accuracy": 58.33,
+        "effective_base": 1014.88
+      },
+      "scenarios": {
+        "bear_close": 990.67,
+        "base_close": 1028.68,
+        "bull_close": 1072.47,
+        "bull_driver": "地缘风险、事件窗口前置",
+        "bear_driver": "模型中枢下方波动"
+      }
+    },
+    {
+      "date": "2026-04-02",
+      "close": 1025.31,
+      "direction": "涨",
+      "confidence": 41.1,
+      "range_low": 979.53,
+      "range_high": 1071.08,
+      "regime": "high",
+      "n_models": 1,
+      "model_details": {
+        "model_name": "direct_gbm_multi_horizon_v1",
+        "horizon_days": 3,
+        "pred_return_pct": 1.868,
+        "up_probability": 0.7204,
+        "test_mape_pct": 3.6004,
+        "test_direction_accuracy": 60.42,
+        "effective_base": 1014.88
+      },
+      "scenarios": {
+        "bear_close": 977.94,
+        "base_close": 1025.31,
+        "bull_close": 1080.61,
+        "bull_driver": "地缘风险、事件窗口前置",
+        "bear_driver": "模型中枢下方波动"
+      }
+    },
+    {
+      "date": "2026-04-03",
+      "close": 1034.86,
+      "direction": "涨",
+      "confidence": 29.5,
+      "range_low": 975.54,
+      "range_high": 1094.19,
+      "regime": "high",
+      "n_models": 1,
+      "model_details": {
+        "model_name": "direct_gbm_multi_horizon_v1",
+        "horizon_days": 4,
+        "pred_return_pct": 3.58,
+        "up_probability": 0.6271,
+        "test_mape_pct": 4.2152,
+        "test_direction_accuracy": 62.5,
+        "effective_base": 1014.88
+      },
+      "scenarios": {
+        "bear_close": 972.77,
+        "base_close": 1034.86,
+        "bull_close": 1096.95,
+        "bull_driver": "地缘风险",
+        "bear_driver": "卖事实风险、事件落地回吐"
+      }
+    }
+  ],
+  "scenario_bundle": {
+    "feature_summary": {
+      "news_bull_score": 0.9952,
+      "news_bear_score": 0.1823,
+      "blog_bull_score": 0.9411,
+      "blog_bear_score": 0.2559,
+      "article_count": 48,
+      "safe_haven_score": 0.0,
+      "policy_risk_score": 0.0,
+      "geo_risk_score": 1.0,
+      "sell_the_news_score": 0.0,
+      "usd_pressure_score": 0.0,
+      "rate_pressure_score": 0.1295,
+      "oil_shock_score": 0.2078,
+      "structural_support_score": 0.0,
+      "policy_relief_score": 0.4309,
+      "geo_relief_score": 0.0
+    },
+    "top_bull": [
+      {
+        "title": "US Defense Secretary Hegseth's broker looked to buy defense fund before Iran attack, FT reports - Reuters",
+        "link": "https://news.google.com/rss/articles/CBMizAFBVV95cUxQY2lyNHI2SUZYY190aG1XcHVIakxaem1JZ01pWDViUHBNdlRPQzZWZDhSLXVtY204dUQxcHl4eUlFQ1VteXFZaDRmdkFPSktBbHRLWk5mUFFCc3E1dHE5MHdCVHJiT3ZscDRmaTVtaVYyeWRTeDV0U3Qwb1ZpVVJyQUltZ25ndU0zb25EajY0VUhuQTJZeEQ4cU5aTVZDam1vODh2T1NWamJsVjk4VVJ4R0VQT25Nck9IdE9hclFQQ0Z3TGpvTnRIUE9hQWQ?oc=5",
+        "published": "2026-03-30 22:51:00",
+        "site": "reuters.com",
+        "source_type": "news",
+        "bull_score": 1.265,
+        "bear_score": 0.0,
+        "weight": 1.15,
+        "tags": [
+          "iran"
+        ],
+        "buckets": {
+          "geo_risk": 1.1
+        }
+      },
+      {
+        "title": "Trump interested in calling on Arab states to help pay for Iran war, White House says - Reuters",
+        "link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxQRXg1X09GZWRmYUg4T2JiMUJ6MUk5REFQTHNZd1lNNmQtcFBQaUEtVW0zX1NvODJxWWhXeTQ1RGVEZkdBMlZHdDg3TmM4c09STEh3WVgwdGdlRm5ReXlDSWZQUm4wTEJPellOc3ExZWVadzZKT0p5dUJaZi04UGktQkZRazJ2TFkzbWxlVnVUazJDNEd3YW0zcWZ6dXpCa0VETXlvQURqZ0hpQnhkVzZ5LTRGajQxUGZZeVdIZTFCbHdpd0k?oc=5",
+        "published": "2026-03-30 19:01:41",
+        "site": "reuters.com",
+        "source_type": "news",
+        "bull_score": 1.265,
+        "bear_score": 0.0,
+        "weight": 1.15,
+        "tags": [
+          "iran"
+        ],
+        "buckets": {
+          "geo_risk": 1.1
+        }
+      },
+      {
+        "title": "Fearing economic collapse after war, Iran cracks down on dissent - Reuters",
+        "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNcjJRSUUwMUw5T3BQNzJOaFRNVmZ5U1RDbThjOHV5dEZlOUFqTVBZRmJPMFIycnBKM24yV3EtWXVjWDZvMERMWTNRcFRuLThFMlRTSy05NEhMcDlOOEVuT1IxVzAzaHdjV0lieDIxUWdtR2hVVi1acTNzeFd3X0cwd2I1X1VNYWJiR3RPd09VUl9Bbmh1OVZhbkJmMExDaUxJbzZLOWNjSnozY254Qm1HMzVPVDM?oc=5",
+        "published": "2026-03-30 17:53:41",
+        "site": "reuters.com",
+        "source_type": "news",
+        "bull_score": 1.265,
+        "bear_score": 0.0,
+        "weight": 1.15,
+        "tags": [
+          "iran"
+        ],
+        "buckets": {
+          "geo_risk": 1.1
+        }
+      }
+    ],
+    "top_bear": [
+      {
+        "title": "US Dollar Index (DXY) Forecast: Pulls back to 100 despite hawkish Fed - FXStreet",
+        "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxOcFl0d2x1dnVrcHV1bDlJSEl2djdYTE5xRUgwSEItbjJnN21rbDFreEdJcjYzNFVPT21Sb0F2TkZwaTM2cTVZVGJPbDRpb0dsMWFwZFExVVEzYTNnMXdfdWRsaW9TTGp5cHR3NmVzTElLRW0xTnhJdG1xdjdldWRnMHp4RWVhcHhjOUwtaEVRQ3ZsQThoYnppaGROLVN6RGxQQWJmMFRFVHNfYkVhLXhpbGI5czBWVVQ4aERkMTJHZ05TZ9IBxwFBVV95cUxOcEc2RHpNbnY5dnJXelhSVHFLdEdaalBfN280SEsyVE5Md19ITE1aZWtpbXRfLUtaak44TFY1WXFEZXhzZlZNVXdoN0dYc1BnNnZvQU1WVllRWU9lblpoeUExaEZtYTdYbmxfX1VabDJwMzRXc3B1aWRsMkx2YXcwTDRFQ3UxVFlwTW5CMDZDcG5oaW5lYXF5Vnp1LUZqOEExTGJrRTJPdTA1UDNfMlVzYlFhcmRzbF9wR3hlUnF3V1NxcFZTMGg0?oc=5",
+        "published": "2026-03-30 05:10:33",
+        "site": "fxstreet.com",
+        "source_type": "blog",
+        "bull_score": 0.0,
+        "bear_score": 0.3906,
+        "weight": 0.434,
+        "tags": [
+          "hawkish"
+        ],
+        "buckets": {
+          "rate_pressure": 0.9
+        }
+      },
+      {
+        "title": "Gold Pares Dramatic Losses as Trump Backs Off From Iran Threat (Bloomberg) - goldseek.com",
+        "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxQaVc2cHQxVV9GLW14N2l0bHRmc2xJcjNPY19iQjktN0VEYWh6YTFtb1FRcFQzVjlXeFN5ZEhfTHctRHE2aXFMSGdrdXd0Z055aHBPclFfVjR3VXpkNU5ob2dIcEhON0EtVVpKTGl1YThGazI1TjVCMDVZU2pEZ3VfRWgxWXF4NHNWVXY2TVppYS1BYm8?oc=5",
+        "published": "2026-03-23 18:38:23",
+        "site": "goldseek.com",
+        "source_type": "blog",
+        "bull_score": 0.0749,
+        "bear_score": 0.0,
+        "weight": 0.0681,
+        "tags": [
+          "iran"
+        ],
+        "buckets": {
+          "geo_risk": 1.1
+        }
+      },
+      {
+        "title": "Gold pushes higher as dollar and oil surge, but key resistance looms - KITCO",
+        "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOd2xsMGEwX3JZZ2loZ3BYV2FvNTFsRlhjU1Y0SVN3NFAxOXpFNjZNM2xINnlwdkNGUEF0dkRvWmVENHNIaGdlWDBqMER3SXJUcmZuOTF1cVhXUG43N2RkeUdyc2RwMXlWeXpNV0FlZ1gxYm5GQ2UtRzJxYkhYdk5SaW15NzNZSUdPeFo3a2hoUTk1OGRzM0NoYkVlX3p2LXoybnFB?oc=5",
+        "published": "2026-03-30 19:05:00",
+        "site": "kitco.com",
+        "source_type": "blog",
+        "bull_score": 0.2325,
+        "bear_score": 0.1395,
+        "weight": 0.465,
+        "tags": [
+          "oil surge"
+        ],
+        "buckets": {
+          "oil_shock": 0.5
+        }
+      }
+    ],
+    "scenario_rows": [
+      {
+        "date": "2026-03-31",
+        "bear_close": 1006.3,
+        "base_close": 1027.16,
+        "bull_close": 1056.96,
+        "base_low": 1006.92,
+        "base_high": 1047.39,
+        "bull_driver": "地缘风险、事件窗口前置",
+        "bear_driver": "模型中枢下方波动",
+        "calendar_score": 0.793,
+        "active_events": [
+          {
+            "event_name": "Middle East Risk Window",
+            "event_type": "geopolitics",
+            "event_date": "2026-03-31",
+            "phase": "pre",
+            "pre_bias": 0.6,
+            "post_bias": -0.15,
+            "importance": 0.8,
+            "notes": "Seed row for current geopolitical premium window"
+          },
+          {
+            "event_name": "Tariff Decision Window",
+            "event_type": "policy",
+            "event_date": "2026-04-02",
+            "phase": "pre",
+            "pre_bias": 0.85,
+            "post_bias": -0.3,
+            "importance": 1.0,
+            "notes": "Seed row for current scenario: event window before decision and sell-the-news after"
+          }
+        ]
+      },
+      {
+        "date": "2026-04-01",
+        "bear_close": 990.67,
+        "base_close": 1028.68,
+        "bull_close": 1072.47,
+        "base_low": 992.53,
+        "base_high": 1064.83,
+        "bull_driver": "地缘风险、事件窗口前置",
+        "bear_driver": "模型中枢下方波动",
+        "calendar_score": 0.421,
+        "active_events": [
+          {
+            "event_name": "Middle East Risk Window",
+            "event_type": "geopolitics",
+            "event_date": "2026-03-31",
+            "phase": "post",
+            "pre_bias": 0.6,
+            "post_bias": -0.15,
+            "importance": 0.8,
+            "notes": "Seed row for current geopolitical premium window"
+          },
+          {
+            "event_name": "Tariff Decision Window",
+            "event_type": "policy",
+            "event_date": "2026-04-02",
+            "phase": "pre",
+            "pre_bias": 0.85,
+            "post_bias": -0.3,
+            "importance": 1.0,
+            "notes": "Seed row for current scenario: event window before decision and sell-the-news after"
+          }
+        ]
+      },
+      {
+        "date": "2026-04-02",
+        "bear_close": 977.94,
+        "base_close": 1025.31,
+        "bull_close": 1080.61,
+        "base_low": 979.53,
+        "base_high": 1071.08,
+        "bull_driver": "地缘风险、事件窗口前置",
+        "bear_driver": "模型中枢下方波动",
+        "calendar_score": 0.776,
+        "active_events": [
+          {
+            "event_name": "Middle East Risk Window",
+            "event_type": "geopolitics",
+            "event_date": "2026-03-31",
+            "phase": "post",
+            "pre_bias": 0.6,
+            "post_bias": -0.15,
+            "importance": 0.8,
+            "notes": "Seed row for current geopolitical premium window"
+          },
+          {
+            "event_name": "Tariff Decision Window",
+            "event_type": "policy",
+            "event_date": "2026-04-02",
+            "phase": "pre",
+            "pre_bias": 0.85,
+            "post_bias": -0.3,
+            "importance": 1.0,
+            "notes": "Seed row for current scenario: event window before decision and sell-the-news after"
+          }
+        ]
+      },
+      {
+        "date": "2026-04-03",
+        "bear_close": 972.77,
+        "base_close": 1034.86,
+        "bull_close": 1096.95,
+        "base_low": 975.54,
+        "base_high": 1094.19,
+        "bull_driver": "地缘风险",
+        "bear_driver": "卖事实风险、事件落地回吐",
+        "calendar_score": -0.26,
+        "active_events": [
+          {
+            "event_name": "Middle East Risk Window",
+            "event_type": "geopolitics",
+            "event_date": "2026-03-31",
+            "phase": "post",
+            "pre_bias": 0.6,
+            "post_bias": -0.15,
+            "importance": 0.8,
+            "notes": "Seed row for current geopolitical premium window"
+          },
+          {
+            "event_name": "Tariff Decision Window",
+            "event_type": "policy",
+            "event_date": "2026-04-02",
+            "phase": "post",
+            "pre_bias": 0.85,
+            "post_bias": -0.3,
+            "importance": 1.0,
+            "notes": "Seed row for current scenario: event window before decision and sell-the-news after"
+          },
+          {
+            "event_name": "USD Rebound Risk",
+            "event_type": "macro",
+            "event_date": "2026-04-03",
+            "phase": "pre",
+            "pre_bias": 0.0,
+            "post_bias": -0.55,
+            "importance": 0.75,
+            "notes": "Seed row for post-event dollar rebound / risk normalization pressure"
+          }
+        ]
+      }
+    ],
+    "pathways": [
+      "地缘风险新闻较密集，模型将其映射为短线风险溢价。"
+    ],
+    "article_count": 48,
+    "calibration": {
+      "median_abs_return": 0.012695,
+      "p75_abs_return": 0.026929,
+      "pre_event_scale": 0.008533,
+      "post_event_scale": 0.005635,
+      "sell_the_news_scale": 0.016906
+    }
+  },
+  "backtest_metrics": [],
+  "event_backtest_metrics": []
+}
