@@ -58,6 +58,10 @@ FEATURE_COLUMNS_DAILY = [
     "ma_5", "ma_10", "ma_20",
     "ma_gap_5", "ma_gap_10", "ma_gap_20",
     "vol_5",
+    "close_vs_high",
+    "close_vs_vwap",
+    "intraday_range_pct",
+    "overnight_gap_pct",
 ]
 
 FEATURE_COLUMNS_CROSS = [
@@ -73,6 +77,19 @@ FEATURE_COLUMNS_CROSS = [
 FEATURE_COLUMNS_META = [
     "hours_to_target",
     "day_of_week",
+]
+
+# CFTC Commitments of Traders (gold futures) features
+# Source: ml-service/data_collector/cot_fetcher.py (Disaggregated Fut-Only)
+FEATURE_COLUMNS_COT = [
+    "cot_mm_net_pct_oi",       # Managed Money net / OI (primary speculator signal)
+    "cot_mm_net_change_1w",    # 1-week change of mm_net / OI
+    "cot_mm_net_change_4w",    # 4-week change (trend)
+    "cot_mm_net_zscore_52w",   # 52-week z-score (extreme positioning)
+    "cot_mm_long_pct_oi",
+    "cot_mm_short_pct_oi",
+    "cot_comm_net_pct_oi",     # Commercial net (reverse signal)
+    "cot_oi_change_1w_pct",    # Open Interest 1w change (participation)
 ]
 
 TROY_OZ_TO_GRAM = 31.1035
@@ -173,9 +190,22 @@ def aggregate_checkpoint_bar(
 # Daily history features (same as original predictor)
 # ---------------------------------------------------------------------------
 
-def build_daily_features(daily_closes: pd.Series) -> Dict[str, float]:
-    """Build lag/return/ma features from daily close series."""
-    s = daily_closes.astype(float)
+def build_daily_features(daily_input: pd.Series | pd.DataFrame) -> Dict[str, float]:
+    """Build lag/return/ma features from daily history.
+
+    Accepts either:
+    - a close-only series (legacy callers)
+    - a daily OHLC dataframe (new callers, richer volatility features)
+    """
+    if isinstance(daily_input, pd.DataFrame):
+        df = daily_input.copy()
+        if "close" not in df.columns:
+            return {col: 0.0 for col in FEATURE_COLUMNS_DAILY}
+        s = pd.to_numeric(df["close"], errors="coerce").astype(float)
+    else:
+        df = None
+        s = pd.to_numeric(daily_input, errors="coerce").astype(float)
+
     if len(s) < 20:
         return {col: 0.0 for col in FEATURE_COLUMNS_DAILY}
 
@@ -186,6 +216,37 @@ def build_daily_features(daily_closes: pd.Series) -> Dict[str, float]:
     ma_5 = s.tail(5).mean()
     ma_10 = s.tail(10).mean()
     ma_20 = s.tail(20).mean()
+
+    close_vs_high = 0.0
+    close_vs_vwap = 0.0
+    intraday_range_pct = 0.0
+    overnight_gap_pct = 0.0
+
+    if df is not None:
+        latest = df.iloc[-1]
+        prev_close = float(s.iloc[-2]) if len(s) >= 2 else float(s.iloc[-1])
+        latest_close = float(s.iloc[-1])
+        latest_high = float(pd.to_numeric(latest.get("high"), errors="coerce") or np.nan)
+        latest_low = float(pd.to_numeric(latest.get("low"), errors="coerce") or np.nan)
+        latest_open = float(pd.to_numeric(latest.get("open"), errors="coerce") or np.nan)
+
+        amount_value = pd.to_numeric(latest.get("amount"), errors="coerce")
+        volume_value = pd.to_numeric(latest.get("volume"), errors="coerce")
+        if pd.notna(amount_value) and pd.notna(volume_value) and float(volume_value) > 0:
+            vwap = float(amount_value) / float(volume_value)
+        elif pd.notna(latest_open) and pd.notna(latest_high) and pd.notna(latest_low):
+            vwap = (float(latest_open) + float(latest_high) + float(latest_low) + latest_close) / 4.0
+        else:
+            vwap = latest_close
+
+        if pd.notna(latest_high) and latest_high > 0:
+            close_vs_high = latest_close / latest_high - 1
+        if pd.notna(vwap) and float(vwap) > 0:
+            close_vs_vwap = latest_close / float(vwap) - 1
+        if pd.notna(latest_high) and pd.notna(latest_low) and prev_close > 0:
+            intraday_range_pct = (float(latest_high) - float(latest_low)) / prev_close
+        if pd.notna(latest_open) and prev_close > 0:
+            overnight_gap_pct = float(latest_open) / prev_close - 1
 
     return {
         "lag_1": float(s.iloc[-1]),
@@ -202,6 +263,10 @@ def build_daily_features(daily_closes: pd.Series) -> Dict[str, float]:
         "ma_gap_10": float(s.iloc[-1] / ma_10 - 1) if ma_10 > 0 else 0.0,
         "ma_gap_20": float(s.iloc[-1] / ma_20 - 1) if ma_20 > 0 else 0.0,
         "vol_5": float(s.pct_change().tail(5).std() or 0.0),
+        "close_vs_high": float(close_vs_high),
+        "close_vs_vwap": float(close_vs_vwap),
+        "intraday_range_pct": float(intraday_range_pct),
+        "overnight_gap_pct": float(overnight_gap_pct),
     }
 
 
@@ -411,3 +476,86 @@ def build_training_dataset(
     X = X[all_feature_columns()]
 
     return X, pd.Series(targets_return, dtype=float), pd.Series(targets_direction, dtype=int)
+
+
+def build_cot_features(
+    cot_daily: "pd.DataFrame | None",
+    target_date: pd.Timestamp,
+) -> Dict[str, float]:
+    """Build CFTC COT features for a given target_date.
+
+    Args:
+        cot_daily: Daily-frequency DataFrame from upsample_cot_to_daily(),
+            must contain column 'date' plus derived COT fields.
+            When None or empty, returns all-zero features (graceful fallback).
+        target_date: Date for which to compute features (look-ahead prevented
+            by alignment of cot_daily's key_col at upsample time).
+
+    Returns:
+        Dict with 8 keys matching FEATURE_COLUMNS_COT.
+    """
+    zero = {col: 0.0 for col in FEATURE_COLUMNS_COT}
+
+    if cot_daily is None or cot_daily.empty or "date" not in cot_daily.columns:
+        return zero
+
+    df = cot_daily.copy()
+    df["date"] = pd.to_datetime(df["date"])
+    # Filter strictly <= target_date
+    df = df[df["date"] <= pd.Timestamp(target_date)].reset_index(drop=True)
+    if df.empty:
+        return zero
+
+    # mm_net_pct_oi time series for derived features.
+    # df is daily (forward-filled from weekly); deduplicate by tracking
+    # consecutive-changes only, not values (flat periods are valid history).
+    if "mm_net_pct_oi" not in df.columns:
+        return zero
+    series = pd.to_numeric(df["mm_net_pct_oi"], errors="coerce")
+
+    # Use a "group by value change" pattern: keep first row of each run of
+    # identical values. This preserves flat weeks vs. weekly changes correctly.
+    shifted = series.shift(1)
+    is_change = (series != shifted).fillna(True)
+    series_weekly = series[is_change].reset_index(drop=True)
+    if series_weekly.empty:
+        return zero
+
+    latest = float(series_weekly.iloc[-1])
+    change_1w = latest - float(series_weekly.iloc[-2]) if len(series_weekly) >= 2 else 0.0
+    change_4w = latest - float(series_weekly.iloc[-5]) if len(series_weekly) >= 5 else 0.0
+
+    if len(series_weekly) >= 10:
+        window = series_weekly.iloc[-52:]
+        mu = float(window.mean())
+        sigma = float(window.std(ddof=0))
+        zscore = (latest - mu) / sigma if sigma > 1e-9 else 0.0
+    else:
+        zscore = 0.0
+
+    def _latest(col: str) -> float:
+        if col not in df.columns:
+            return 0.0
+        val = pd.to_numeric(df[col].iloc[-1], errors="coerce")
+        return float(val) if pd.notna(val) else 0.0
+
+    # OI 1w change
+    oi_series = pd.to_numeric(df.get("open_interest", pd.Series(dtype=float)),
+                              errors="coerce").dropna().drop_duplicates()
+    if len(oi_series) >= 2:
+        oi_latest = float(oi_series.iloc[-1])
+        oi_prev = float(oi_series.iloc[-2])
+        oi_change_pct = (oi_latest - oi_prev) / oi_prev if oi_prev > 0 else 0.0
+    else:
+        oi_change_pct = 0.0
+
+    return {
+        "cot_mm_net_pct_oi": round(latest, 6),
+        "cot_mm_net_change_1w": round(change_1w, 6),
+        "cot_mm_net_change_4w": round(change_4w, 6),
+        "cot_mm_net_zscore_52w": round(zscore, 4),
+        "cot_mm_long_pct_oi": round(_latest("mm_long_pct_oi"), 6),
+        "cot_mm_short_pct_oi": round(_latest("mm_short_pct_oi"), 6),
+        "cot_comm_net_pct_oi": round(_latest("comm_net_pct_oi"), 6),
+        "cot_oi_change_1w_pct": round(oi_change_pct, 6),
+    }

@@ -20,6 +20,7 @@ def predict_direct_gbm(
     target_dates: Sequence[pd.Timestamp],
     lookback_days: int = 240,
     verbose: bool = False,
+    cot_daily: pd.DataFrame = None,
 ) -> List[Dict[str, Any]]:
     """Predict GBM direct multi-horizon closes and return flat dicts.
 
@@ -52,6 +53,7 @@ def predict_direct_gbm(
         target_dates=list(target_dates),
         lookback_days=lookback_days,
         verbose=verbose,
+        cot_daily=cot_daily,
     )
 
     flat: List[Dict[str, Any]] = []
@@ -86,6 +88,7 @@ def rolling_backtest_gbm(
     lookback: int = 240,
     max_horizon: int = 5,
     stride: int = 10,
+    cot_daily: pd.DataFrame = None,
 ) -> pd.DataFrame:
     """Thin passthrough to rolling_backtest_direct."""
     from models.multi_day_direct_predictor import rolling_backtest_direct
@@ -97,4 +100,5 @@ def rolling_backtest_gbm(
         lookback=lookback,
         max_horizon=max_horizon,
         stride=stride,
+        cot_daily=cot_daily,
     )
