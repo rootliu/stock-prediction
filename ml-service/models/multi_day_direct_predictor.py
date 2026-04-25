@@ -583,21 +583,30 @@ def _train_horizon_model(
 
     branch_models: Dict[str, Any] = {}
     branch_blend_weights: Dict[str, float] = {}
-    if horizon_days <= 2:
+    if horizon_days <= 5:
         jump_mask = x_train["jump_regime_code"] >= 1.0
         trend_down_mask = x_train["trend_regime_code"] <= -1.0
         trend_up_mask = x_train["trend_regime_code"] >= 1.0
         directional_score = x_train["overnight_gap_pct"] + 0.5 * x_train["ret_1"]
         jump_up_mask = jump_mask & (directional_score >= 0)
         jump_down_mask = jump_mask & (directional_score < 0)
-        branch_specs = {
-            "jump_up": jump_up_mask,
-            "jump_down": jump_down_mask,
-            "jump": jump_mask,
-            "trend_down": trend_down_mask & ~jump_mask,
-            "trend_up": trend_up_mask & ~jump_mask,
-            "normal": ~jump_mask,
-        }
+        branch_specs: Dict[str, pd.Series] = {}
+        if horizon_days <= 2:
+            branch_specs.update(
+                {
+                    "jump_up": jump_up_mask,
+                    "jump_down": jump_down_mask,
+                    "jump": jump_mask,
+                }
+            )
+        trend_only_mask = (~jump_mask) if horizon_days <= 2 else pd.Series(True, index=x_train.index)
+        branch_specs.update(
+            {
+                "trend_down": trend_down_mask & trend_only_mask,
+                "trend_up": trend_up_mask & trend_only_mask,
+                "normal": ~(jump_mask | trend_down_mask | trend_up_mask),
+            }
+        )
         for branch_name, mask in branch_specs.items():
             branch_x = x_train.loc[mask]
             if branch_name in {"jump_up", "jump_down"}:
@@ -605,9 +614,9 @@ def _train_horizon_model(
             elif branch_name == "jump":
                 min_samples = 12
             elif branch_name in {"trend_down", "trend_up"}:
-                min_samples = 10
+                min_samples = 10 if horizon_days <= 2 else (12 if horizon_days <= 4 else 14)
             else:
-                min_samples = 16
+                min_samples = 16 if horizon_days <= 2 else (18 if horizon_days <= 4 else 20)
             if len(branch_x) < min_samples:
                 continue
             branch_y_ret = y_ret_train.loc[mask]
@@ -636,11 +645,11 @@ def _train_horizon_model(
         if "jump" in branch_models:
             branch_blend_weights["jump"] = 0.65
         if "trend_down" in branch_models:
-            branch_blend_weights["trend_down"] = 0.72
+            branch_blend_weights["trend_down"] = 0.72 if horizon_days <= 2 else (0.62 if horizon_days <= 4 else 0.55)
         if "trend_up" in branch_models:
-            branch_blend_weights["trend_up"] = 0.68
+            branch_blend_weights["trend_up"] = 0.68 if horizon_days <= 2 else (0.58 if horizon_days <= 4 else 0.52)
         if "normal" in branch_models:
-            branch_blend_weights["normal"] = 0.55
+            branch_blend_weights["normal"] = 0.55 if horizon_days <= 2 else (0.45 if horizon_days <= 4 else 0.40)
 
     return {
         "trained": True,
