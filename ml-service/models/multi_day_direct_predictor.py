@@ -906,6 +906,8 @@ def rolling_backtest_direct(
             records.append(
                 {
                     "horizon": h_idx + 1,
+                    "origin_date": origin_date.strftime("%Y-%m-%d"),
+                    "target_date": pd.Timestamp(daily_sorted.iloc[ti]["date"]).strftime("%Y-%m-%d"),
                     "origin_close": origin_close,
                     "pred_close": pred["close"],
                     "actual_close": float(daily_sorted.iloc[ti]["close"]),
