@@ -41,7 +41,11 @@ from models.multi_day_direct_predictor import (
     rolling_backtest_direct,
     run_direct_multi_day_prediction,
 )
-from models.event_sentiment import build_event_scenario_bundle
+from models.event_sentiment import (
+    build_event_gating_policy,
+    build_event_scenario_bundle,
+    resolve_event_gating_decision,
+)
 from models.volatility_regime import compute_regime_info
 
 TROY_OZ_TO_GRAM = 31.1035
@@ -424,7 +428,10 @@ def rolling_event_backtest_direct(
     return pd.DataFrame(records)
 
 
-def compute_event_backtest_metrics(bt: pd.DataFrame) -> pd.DataFrame:
+def compute_event_backtest_metrics(
+    bt: pd.DataFrame,
+    gating_policy: Dict[str, Any] | None = None,
+) -> pd.DataFrame:
     rows = []
     if bt.empty:
         return pd.DataFrame(rows)
@@ -433,16 +440,29 @@ def compute_event_backtest_metrics(bt: pd.DataFrame) -> pd.DataFrame:
         sub = bt[bt["horizon"] == h]
         if sub.empty:
             continue
+        row = {
+            "周期": f"T+{h}",
+            "样本数": int(len(sub)),
+            "Base区间命中率%": round(float(sub["base_hit"].mean() * 100), 1),
+            "Event区间命中率%": round(float(sub["event_hit"].mean() * 100), 1),
+            "命中率改善%": round(float((sub["event_hit"].mean() - sub["base_hit"].mean()) * 100), 1),
+            "Base平均宽度%": round(float(sub["base_width_pct"].mean()), 2),
+            "Event平均宽度%": round(float(sub["event_width_pct"].mean()), 2),
+        }
+        if gating_policy is not None:
+            gating = resolve_event_gating_decision(gating_policy, int(h))
+            selected_hit = sub["event_hit"] if gating["enabled"] else sub["base_hit"]
+            selected_width = sub["event_width_pct"] if gating["enabled"] else sub["base_width_pct"]
+            row.update(
+                {
+                    "Gate选择": "event" if gating["enabled"] else "base",
+                    "Gate后命中率%": round(float(selected_hit.mean() * 100), 1),
+                    "Gate后改善%": round(float((selected_hit.mean() - sub["base_hit"].mean()) * 100), 1),
+                    "Gate后平均宽度%": round(float(selected_width.mean()), 2),
+                }
+            )
         rows.append(
-            {
-                "周期": f"T+{h}",
-                "样本数": int(len(sub)),
-                "Base区间命中率%": round(float(sub["base_hit"].mean() * 100), 1),
-                "Event区间命中率%": round(float(sub["event_hit"].mean() * 100), 1),
-                "命中率改善%": round(float((sub["event_hit"].mean() - sub["base_hit"].mean()) * 100), 1),
-                "Base平均宽度%": round(float(sub["base_width_pct"].mean()), 2),
-                "Event平均宽度%": round(float(sub["event_width_pct"].mean()), 2),
-            }
+            row
         )
     return pd.DataFrame(rows)
 
@@ -556,6 +576,28 @@ def format_event_calibration(calibration: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def format_event_gating(bundle: Dict[str, Any]) -> str:
+    gating = bundle.get("gating", {}) or {}
+    horizons = gating.get("horizons", {}) or {}
+    lines = ["  Event Gating:"]
+    if not horizons:
+        lines.append("    no historical event backtest available -> fallback to base interval")
+        return "\n".join(lines)
+
+    for horizon in sorted(int(h) for h in horizons.keys()):
+        row = resolve_event_gating_decision(gating, horizon)
+        lines.append(
+            "    "
+            f"T+{horizon}: {'event' if row['enabled'] else 'base'}  "
+            f"samples={int(row.get('samples', 0))}  "
+            f"base_hit={float(row.get('base_hit_pct') or 0.0):.2f}%  "
+            f"event_hit={float(row.get('event_hit_pct') or 0.0):.2f}%  "
+            f"improvement={float(row.get('improvement_pct') or 0.0):+.2f}%  "
+            f"reason={row.get('reason', 'unknown')}"
+        )
+    return "\n".join(lines)
+
+
 def format_event_headlines(bundle: Dict[str, Any]) -> str:
     lines = ["  Event Headlines:"]
     top_bull = bundle.get("top_bull", [])
@@ -605,14 +647,15 @@ def format_scenario_table(bundle: Dict[str, Any]) -> str:
         return "  (无情景路径)"
 
     header = (
-        f"{'日期':<12}  {'Bear':>10}  {'Base':>10}  {'Bull':>10}  "
+        f"{'日期':<12}  {'Gate':<6}  {'Bear':>10}  {'Base':>10}  {'Bull':>10}  "
         f"{'Bull逻辑':<18}  {'Bear逻辑':<18}"
     )
-    sep = "-" * 90
+    sep = "-" * 98
     lines = ["  Scenario Path:", header, sep]
     for row in scenario_rows:
         lines.append(
             f"{row['date']:<12}  "
+            f"{str(row.get('gate_mode', 'event')):<6}  "
             f"{row['bear_close']:>10.2f}  "
             f"{row['base_close']:>10.2f}  "
             f"{row['bull_close']:>10.2f}  "
@@ -774,7 +817,17 @@ def _write_report_outputs(
             [
                 "",
                 report_frame[
-                    ["date", "bear_close", "base_close", "bull_close", "direction", "confidence", "bull_driver", "bear_driver"]
+                    [
+                        "date",
+                        "gate_mode",
+                        "bear_close",
+                        "base_close",
+                        "bull_close",
+                        "direction",
+                        "confidence",
+                        "bull_driver",
+                        "bear_driver",
+                    ]
                 ].to_markdown(index=False),
                 "",
                 f"![gold-{forecast_mode}-scenario]({chart_png})",
@@ -816,12 +869,24 @@ def _write_report_outputs(
                 "## Bull / Base / Bear",
                 "",
                 scenario_frame[
-                    ["date", "bear_close", "base_low", "base_close", "base_high", "bull_close", "bull_driver", "bear_driver"]
+                    [
+                        "date",
+                        "gate_mode",
+                        "bear_close",
+                        "base_low",
+                        "base_close",
+                        "base_high",
+                        "bull_close",
+                        "bull_driver",
+                        "bear_driver",
+                        "gating_reason",
+                    ]
                 ].to_markdown(index=False),
                 "",
             ]
         )
     if scenario_bundle:
+        md_lines.extend(["## Event Gating", "", f"```json\n{json.dumps(scenario_bundle.get('gating', {}), ensure_ascii=False, indent=2)}\n```", ""])
         md_lines.extend(["## Event Features", "", f"```json\n{json.dumps(scenario_bundle.get('feature_summary', {}), ensure_ascii=False, indent=2)}\n```", ""])
         md_lines.extend(["## Event Calibration", "", f"```json\n{json.dumps(scenario_bundle.get('calibration', {}), ensure_ascii=False, indent=2)}\n```", ""])
         headlines = scenario_bundle.get("top_bull", []) + scenario_bundle.get("top_bear", [])
@@ -948,6 +1013,7 @@ def main(
     # ── 2. 回测 ──────────────────────────────────────────────────────
     metrics = pd.DataFrame()
     event_metrics = pd.DataFrame()
+    event_gating = build_event_gating_policy(None)
     if not skip_backtest:
         print("\n" + "-" * 85)
         backtest_label = "Multi-Bar" if forecast_mode == "multibar" else "Direct Multi-Horizon"
@@ -996,7 +1062,8 @@ def main(
                 event_window_days=event_window_days,
             )
             if not event_bt.empty:
-                event_metrics = compute_event_backtest_metrics(event_bt)
+                event_gating = build_event_gating_policy(event_bt)
+                event_metrics = compute_event_backtest_metrics(event_bt, gating_policy=event_gating)
                 print("\n" + event_metrics.to_string(index=False))
             else:
                 print("  (事件区间回测无有效数据)")
@@ -1071,11 +1138,15 @@ def main(
                 daily_df=shfe_daily,
                 event_context_csv=event_context_csv,
                 window_days=event_window_days,
+                gating_policy=event_gating,
+                apply_gating=True,
             )
             print()
             print(format_event_feature_summary(scenario_bundle["feature_summary"]))
             print()
             print(format_event_calibration(scenario_bundle["calibration"]))
+            print()
+            print(format_event_gating(scenario_bundle))
             print()
             print(format_event_headlines(scenario_bundle))
             print()
@@ -1096,6 +1167,8 @@ def main(
                         "bull_close": current["bull_close"],
                         "bull_driver": current["bull_driver"],
                         "bear_driver": current["bear_driver"],
+                        "gate_mode": current.get("gate_mode", "event"),
+                        "gating_reason": current.get("gating_reason", ""),
                     }
 
         if report_dir:

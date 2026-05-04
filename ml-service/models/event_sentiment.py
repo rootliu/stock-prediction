@@ -1,9 +1,12 @@
 """
 Event and sentiment overlay for gold scenario analysis.
 
-This module surveys a small set of news/blog sources, derives heuristic
-event-risk features, and builds explainable bull/base/bear scenario paths
-without changing the core forecasting logic.
+This module keeps the event overlay explainable and conservative:
+- surveys a small set of RSS sources for recent gold-related headlines
+- derives heuristic bull/bear feature scores
+- calibrates event-driven interval widening from local history
+- applies a gating policy so event intervals are only used when
+  historical backtests show better interval hit rates than the base band
 """
 
 from __future__ import annotations
@@ -48,7 +51,6 @@ SOURCE_TIER_MULTIPLIER = {
     "blog": 0.62,
 }
 
-
 QUERY_TERMS = (
     "gold",
     "tariff",
@@ -63,7 +65,6 @@ QUERY_TERMS = (
     "Fed",
     "safe haven",
 )
-
 
 PHRASE_RULES: Tuple[Dict[str, Any], ...] = (
     {"phrase": "safe haven", "bull": 1.6, "bucket": "safe_haven"},
@@ -93,7 +94,6 @@ PHRASE_RULES: Tuple[Dict[str, Any], ...] = (
     {"phrase": "rate cuts fade", "bear": 1.0, "bucket": "rate_pressure"},
     {"phrase": "dovish", "bull": 0.7, "bucket": "rate_pressure"},
 )
-
 
 DEFAULT_EVENT_CONTEXT_CSV = Path(__file__).resolve().parents[1] / "data" / "event_context.csv"
 
@@ -158,16 +158,12 @@ def _iter_feed_items(xml_bytes: bytes) -> Iterable[Dict[str, Any]]:
 
     items: List[Dict[str, Any]] = []
     for item in channel.findall("item"):
-        title = (item.findtext("title") or "").strip()
-        link = (item.findtext("link") or "").strip()
-        description = (item.findtext("description") or "").strip()
-        pub_date = _parse_pub_date(item.findtext("pubDate"))
         items.append(
             {
-                "title": title,
-                "link": link,
-                "description": description,
-                "published": pub_date,
+                "title": (item.findtext("title") or "").strip(),
+                "link": (item.findtext("link") or "").strip(),
+                "description": (item.findtext("description") or "").strip(),
+                "published": _parse_pub_date(item.findtext("pubDate")),
             }
         )
     return items
@@ -179,18 +175,18 @@ def _score_text(text: str) -> Tuple[float, float, Dict[str, float], List[str]]:
     bear = 0.0
     buckets: Dict[str, float] = {}
     tags: List[str] = []
-
     for rule in PHRASE_RULES:
-        phrase = rule["phrase"]
-        if phrase in lowered:
-            tags.append(phrase)
-            bull += float(rule.get("bull", 0.0))
-            bear += float(rule.get("bear", 0.0))
-            bucket = str(rule["bucket"])
-            buckets[bucket] = buckets.get(bucket, 0.0) + max(
-                float(rule.get("bull", 0.0)),
-                float(rule.get("bear", 0.0)),
-            )
+        phrase = str(rule["phrase"])
+        if phrase not in lowered:
+            continue
+        tags.append(phrase)
+        bull += float(rule.get("bull", 0.0))
+        bear += float(rule.get("bear", 0.0))
+        bucket = str(rule["bucket"])
+        buckets[bucket] = buckets.get(bucket, 0.0) + max(
+            float(rule.get("bull", 0.0)),
+            float(rule.get("bear", 0.0)),
+        )
     return bull, bear, buckets, tags
 
 
@@ -326,9 +322,6 @@ def survey_event_sentiment(
             if mapped:
                 bucket_scores[mapped] += float(score) * float(article["weight"])
 
-    top_bull = sorted(articles, key=lambda row: row["bull_score"] - row["bear_score"], reverse=True)[:3]
-    top_bear = sorted(articles, key=lambda row: row["bear_score"] - row["bull_score"], reverse=True)[:3]
-
     feature_summary = {
         "news_bull_score": round(_bounded_score(news_bull, 8.0), 4),
         "news_bear_score": round(_bounded_score(news_bear, 6.0), 4),
@@ -343,6 +336,8 @@ def survey_event_sentiment(
         }
     )
 
+    top_bull = sorted(articles, key=lambda row: row["bull_score"] - row["bear_score"], reverse=True)[:3]
+    top_bear = sorted(articles, key=lambda row: row["bear_score"] - row["bull_score"], reverse=True)[:3]
     return {
         "articles": articles,
         "feature_summary": feature_summary,
@@ -370,7 +365,6 @@ def _calibrate_event_overlay(
     historical_pre: List[float] = []
     historical_post: List[float] = []
     historical_sell: List[float] = []
-
     if not daily_sorted.empty:
         date_index = {pd.Timestamp(row["date"]).normalize(): idx for idx, row in daily_sorted.iterrows()}
         for event in events:
@@ -396,7 +390,6 @@ def _calibrate_event_overlay(
     pre_scale = float(np.median(historical_pre)) if historical_pre else p75_abs
     post_scale = float(np.median(historical_post)) if historical_post else p75_abs * 0.9
     sell_scale = float(np.median(historical_sell)) if historical_sell else median_abs * 1.25
-
     return {
         "median_abs_return": round(median_abs, 6),
         "p75_abs_return": round(p75_abs, 6),
@@ -471,6 +464,99 @@ def _regime_width(regime: str) -> float:
     }.get(regime, 0.01)
 
 
+def build_event_gating_policy(
+    event_backtest: Optional[pd.DataFrame],
+    min_improvement_pct: float = 0.0,
+    min_samples: int = 20,
+) -> Dict[str, Any]:
+    policy: Dict[str, Any] = {
+        "enabled": False,
+        "reason": "no_backtest_history",
+        "source": "historical_interval_hit_rate",
+        "default_enabled": False,
+        "min_improvement_pct": float(min_improvement_pct),
+        "min_samples": int(min_samples),
+        "enabled_horizons": [],
+        "horizons": {},
+    }
+    if event_backtest is None or event_backtest.empty:
+        return policy
+
+    required_cols = {"horizon", "base_hit", "event_hit", "base_width_pct", "event_width_pct"}
+    if not required_cols.issubset(set(event_backtest.columns)):
+        policy["reason"] = "invalid_backtest_frame"
+        return policy
+
+    enabled_horizons: List[int] = []
+    horizons: Dict[int, Dict[str, Any]] = {}
+    for horizon in sorted(pd.Series(event_backtest["horizon"]).dropna().astype(int).unique()):
+        sub = event_backtest[event_backtest["horizon"] == horizon]
+        if sub.empty:
+            continue
+
+        samples = int(len(sub))
+        base_hit_pct = float(sub["base_hit"].mean() * 100)
+        event_hit_pct = float(sub["event_hit"].mean() * 100)
+        improvement_pct = float(event_hit_pct - base_hit_pct)
+        enabled = samples >= min_samples and improvement_pct > float(min_improvement_pct)
+
+        reason = "enabled"
+        if samples < min_samples:
+            reason = "insufficient_samples"
+        elif improvement_pct <= float(min_improvement_pct):
+            reason = "no_hit_rate_improvement"
+
+        horizons[int(horizon)] = {
+            "enabled": bool(enabled),
+            "reason": reason,
+            "samples": samples,
+            "base_hit_pct": round(base_hit_pct, 2),
+            "event_hit_pct": round(event_hit_pct, 2),
+            "improvement_pct": round(improvement_pct, 2),
+            "base_width_pct": round(float(sub["base_width_pct"].mean()), 4),
+            "event_width_pct": round(float(sub["event_width_pct"].mean()), 4),
+        }
+        if enabled:
+            enabled_horizons.append(int(horizon))
+
+    policy["horizons"] = horizons
+    policy["enabled_horizons"] = enabled_horizons
+    policy["enabled"] = bool(enabled_horizons)
+    policy["reason"] = "historical_improvement_detected" if enabled_horizons else "no_horizon_improved_hit_rate"
+    return policy
+
+
+def resolve_event_gating_decision(
+    gating_policy: Optional[Dict[str, Any]],
+    horizon: int,
+) -> Dict[str, Any]:
+    decision = {
+        "enabled": False,
+        "reason": "no_backtest_history",
+        "samples": 0,
+        "base_hit_pct": None,
+        "event_hit_pct": None,
+        "improvement_pct": None,
+        "base_width_pct": None,
+        "event_width_pct": None,
+    }
+    if not gating_policy:
+        return decision
+
+    horizons = gating_policy.get("horizons", {}) or {}
+    raw = horizons.get(horizon)
+    if raw is None:
+        raw = horizons.get(str(horizon))
+    if raw is None:
+        decision["reason"] = str(gating_policy.get("reason", "missing_horizon_history"))
+        return decision
+
+    merged = decision.copy()
+    merged.update(raw)
+    merged["enabled"] = bool(merged.get("enabled", False))
+    return merged
+
+
 def build_event_scenario_bundle(
     base_predictions: Sequence[Dict[str, Any]],
     analysis_date: pd.Timestamp,
@@ -480,6 +566,8 @@ def build_event_scenario_bundle(
     window_days: int = 7,
     use_live_survey: bool = True,
     survey_override: Optional[Dict[str, Any]] = None,
+    gating_policy: Optional[Dict[str, Any]] = None,
+    apply_gating: bool = False,
 ) -> Dict[str, Any]:
     now = pd.Timestamp(analysis_date)
     if survey_override is not None:
@@ -488,6 +576,7 @@ def build_event_scenario_bundle(
         survey = survey_event_sentiment(now=now, window_days=window_days)
     else:
         survey = _empty_survey()
+
     events = _load_event_context(event_context_csv or DEFAULT_EVENT_CONTEXT_CSV)
     summary = survey["feature_summary"]
     calibration = _calibrate_event_overlay(daily_df=daily_df, events=events, analysis_date=now)
@@ -504,6 +593,7 @@ def build_event_scenario_bundle(
     policy_risk = min(float(summary.get("policy_risk_score", 0.0)), 1.0)
     safe_haven = min(float(summary.get("safe_haven_score", 0.0)), 1.0)
     rate_pressure = min(float(summary.get("rate_pressure_score", 0.0)), 1.0)
+    effective_gating = gating_policy or build_event_gating_policy(None)
 
     scenario_rows: List[Dict[str, Any]] = []
     for idx, pred in enumerate(base_predictions, start=1):
@@ -516,14 +606,28 @@ def build_event_scenario_bundle(
         pre_event_score = max(float(calendar["pre_event_score"]), 0.0)
         post_event_score = max(-float(calendar["post_event_score"]), 0.0)
         sell_the_news_score = max(float(calendar["sell_the_news_score"]), 0.0)
+
         horizon_multiplier = min(1.28, 1.0 + 0.06 * (idx - 1))
         width = max(_regime_width(regime), calibration["median_abs_return"]) * horizon_multiplier
-        width *= (1.0 + 0.35 * intensity)
+        width *= 1.0 + 0.35 * intensity
         base_up_width = max((base_high - base_close) / max(base_close, 1e-8), width)
         base_down_width = max((base_close - base_low) / max(base_close, 1e-8), width)
 
-        bull_signal = bull_strength * 0.35 + safe_haven * 0.15 + geo_risk * 0.25 + policy_risk * 0.15 + pre_event_score * 0.10
-        bear_signal = bear_strength * 0.20 + usd_pressure * 0.25 + rate_pressure * 0.15 + post_event_score * 0.20 + sell_news * 0.10 + sell_the_news_score * 0.10
+        bull_signal = (
+            bull_strength * 0.35
+            + safe_haven * 0.15
+            + geo_risk * 0.25
+            + policy_risk * 0.15
+            + pre_event_score * 0.10
+        )
+        bear_signal = (
+            bear_strength * 0.20
+            + usd_pressure * 0.25
+            + rate_pressure * 0.15
+            + post_event_score * 0.20
+            + sell_news * 0.10
+            + sell_the_news_score * 0.10
+        )
 
         bull_extra = calibration["pre_event_scale"] * min(bull_signal, 1.8)
         bear_extra = calibration["post_event_scale"] * min(bear_signal, 1.8)
@@ -533,57 +637,99 @@ def build_event_scenario_bundle(
 
         bull_boost = float(np.clip(base_up_width + bull_extra, base_up_width, 0.06))
         bear_boost = float(np.clip(base_down_width + bear_extra, base_down_width, 0.06))
-
-        bull_close = base_close * (1 + bull_boost)
-        bear_close = base_close * (1 - bear_boost)
+        overlay_bull_close = base_close * (1 + bull_boost)
+        overlay_bear_close = base_close * (1 - bear_boost)
 
         bull_driver_parts: List[str] = []
         bear_driver_parts: List[str] = []
         if safe_haven > 0.2:
-            bull_driver_parts.append("避险情绪")
+            bull_driver_parts.append("safe_haven")
         if geo_risk > 0.2:
-            bull_driver_parts.append("地缘风险")
+            bull_driver_parts.append("geo_risk")
         if policy_risk > 0.2:
-            bull_driver_parts.append("政策不确定性")
+            bull_driver_parts.append("policy_risk")
         if pre_event_score > 0.15:
-            bull_driver_parts.append("事件窗口前置")
+            bull_driver_parts.append("pre_event_window")
 
         if sell_news > 0.2 or sell_the_news_score > 0.15:
-            bear_driver_parts.append("卖事实风险")
+            bear_driver_parts.append("sell_the_news")
         if usd_pressure > 0.2:
-            bear_driver_parts.append("美元反弹")
+            bear_driver_parts.append("usd_pressure")
         if rate_pressure > 0.2:
-            bear_driver_parts.append("利率压力")
+            bear_driver_parts.append("rate_pressure")
         if post_event_score > 0.15:
-            bear_driver_parts.append("事件落地回吐")
+            bear_driver_parts.append("post_event_window")
 
-        row = {
-            "date": target_date.strftime("%Y-%m-%d"),
-            "bear_close": round(float(bear_close), 2),
-            "base_close": round(float(base_close), 2),
-            "bull_close": round(float(bull_close), 2),
-            "base_low": round(float(base_low), 2),
-            "base_high": round(float(base_high), 2),
-            "bull_driver": "、".join(bull_driver_parts) or "模型中枢上方波动",
-            "bear_driver": "、".join(bear_driver_parts) or "模型中枢下方波动",
-            "calendar_score": round(calendar_bias, 3),
-            "active_events": calendar["active_events"],
-        }
-        scenario_rows.append(row)
+        if apply_gating:
+            gating_decision = resolve_event_gating_decision(effective_gating, idx)
+            event_enabled = bool(gating_decision["enabled"])
+        else:
+            gating_decision = {
+                "enabled": True,
+                "reason": "raw_event_overlay",
+                "samples": None,
+                "base_hit_pct": None,
+                "event_hit_pct": None,
+                "improvement_pct": None,
+                "base_width_pct": None,
+                "event_width_pct": None,
+            }
+            event_enabled = True
+        if event_enabled:
+            bull_close = overlay_bull_close
+            bear_close = overlay_bear_close
+            bull_driver = " / ".join(bull_driver_parts) or "volatility_expansion"
+            bear_driver = " / ".join(bear_driver_parts) or "volatility_expansion"
+        else:
+            bull_close = base_high
+            bear_close = base_low
+            bull_driver = "base_interval_fallback"
+            bear_driver = "base_interval_fallback"
+
+        scenario_rows.append(
+            {
+                "date": target_date.strftime("%Y-%m-%d"),
+                "bear_close": round(float(bear_close), 2),
+                "base_close": round(float(base_close), 2),
+                "bull_close": round(float(bull_close), 2),
+                "base_low": round(float(base_low), 2),
+                "base_high": round(float(base_high), 2),
+                "bull_driver": bull_driver,
+                "bear_driver": bear_driver,
+                "calendar_score": round(calendar_bias, 3),
+                "active_events": calendar["active_events"],
+                "event_enabled": event_enabled,
+                "gate_mode": "event" if event_enabled else "base",
+                "gating_reason": gating_decision["reason"],
+                "gating_improvement_pct": gating_decision["improvement_pct"],
+                "gating_base_hit_pct": gating_decision["base_hit_pct"],
+                "gating_event_hit_pct": gating_decision["event_hit_pct"],
+                "overlay_bear_close": round(float(overlay_bear_close), 2),
+                "overlay_bull_close": round(float(overlay_bull_close), 2),
+            }
+        )
 
     top_pathways: List[str] = []
+    if apply_gating:
+        enabled_horizons = [int(h) for h in effective_gating.get("enabled_horizons", [])]
+        if enabled_horizons:
+            enabled_label = ", ".join(f"T+{h}" for h in sorted(enabled_horizons))
+            top_pathways.append(f"Event gating enabled on {enabled_label}; other horizons fall back to base interval.")
+        else:
+            top_pathways.append("Event gating kept all horizons on base interval because history did not improve hit rate.")
+
     if summary.get("safe_haven_score", 0.0) > 0.8:
-        top_pathways.append("主流新闻中的避险叙事偏强，提升 bull 上沿。")
+        top_pathways.append("Safe-haven headlines are elevated and can widen the upside path when gating is open.")
     if summary.get("policy_risk_score", 0.0) > 0.8:
-        top_pathways.append("政策/关税类报道偏多，事件窗口前的上行弹性被放大。")
+        top_pathways.append("Policy-risk headlines mainly affect the pre-event upside path.")
     if summary.get("geo_risk_score", 0.0) > 0.8:
-        top_pathways.append("地缘风险新闻较密集，模型将其映射为短线风险溢价。")
+        top_pathways.append("Geopolitical risk is active and mainly widens the risk-premium scenario.")
     if summary.get("sell_the_news_score", 0.0) > 0.8:
-        top_pathways.append("近期标题中出现较多获利了结/兑现类表达，bear 路径下调更深。")
+        top_pathways.append("Sell-the-news language mainly deepens the downside path after events.")
     if summary.get("usd_pressure_score", 0.0) > 0.8:
-        top_pathways.append("美元反弹类叙事偏强，bear 路径会额外考虑压制。")
-    if not top_pathways:
-        top_pathways.append("近一周事件情绪信号偏弱，bull/bear 主要由波动率区间展开。")
+        top_pathways.append("USD pressure remains a bearish overlay for event-driven downside scenarios.")
+    if len(top_pathways) == 1:
+        top_pathways.append("Recent event signals are modest, so the scenario band mostly follows the base volatility range.")
 
     return {
         "feature_summary": summary,
@@ -593,4 +739,6 @@ def build_event_scenario_bundle(
         "pathways": top_pathways,
         "article_count": int(summary.get("article_count", 0)),
         "calibration": calibration,
+        "gating": effective_gating,
+        "gating_applied": bool(apply_gating),
     }
