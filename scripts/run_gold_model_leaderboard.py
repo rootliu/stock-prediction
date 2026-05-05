@@ -316,7 +316,7 @@ def parse_args(argv: Optional[Iterable[str]] = None) -> argparse.Namespace:
         action="store_true",
         help="Do not fetch/use COT data; COT variants will be skipped.",
     )
-    parser.add_argument("--cot-start", default="2020-01-01", help="COT fetch start date.")
+    parser.add_argument("--cot-start", default="2007-01-01", help="COT fetch start date.")
     parser.add_argument(
         "--cot-alignment",
         default="leak_safe",

@@ -37,6 +37,9 @@ node_modules/
 *.tmp
 *.temp
 .tmp/
+.cache/
+.mplconfig/
+ml-service/data/cot_gold.csv
 
 # Build outputs
 client/dist/

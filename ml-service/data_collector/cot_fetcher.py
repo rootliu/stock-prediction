@@ -75,15 +75,21 @@ def fetch_gold_cot(
     """
     cache_path = cache_path or _default_cache_path()
     end_date = end_date or date.today().isoformat()
+    requested_start = pd.Timestamp(start_date).normalize()
 
     cached: Optional[pd.DataFrame] = None
     if cache_path.exists() and not force_refresh:
         try:
             cached = pd.read_csv(cache_path, parse_dates=["report_date", "known_from"])
             if not cached.empty:
+                earliest_cached = pd.Timestamp(cached["report_date"].min()).normalize()
                 latest_cached = pd.Timestamp(cached["report_date"].max()).normalize()
-                # Refresh from last known + 1 day to pick up new weekly releases
-                start_date = (latest_cached + pd.Timedelta(days=1)).strftime("%Y-%m-%d")
+                if requested_start < earliest_cached:
+                    # Backfill older history requested by long-window backtests.
+                    start_date = requested_start.strftime("%Y-%m-%d")
+                else:
+                    # Refresh from last known + 1 day to pick up new weekly releases.
+                    start_date = (latest_cached + pd.Timedelta(days=1)).strftime("%Y-%m-%d")
         except Exception:
             cached = None
 
