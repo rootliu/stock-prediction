@@ -672,7 +672,13 @@ def run_direct_multi_day_prediction(
     lookback_days: int = 240,
     verbose: bool = True,
     cot_daily: Optional[pd.DataFrame] = None,
+    horizons_to_train: Optional[Sequence[int]] = None,
 ) -> List[Dict[str, Any]]:
+    """
+    horizons_to_train: optional subset of horizons (1..N) to train. If None,
+    train all horizons from 1 to len(target_dates). Use this to skip wasted
+    training when only a specific horizon (e.g. T+20) is needed.
+    """
     if not target_dates:
         return []
 
@@ -687,8 +693,13 @@ def run_direct_multi_day_prediction(
             f"  [Regime] {regime} (vol={regime_info['annualized_vol']}%, dampening={regime_info['dampening']})"
         )
 
+    horizons_iter = (
+        sorted(set(int(h) for h in horizons_to_train))
+        if horizons_to_train
+        else list(range(1, len(target_dates) + 1))
+    )
     models: Dict[int, Dict[str, Any]] = {}
-    for horizon_days in range(1, len(target_dates) + 1):
+    for horizon_days in horizons_iter:
         if verbose:
             print(f"  [Train] T+{horizon_days} direct model ...", end=" ")
         model_info = _train_horizon_model(

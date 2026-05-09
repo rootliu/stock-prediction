@@ -21,6 +21,7 @@ def predict_direct_gbm(
     lookback_days: int = 240,
     verbose: bool = False,
     cot_daily: pd.DataFrame = None,
+    horizons_to_train: Optional[Sequence[int]] = None,
 ) -> List[Dict[str, Any]]:
     """Predict GBM direct multi-horizon closes and return flat dicts.
 
@@ -54,6 +55,7 @@ def predict_direct_gbm(
         lookback_days=lookback_days,
         verbose=verbose,
         cot_daily=cot_daily,
+        horizons_to_train=horizons_to_train,
     )
 
     flat: List[Dict[str, Any]] = []
