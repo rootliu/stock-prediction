@@ -514,6 +514,96 @@ def _trend_branch_name(trend_regime_code: float) -> str:
     return "normal"
 
 
+def _apply_directional_guard(
+    pred_return: float,
+    horizon_days: int,
+    trend_regime_code: float,
+    trend_signal: float,
+    up_prob: Optional[float],
+    confidence: float,
+    ret_1: float,
+    ma_gap_5: float,
+    ma_gap_10: float,
+    close_vs_vwap: float,
+    close_vs_high: float,
+    ret_3: float,
+    ret_5: float,
+    branch_name: Optional[str],
+) -> Tuple[float, str]:
+    """
+    Convert weak/contradictory model output into a conservative return.
+
+    The April-May continuation backtest showed a common failure mode: the
+    regressor kept a stale bullish carry while the latest price structure had
+    already rolled over. This guard is intentionally asymmetric: it only clips
+    bullish forecasts when classifier confidence and recent trend evidence do
+    not support them.
+    """
+    pred_return = float(pred_return)
+    if pred_return <= 0:
+        return pred_return, "none"
+
+    horizon = max(int(horizon_days), 1)
+    up_prob_value = float(up_prob) if up_prob is not None else 0.5
+    trend_strength = min(max(float(trend_signal or 0.0), 0.0), 3.0)
+    bearish_structure = (
+        float(trend_regime_code) <= -1.0
+        or (float(ma_gap_5) < -0.003 and float(ma_gap_10) < -0.002)
+        or (float(ret_3) < -0.010 and float(ret_5) < -0.015)
+    )
+    weak_confidence = float(confidence) < (38.0 if horizon <= 3 else 42.0)
+    classifier_bearish = up_prob_value < (0.47 if horizon <= 3 else 0.49)
+    trend_down_branch = branch_name == "trend_down"
+
+    if horizon <= 3:
+        short_bearish_continuation = (
+            float(ret_1) < -0.005
+            and float(ma_gap_5) < -0.008
+            and float(ma_gap_10) < -0.010
+            and float(close_vs_high) < -0.008
+            and (horizon < 3 or float(ret_5) > -0.025)
+        )
+        short_failed_bounce = (
+            float(ret_1) > 0.0
+            and float(ret_3) < -0.010
+            and float(ma_gap_10) < -0.008
+            and float(close_vs_vwap) < 0.002
+            and float(close_vs_high) < -0.004
+        )
+        short_top_rollover = (
+            float(ret_1) < 0.0
+            and float(ret_3) > 0.015
+            and float(ret_5) > 0.010
+            and float(close_vs_vwap) < 0.0
+            and float(close_vs_high) < -0.006
+        )
+        if short_bearish_continuation or short_failed_bounce or short_top_rollover:
+            floor = -0.0010 * float(np.sqrt(horizon))
+            return float(min(pred_return * 0.15, floor)), "short_structure_guard"
+
+    if bearish_structure and (weak_confidence or classifier_bearish or trend_down_branch):
+        if horizon <= 3:
+            return float(pred_return * 0.35), "near_bearish_decay"
+
+        horizon_scale = float(np.sqrt(max(horizon, 1) / 5.0))
+        if horizon >= 5:
+            floor = -0.0015 * horizon_scale
+            if classifier_bearish:
+                floor = -0.0025 * horizon_scale
+            if trend_strength >= 0.35:
+                floor *= min(1.45, 1.0 + 0.18 * trend_strength)
+            return float(min(pred_return * 0.18, floor)), "bearish_guard"
+
+    if weak_confidence and horizon >= 5:
+        scale = 0.35 if horizon <= 7 else 0.20
+        return float(pred_return * scale), "low_confidence_decay"
+
+    if branch_name == "trend_up" and weak_confidence and horizon >= 8:
+        return float(pred_return * 0.45), "long_horizon_trend_decay"
+
+    return pred_return, "none"
+
+
 def _train_horizon_model(
     daily_df: pd.DataFrame,
     comex_daily: pd.DataFrame,
@@ -583,7 +673,7 @@ def _train_horizon_model(
 
     branch_models: Dict[str, Any] = {}
     branch_blend_weights: Dict[str, float] = {}
-    if horizon_days <= 5:
+    if horizon_days <= 10:
         jump_mask = x_train["jump_regime_code"] >= 1.0
         trend_down_mask = x_train["trend_regime_code"] <= -1.0
         trend_up_mask = x_train["trend_regime_code"] >= 1.0
@@ -614,9 +704,9 @@ def _train_horizon_model(
             elif branch_name == "jump":
                 min_samples = 12
             elif branch_name in {"trend_down", "trend_up"}:
-                min_samples = 10 if horizon_days <= 2 else (12 if horizon_days <= 4 else 14)
+                min_samples = 10 if horizon_days <= 2 else (12 if horizon_days <= 4 else (14 if horizon_days <= 7 else 16))
             else:
-                min_samples = 16 if horizon_days <= 2 else (18 if horizon_days <= 4 else 20)
+                min_samples = 16 if horizon_days <= 2 else (18 if horizon_days <= 4 else (20 if horizon_days <= 7 else 22))
             if len(branch_x) < min_samples:
                 continue
             branch_y_ret = y_ret_train.loc[mask]
@@ -645,11 +735,17 @@ def _train_horizon_model(
         if "jump" in branch_models:
             branch_blend_weights["jump"] = 0.65
         if "trend_down" in branch_models:
-            branch_blend_weights["trend_down"] = 0.72 if horizon_days <= 2 else (0.62 if horizon_days <= 4 else 0.55)
+            branch_blend_weights["trend_down"] = (
+                0.72 if horizon_days <= 2 else (0.62 if horizon_days <= 4 else (0.50 if horizon_days <= 7 else 0.42))
+            )
         if "trend_up" in branch_models:
-            branch_blend_weights["trend_up"] = 0.68 if horizon_days <= 2 else (0.58 if horizon_days <= 4 else 0.52)
+            branch_blend_weights["trend_up"] = (
+                0.68 if horizon_days <= 2 else (0.58 if horizon_days <= 4 else (0.42 if horizon_days <= 7 else 0.30))
+            )
         if "normal" in branch_models:
-            branch_blend_weights["normal"] = 0.55 if horizon_days <= 2 else (0.45 if horizon_days <= 4 else 0.40)
+            branch_blend_weights["normal"] = (
+                0.55 if horizon_days <= 2 else (0.45 if horizon_days <= 4 else (0.35 if horizon_days <= 7 else 0.25))
+            )
 
     return {
         "trained": True,
@@ -747,6 +843,12 @@ def run_direct_multi_day_prediction(
         trend_signal = float(feature_row.get("trend_signal", 0.0))
         overnight_gap_pct = float(feature_row.get("overnight_gap_pct", 0.0))
         ret_1 = float(feature_row.get("ret_1", 0.0))
+        ret_3 = float(feature_row.get("ret_3", 0.0))
+        ret_5 = float(feature_row.get("ret_5", 0.0))
+        ma_gap_5 = float(feature_row.get("ma_gap_5", 0.0))
+        ma_gap_10 = float(feature_row.get("ma_gap_10", 0.0))
+        close_vs_vwap = float(feature_row.get("close_vs_vwap", 0.0))
+        close_vs_high = float(feature_row.get("close_vs_high", 0.0))
 
         pred_return = float(model_info["reg_model"].predict(x_row)[0])
         preferred_branch = _directional_jump_branch_name(jump_regime_code, overnight_gap_pct, ret_1)
@@ -765,6 +867,9 @@ def run_direct_multi_day_prediction(
             trend_branch = _trend_branch_name(trend_regime_code)
             if trend_branch in branch_models:
                 branch_name = trend_branch
+                branch_info = branch_models[branch_name]
+            elif "normal" in branch_models:
+                branch_name = "normal"
                 branch_info = branch_models[branch_name]
         elif "normal" in branch_models:
             branch_name = "normal"
@@ -790,15 +895,6 @@ def run_direct_multi_day_prediction(
             branch_bias = float(branch_info.get("recent_bias_return", 0.0))
             bias_adjustment = 0.55 * bias_adjustment + 0.45 * branch_bias
         pred_return += bias_adjustment
-        pred_return = _clip_return(
-            pred_return,
-            vol_5,
-            horizon_days,
-            jump_regime_code=jump_regime_code,
-            jump_signal=jump_signal,
-        )
-        pred_close_raw = current_close * (1 + pred_return)
-        pred_close = float(dampen_prediction(pred_close_raw, current_close, regime))
 
         up_prob = None
         cls_model = model_info.get("cls_model")
@@ -813,6 +909,33 @@ def run_direct_multi_day_prediction(
         dir_acc = float(metrics.get("direction_accuracy") or 50.0) / 100.0
         horizon_decay = max(0.45, 1.0 - 0.10 * (horizon_days - 1))
         confidence = (0.55 * prob_conf + 0.45 * dir_acc) * 100 * horizon_decay
+
+        pre_guard_return = pred_return
+        pred_return, direction_guard = _apply_directional_guard(
+            pred_return=pred_return,
+            horizon_days=horizon_days,
+            trend_regime_code=trend_regime_code,
+            trend_signal=trend_signal,
+            up_prob=up_prob,
+            confidence=confidence,
+            ret_1=ret_1,
+            ma_gap_5=ma_gap_5,
+            ma_gap_10=ma_gap_10,
+            close_vs_vwap=close_vs_vwap,
+            close_vs_high=close_vs_high,
+            ret_3=ret_3,
+            ret_5=ret_5,
+            branch_name=branch_name if branch_used else None,
+        )
+        pred_return = _clip_return(
+            pred_return,
+            vol_5,
+            horizon_days,
+            jump_regime_code=jump_regime_code,
+            jump_signal=jump_signal,
+        )
+        pred_close_raw = current_close * (1 + pred_return)
+        pred_close = float(dampen_prediction(pred_close_raw, current_close, regime))
 
         range_pct = max(float(metrics.get("mape_pct") or 1.0) / 100.0, 0.005)
         range_pct *= min(1.6, 1.0 + 0.12 * (horizon_days - 1))
@@ -843,7 +966,9 @@ def run_direct_multi_day_prediction(
                 "model_details": {
                     "model_name": "direct_gbm_multi_horizon_v2",
                     "horizon_days": horizon_days,
+                    "pre_guard_return_pct": round(pre_guard_return * 100, 3),
                     "pred_return_pct": round(pred_return * 100, 3),
+                    "direction_guard": direction_guard,
                     "up_probability": round(up_prob, 4) if up_prob is not None else None,
                     "test_mape_pct": metrics.get("mape_pct"),
                     "test_direction_accuracy": metrics.get("direction_accuracy"),
