@@ -1,0 +1,78 @@
+{
+  "snapshot_date": "2026-05-21",
+  "snapshot_time_utc": "2026-05-21T11:00:13.818224+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9896,
+    "news_bear_score": 0.491,
+    "blog_bull_score": 0.899,
+    "blog_bear_score": 0.6595,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.1659,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.6122,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.8892,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Iran Threatens to Retaliate Beyond Middle East If US Attacks - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.8054,
+      "tags": [
+        "iran",
+        "middle east"
+      ]
+    },
+    {
+      "title": "Exclusive: Supreme Leader says enriched uranium must stay in Iran, Iranian sources say - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.259,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran rebuilding military industrial base faster than expected, CNN reports - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2128,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold breaks below $4,540, silver tests $75 as yields rise, Hormuz talks cap oil - Kitco AM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.4423,
+      "tags": [
+        "talks",
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Gold steadies as markets balance retreat in US yields with hawkish Fed outlook - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3057,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "US Dollar: Fed minutes to clarify hawkish momentum – TD Securities - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.2942,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

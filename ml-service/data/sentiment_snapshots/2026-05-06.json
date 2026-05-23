@@ -1,0 +1,78 @@
+{
+  "snapshot_date": "2026-05-06",
+  "snapshot_time_utc": "2026-05-06T11:00:16.306809+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9887,
+    "news_bear_score": 0.5589,
+    "blog_bull_score": 0.9254,
+    "blog_bear_score": 0.43,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.9021,
+    "geo_relief_score": 0.3736
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "US and Iran closing in on memorandum to end war, Pakistani source says - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2509,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran foreign minister meets Chinese counterpart a week before Trump's Beijing trip - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2441,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US and Iran closing in on one-page memo to end war, Axios reports - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2439,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "European stocks soar amid growing optimism for Gulf peace deal - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.3016,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Gold edges higher above $4,550 on fragile US–Iran ceasefire - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3782,
+      "tags": [
+        "iran",
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "Brent oil tops $118 after Trump says he will blockade Iran until it agrees to a nuclear deal - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.0242,
+      "tags": [
+        "iran",
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

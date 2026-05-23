@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-05-01",
+  "snapshot_time_utc": "2026-05-01T11:00:26.900260+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9893,
+    "news_bear_score": 0.309,
+    "blog_bull_score": 0.9026,
+    "blog_bear_score": 0.2783,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.1097,
+    "rate_pressure_score": 0.259,
+    "oil_shock_score": 0.0722,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.2025,
+    "geo_relief_score": 0.4632
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Dubai chefs shrink menus as Iran war makes tomatillos, scallops harder to source - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1923,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran Says Trump’s Blockade Will Keep Pushing Up Oil Prices - Bloomberg",
+      "site": "bloomberg.com",
+      "bull_score": 1.148,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US official says Iran war truce 'terminated' hostilities for war powers deadline - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1245,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold Price Forecast: XAU/USD looks vulnerable amid inflation fears, hawkish Fed hold - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.274,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "USD/JPY surges to near two-year high after Fed’s decision to deliver a hawkish hold - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.2407,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Extended ceasefire only prolongs market uncertainty, gold’s medium-term prospects strengthen while silver demand slides – Heraeus - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.1497,
+      "tags": [
+        "ceasefire"
+      ]
+    }
+  ],
+  "error": null
+}

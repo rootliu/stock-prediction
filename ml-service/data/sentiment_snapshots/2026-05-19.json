@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-05-19",
+  "snapshot_time_utc": "2026-05-19T11:00:14.267096+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9895,
+    "news_bear_score": 0.1276,
+    "blog_bull_score": 0.8863,
+    "blog_bear_score": 0.3278,
+    "article_count": 48,
+    "safe_haven_score": 0.1607,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.1696,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.4923,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Trump says he's postponing 'scheduled attack of Iran tomorrow' at Middle East leaders' request - CNBC",
+      "site": "cnbc.com",
+      "bull_score": 1.3913,
+      "tags": [
+        "iran",
+        "middle east"
+      ]
+    },
+    {
+      "title": "Iran says peace proposal includes reparations for war damage, US troop withdrawal - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2303,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "(USD/RUB) Ruble Tops Global Currencies as Putin Reaps Iran War Oil Gain - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1559,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "British Pound softens as UK political turmoil, hawkish Fed bets weigh - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3539,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Silver drops 4.6% as yields rise, gold holds above $4,650 - Kitco PM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.16,
+      "tags": [
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Gold firms near $4,700, silver slips as Hormuz talks steady oil - Kitco AM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.0547,
+      "tags": [
+        "talks"
+      ]
+    }
+  ],
+  "error": null
+}

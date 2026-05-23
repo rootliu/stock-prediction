@@ -1,0 +1,78 @@
+{
+  "snapshot_date": "2026-05-05",
+  "snapshot_time_utc": "2026-05-05T11:00:24.670482+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9895,
+    "news_bear_score": 0.4631,
+    "blog_bull_score": 0.8895,
+    "blog_bear_score": 0.3376,
+    "article_count": 47,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.2789,
+    "oil_shock_score": 0.1262,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.208,
+    "geo_relief_score": 0.7149
+  },
+  "article_count": 47,
+  "top_bull": [
+    {
+      "title": "Middle East truce in doubt as US and Iran fight for control of Strait of Hormuz - Reuters",
+      "site": "reuters.com",
+      "bull_score": 2.3676,
+      "tags": [
+        "iran",
+        "middle east"
+      ]
+    },
+    {
+      "title": "Ships Cluster Further From Hormuz Strait as Iran Widens Grip - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1462,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "South Korean-operated vessel ablaze in Strait of Hormuz; Trump says Iran fired at ship - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1079,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold recovers further from one-month low; hawkish rate bets and firm USD to limit upside - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3761,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Brent oil tops $118 after Trump says he will blockade Iran until it agrees to a nuclear deal - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.0321,
+      "tags": [
+        "iran",
+        "deal"
+      ]
+    },
+    {
+      "title": "Bar and coin demand drives gold market as central banks stay resilient amid geopolitical strain – WGC - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.0,
+      "tags": [
+        "geopolitical"
+      ]
+    }
+  ],
+  "error": null
+}

@@ -1,0 +1,80 @@
+{
+  "snapshot_date": "2026-05-08",
+  "snapshot_time_utc": "2026-05-08T11:00:13.042594+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9916,
+    "news_bear_score": 0.5547,
+    "blog_bull_score": 0.9171,
+    "blog_bear_score": 0.4805,
+    "article_count": 46,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.508,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.1908,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.6331,
+    "geo_relief_score": 0.7652
+  },
+  "article_count": 46,
+  "top_bull": [
+    {
+      "title": "Oil futures rise after U.S., Iran trade fire; stock futures quiet after court rejects Trump’s tariffs - MarketWatch",
+      "site": "marketwatch.com",
+      "bull_score": 1.6219,
+      "tags": [
+        "tariff",
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran focus at Trump-Xi summit may delay progress on tariffs, rare earths - CNBC",
+      "site": "cnbc.com",
+      "bull_score": 1.4902,
+      "tags": [
+        "tariff",
+        "iran"
+      ]
+    },
+    {
+      "title": "Toyota expects $4.3 billion hit from Iran war - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1796,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Treasury Yields Rise as Iran Rejects U.S. Plan for Strait of Hormuz - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.5794,
+      "tags": [
+        "iran",
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Gold, silver rally on weaker dollar after crude collapses on Iran ceasefire hopes - Kitco AM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.2774,
+      "tags": [
+        "iran",
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "Gold Edges Higher As Iran Sends Fresh Peace Plan To U.S. - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.0,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "error": null
+}

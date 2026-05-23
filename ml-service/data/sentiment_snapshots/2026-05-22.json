@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-05-22",
+  "snapshot_time_utc": "2026-05-22T11:00:14.693803+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9866,
+    "news_bear_score": 0.5745,
+    "blog_bull_score": 0.9455,
+    "blog_bear_score": 0.392,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.9527,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Europe's AI stocks shine through gloom of Iran war - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1792,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "India's job engine strains as Iran war hits remittances and trade - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1583,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Attack on UAE Nuclear Plant From Iraq ‘Warning Shot’ By Iran - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1536,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Puig plunges after Estée Lauder tie-up talks terminated; European stocks open higher - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.3776,
+      "tags": [
+        "talks"
+      ]
+    },
+    {
+      "title": "Stephen Miran exits the Fed. How he set the stage for Kevin Warsh. - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.0,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Dollar retreats on report of U.S.-Iran sanctions deal - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.0583,
+      "tags": [
+        "iran",
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

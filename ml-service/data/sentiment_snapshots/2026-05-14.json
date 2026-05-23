@@ -1,0 +1,79 @@
+{
+  "snapshot_date": "2026-05-14",
+  "snapshot_time_utc": "2026-05-14T11:00:14.397892+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9888,
+    "news_bear_score": 0.1041,
+    "blog_bull_score": 0.9053,
+    "blog_bear_score": 0.3509,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.3598,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.0992,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.4308,
+    "geo_relief_score": 0.1751
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Iran urges BRICS to condemn US, Israel for war, exposing bloc divisions - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1969,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US Efforts to End Iran War Stumble as Ship Seized Near UAE - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1688,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "South Korea official says unlikely anyone but Iran behind Hormuz ship attack, Yonhap reports - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1576,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Hot inflation data and stalled Iran ceasefire talks send gold retreating - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.5202,
+      "tags": [
+        "iran",
+        "ceasefire",
+        "talks"
+      ]
+    },
+    {
+      "title": "Trump says Iran ceasefire is ‘on life support’ after rejecting Tehran’s counterproposal - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.1841,
+      "tags": [
+        "iran",
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "Gold Surges Past $4,770 as Geopolitical Optimism Cools Inflation Fears - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.0,
+      "tags": [
+        "geopolitical"
+      ]
+    }
+  ],
+  "error": null
+}

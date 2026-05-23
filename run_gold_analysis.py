@@ -47,6 +47,7 @@ from models.event_sentiment import (
     resolve_event_gating_decision,
 )
 from models.volatility_regime import compute_regime_info
+from models.market_regime import compute_market_regime, format_regime_report
 
 TROY_OZ_TO_GRAM = 31.1035
 _TRADE_CALENDAR_CACHE: pd.DatetimeIndex | None = None
@@ -1003,12 +1004,37 @@ def main(
         print("\n  [跳过] 跨市场信号")
         cross = pd.DataFrame(columns=["date"])
 
-    # Regime info
+    # Regime info (legacy single-axis — kept for backward compat with
+    # downstream predictor/backtest code).
     regime_info = compute_regime_info(shfe_daily["close"])
     print(f"\n  [Regime] {regime_info['regime'].upper()} — "
           f"年化波动率 {regime_info['annualized_vol']}%, "
           f"预测压缩 {(1-regime_info['dampening'])*100:.0f}%, "
           f"方向阈值 {regime_info['direction_threshold']*100:.0f}%")
+
+    # Multi-dimensional regime (trend / momentum / cross-asset + composite)
+    try:
+        comex_closes = (
+            comex["close"].astype(float)
+            if isinstance(comex, pd.DataFrame) and "close" in comex.columns and not comex.empty
+            else None
+        )
+        usdcny_closes = (
+            usdcny["close"].astype(float)
+            if isinstance(usdcny, pd.DataFrame) and "close" in usdcny.columns and not usdcny.empty
+            else None
+        )
+        market_regime = compute_market_regime(
+            shfe_daily["close"].astype(float),
+            comex_daily_closes=comex_closes,
+            usdcny_daily_closes=usdcny_closes,
+            window=20,
+        )
+        print()
+        print(format_regime_report(market_regime))
+    except Exception as exc:  # noqa: BLE001  — regime is diagnostic, never fatal
+        print(f"\n  [Regime-Multi] 计算失败: {exc}")
+        market_regime = None
 
     # ── 2. 回测 ──────────────────────────────────────────────────────
     metrics = pd.DataFrame()

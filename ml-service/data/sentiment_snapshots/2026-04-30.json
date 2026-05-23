@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-04-30",
+  "snapshot_time_utc": "2026-04-30T11:00:46.018094+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9895,
+    "news_bear_score": 0.0705,
+    "blog_bull_score": 0.8414,
+    "blog_bear_score": 0.444,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.2111,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.3418,
+    "oil_shock_score": 0.2096,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.2215,
+    "geo_relief_score": 0.0663
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "From surplus to strain: world rice supply threatened by Iran war, El Nino - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2154,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Europe’s Top Economies Send Mixed Signals on Iran War’s Effects - Bloomberg",
+      "site": "bloomberg.com",
+      "bull_score": 1.1825,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Stagflation risks stacking up as Iran war enters third month - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1649,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold Price Forecast: XAU/USD looks vulnerable amid inflation fears, hawkish Fed hold - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3646,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Forex Today: US Dollar surges amid Fed's hawkish hold in Powell’s last meeting - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3306,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Extended ceasefire only prolongs market uncertainty, gold’s medium-term prospects strengthen while silver demand slides – Heraeus - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.1992,
+      "tags": [
+        "ceasefire"
+      ]
+    }
+  ],
+  "error": null
+}

@@ -1,0 +1,79 @@
+{
+  "snapshot_date": "2026-05-10",
+  "snapshot_time_utc": "2026-05-10T11:00:14.994605+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9814,
+    "news_bear_score": 0.2008,
+    "blog_bull_score": 0.8563,
+    "blog_bear_score": 0.263,
+    "article_count": 45,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.3605,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0803,
+    "rate_pressure_score": 0.127,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.2655,
+    "geo_relief_score": 0.3509
+  },
+  "article_count": 45,
+  "top_bull": [
+    {
+      "title": "U.S. sanctions companies and individuals in the Middle East and China for helping Iran - CNBC",
+      "site": "cnbc.com",
+      "bull_score": 1.2501,
+      "tags": [
+        "iran",
+        "middle east"
+      ]
+    },
+    {
+      "title": "US Awaits Iran Reply as Aramco Says Hormuz Opening No Quick Fix - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1579,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Israel built and defended a secret base in Iraq for Iran war, WSJ reports - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0737,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Treasury Yields Rise as Iran Rejects U.S. Plan for Strait of Hormuz - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.383,
+      "tags": [
+        "iran",
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Gold, silver rally on weaker dollar after crude collapses on Iran ceasefire hopes - Kitco AM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.1567,
+      "tags": [
+        "iran",
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "Global oil prices top $114 a barrel on worries over supply disruptions due to renewed Middle East tensions (MarketWatch) - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.0,
+      "tags": [
+        "middle east"
+      ]
+    }
+  ],
+  "error": null
+}

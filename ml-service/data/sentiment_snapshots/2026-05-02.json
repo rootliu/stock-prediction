@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-05-02",
+  "snapshot_time_utc": "2026-05-02T11:00:38.384785+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9812,
+    "news_bear_score": 0.094,
+    "blog_bull_score": 0.9123,
+    "blog_bear_score": 0.2004,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.6271,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.3986,
+    "geo_relief_score": 0.0375
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Iran standoff could leave Trump worse off than before he went to war - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1781,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Saudi liquor store runs short because of Iran war bottleneck - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0295,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump says Iran war 'terminated,' as war powers deadline arrives - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0157,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Extended ceasefire only prolongs market uncertainty, gold’s medium-term prospects strengthen while silver demand slides – Heraeus - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.1125,
+      "tags": [
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "Dollar dips as traders eye U.S.-Iran talks, central banks - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.0511,
+      "tags": [
+        "iran",
+        "talks"
+      ]
+    },
+    {
+      "title": "Gold Slumps As U.S.-Iran Standoff Continues, Strait Of Hormuz Remains Closed - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.0,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "error": null
+}

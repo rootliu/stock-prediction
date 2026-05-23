@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-05-04",
+  "snapshot_time_utc": "2026-05-04T11:00:29.164838+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9652,
+    "news_bear_score": 0.3295,
+    "blog_bull_score": 0.8207,
+    "blog_bear_score": 0.3796,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.3227,
+    "geo_risk_score": 0.9999,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.396,
+    "rate_pressure_score": 0.2437,
+    "oil_shock_score": 0.3038,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.3377,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Iran's Fars News agency reports incident with U.S. warship in Strait of Hormuz - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2599,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran's Revolutionary Guards unveil new map of Strait of Hormuz under their control, state media says - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.238,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "NATO Chief Says US Disappointed in Europe Over Iran Response - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1518,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Dollar rises, European stocks and bonds fall after reports of U.S. warship being hit missiles - Reuters",
+      "site": "reuters.com",
+      "bear_score": 1.2568,
+      "tags": [
+        "dollar rises"
+      ]
+    },
+    {
+      "title": "Gold slides further below $4,600 amid hawkish rate outlook - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3781,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Pound Sterling advances on BoE hawkish hold while Hormuz tensions cap gains - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3679,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

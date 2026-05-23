@@ -1,0 +1,81 @@
+{
+  "snapshot_date": "2026-05-11",
+  "snapshot_time_utc": "2026-05-11T11:00:13.416798+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9948,
+    "news_bear_score": 0.3878,
+    "blog_bull_score": 0.8883,
+    "blog_bear_score": 0.2888,
+    "article_count": 46,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0817,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0604,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.5704,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.6515,
+    "geo_relief_score": 0.0377
+  },
+  "article_count": 46,
+  "top_bull": [
+    {
+      "title": "Iran says it will 'never bow' as Trump rejects peace counteroffer, prolonging Middle East conflict - CNBC",
+      "site": "cnbc.com",
+      "bull_score": 1.5144,
+      "tags": [
+        "iran",
+        "middle east"
+      ]
+    },
+    {
+      "title": "Trump dismisses Iran's reply to peace plan, oil jumps as Hormuz closure persists - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.8046,
+      "tags": [
+        "iran",
+        "oil jumps"
+      ]
+    },
+    {
+      "title": "Oil Jumps After Trump Says Iran’s Peace Offer ‘Unacceptable’ - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.7131,
+      "tags": [
+        "iran",
+        "oil jumps"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold, silver rally on weaker dollar after crude collapses on Iran ceasefire hopes - Kitco AM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.1131,
+      "tags": [
+        "iran",
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "Global oil prices top $114 a barrel on worries over supply disruptions due to renewed Middle East tensions (MarketWatch) - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.0,
+      "tags": [
+        "middle east"
+      ]
+    },
+    {
+      "title": "Dollar tumbles against yen as intervention chatter swirls, optimism grows for U.S.-Iran deal - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.0397,
+      "tags": [
+        "iran",
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

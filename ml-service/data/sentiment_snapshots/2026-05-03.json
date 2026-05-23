@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-05-03",
+  "snapshot_time_utc": "2026-05-03T11:00:28.280539+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.969,
+    "news_bear_score": 0.077,
+    "blog_bull_score": 0.8381,
+    "blog_bear_score": 0.1421,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.5161,
+    "geo_risk_score": 0.9999,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.0139,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.2983,
+    "geo_relief_score": 0.0282
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Iran executes man convicted over killing of security officer in 2022 unrest - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2102,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump says there is possibility US could restart strikes on Iran - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0926,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump Says Prefers Not to Strike Iran Even as Frustration Mounts - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.0433,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Extended ceasefire only prolongs market uncertainty, gold’s medium-term prospects strengthen while silver demand slides – Heraeus - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.0846,
+      "tags": [
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "U.S. stock futures mixed, oil rises ahead of a busy week for Wall Street - MarketWatch",
+      "site": "marketwatch.com",
+      "bear_score": 0.0279,
+      "tags": [
+        "oil rises"
+      ]
+    },
+    {
+      "title": "Gold Slumps As U.S.-Iran Standoff Continues, Strait Of Hormuz Remains Closed - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.0,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "error": null
+}

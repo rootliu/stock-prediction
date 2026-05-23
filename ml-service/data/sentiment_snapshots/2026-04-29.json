@@ -1,0 +1,78 @@
+{
+  "snapshot_date": "2026-04-29",
+  "snapshot_time_utc": "2026-04-29T11:00:26.704064+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9906,
+    "news_bear_score": 0.1274,
+    "blog_bull_score": 0.8623,
+    "blog_bear_score": 0.3393,
+    "article_count": 48,
+    "safe_haven_score": 0.2192,
+    "policy_risk_score": 0.4863,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.152,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.2411,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.2798,
+    "geo_relief_score": 0.1336
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Major data center company pauses investment decisions in Middle East amid Iran war, CEO tells CNBC - CNBC",
+      "site": "cnbc.com",
+      "bull_score": 1.5641,
+      "tags": [
+        "iran",
+        "middle east"
+      ]
+    },
+    {
+      "title": "No, the Iranian Oil Industry Isn’t About to 'Explode' - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1598,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump says King Charles does not want Iran to have nuclear weapon - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1586,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Extended ceasefire only prolongs market uncertainty, gold’s medium-term prospects strengthen while silver demand slides – Heraeus - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.2651,
+      "tags": [
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "Oil rises on stalled peace talks while Wall Street stocks slip - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.198,
+      "tags": [
+        "oil rises",
+        "talks"
+      ]
+    },
+    {
+      "title": "EU Opens Door to Talks With Ukraine on Next Membership Steps - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.0463,
+      "tags": [
+        "talks"
+      ]
+    }
+  ],
+  "error": null
+}

@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-05-18",
+  "snapshot_time_utc": "2026-05-18T11:00:15.054870+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9845,
+    "news_bear_score": 0.4628,
+    "blog_bull_score": 0.8784,
+    "blog_bear_score": 0.4695,
+    "article_count": 48,
+    "safe_haven_score": 0.2124,
+    "policy_risk_score": 0.1782,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.6094,
+    "oil_shock_score": 0.2045,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.68,
+    "geo_relief_score": 0.0196
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Global bond rout deepens as Iran war drags on and underscores inflation fears - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.238,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Investors bet on stability after Trump-Xi summit as Iran war concerns linger - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2367,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "How Trump’s crypto venture and Iran’s top exchange tapped into the same industry networks - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2245,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Treasury yields rise as inflation fears drive global bond rout - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.9144,
+      "tags": [
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Opaque oil deals around Hormuz test the petrodollar - Reuters",
+      "site": "reuters.com",
+      "bear_score": 0.4547,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Japanese Yen weakens as hawkish Fed bets drive USD higher - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3474,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

@@ -1,0 +1,78 @@
+{
+  "snapshot_date": "2026-04-26",
+  "snapshot_time_utc": "2026-04-26T11:00:28.354029+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9777,
+    "news_bear_score": 0.6574,
+    "blog_bull_score": 0.8365,
+    "blog_bear_score": 0.2839,
+    "article_count": 48,
+    "safe_haven_score": 0.1234,
+    "policy_risk_score": 0.2002,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.9117,
+    "geo_relief_score": 0.4038
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Iran executes man linked to militant group, Tasnim reports - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1724,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US Says Navy Intercepted Iran-Linked Vessel in Arabian Sea - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.0227,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Strait of Hormuz Remains Near-Empty With Just a Few Iran Ships Moving - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 0.9136,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Trump Scraps US Trip for Iran Talks, Leaving Ceasefire in Limbo - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 1.359,
+      "tags": [
+        "iran",
+        "ceasefire",
+        "talks"
+      ]
+    },
+    {
+      "title": "EU Opens Door to Talks With Ukraine on Next Membership Steps - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.1091,
+      "tags": [
+        "talks"
+      ]
+    },
+    {
+      "title": "Agnico Eagle moves to consolidate Finland's gold district in nearly C$4B deal - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.0335,
+      "tags": [
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

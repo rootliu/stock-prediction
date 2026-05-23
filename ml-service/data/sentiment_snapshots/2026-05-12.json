@@ -1,0 +1,79 @@
+{
+  "snapshot_date": "2026-05-12",
+  "snapshot_time_utc": "2026-05-12T11:00:13.494929+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9902,
+    "news_bear_score": 0.5943,
+    "blog_bull_score": 0.9294,
+    "blog_bear_score": 0.4565,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.1333,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.1882,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.5532,
+    "geo_relief_score": 0.8571
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Evolving drone war in southern Lebanon clouds Iran peace prospects - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2452,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran could enrich uranium to weapons grade if attacked, lawmaker warns - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2422,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran war creates new must-have for summer holidays: the plan B - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1933,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "AI rally fizzles as Middle East ceasefire goes on ’life support’ By Reuters - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.5595,
+      "tags": [
+        "middle east",
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "Gold, silver rally on weaker dollar after crude collapses on Iran ceasefire hopes - Kitco AM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.085,
+      "tags": [
+        "iran",
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "Trump says Iran ceasefire is ‘on life support’ after rejecting Tehran’s counterproposal - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.3261,
+      "tags": [
+        "iran",
+        "ceasefire"
+      ]
+    }
+  ],
+  "error": null
+}

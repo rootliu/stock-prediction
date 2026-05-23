@@ -1,0 +1,81 @@
+{
+  "snapshot_date": "2026-04-24",
+  "snapshot_time_utc": "2026-04-24T03:09:37.625895+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9918,
+    "news_bear_score": 0.273,
+    "blog_bull_score": 0.9167,
+    "blog_bear_score": 0.657,
+    "article_count": 48,
+    "safe_haven_score": 0.2366,
+    "policy_risk_score": 0.1714,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.4122,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.5624,
+    "geo_relief_score": 0.6013
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Oil Jumps as Iran Tensions Simmer With Hormuz Flows Blocked - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.5671,
+      "tags": [
+        "iran",
+        "oil jumps"
+      ]
+    },
+    {
+      "title": "Oil rises on concerns over escalating military tensions in the Middle East - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.4611,
+      "tags": [
+        "middle east",
+        "oil rises"
+      ]
+    },
+    {
+      "title": "Trump says US will not use nuclear weapon in Iran war - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2092,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Trump says Israel-Lebanon ceasefire extended by 3 wks, sees no rush for Iran deal - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.7499,
+      "tags": [
+        "iran",
+        "ceasefire",
+        "deal"
+      ]
+    },
+    {
+      "title": "Agnico Eagle moves to consolidate Finland's gold district in nearly C$4B deal - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.0707,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "GBP/USD eases near 1.35 as Dollar firms despite Iran ceasefire extension - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.2324,
+      "tags": [
+        "iran",
+        "ceasefire"
+      ]
+    }
+  ],
+  "error": null
+}

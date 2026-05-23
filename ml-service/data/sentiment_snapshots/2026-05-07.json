@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-05-07",
+  "snapshot_time_utc": "2026-05-07T11:00:13.646331+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9895,
+    "news_bear_score": 0.3985,
+    "blog_bull_score": 0.9315,
+    "blog_bear_score": 0.4074,
+    "article_count": 47,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.3741,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.861,
+    "geo_relief_score": 0.1224
+  },
+  "article_count": 47,
+  "top_bull": [
+    {
+      "title": "U.S. President Trump's renewed trade war with China - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1986,
+      "tags": [
+        "trade war"
+      ]
+    },
+    {
+      "title": "Shell Profit Rises as Iran War Boosts Oil Price and Trading - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1962,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Gold climbs to two-week high as US-Iran peace hopes push oil lower - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1281,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold, silver rally on weaker dollar after crude collapses on Iran ceasefire hopes - Kitco AM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.3691,
+      "tags": [
+        "iran",
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "Gold Edges Higher As Iran Sends Fresh Peace Plan To U.S. - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.0,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Global oil prices top $114 a barrel on worries over supply disruptions due to renewed Middle East tensions (MarketWatch) - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.0,
+      "tags": [
+        "middle east"
+      ]
+    }
+  ],
+  "error": null
+}

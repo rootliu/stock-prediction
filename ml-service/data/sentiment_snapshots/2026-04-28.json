@@ -1,0 +1,79 @@
+{
+  "snapshot_date": "2026-04-28",
+  "snapshot_time_utc": "2026-04-28T11:00:31.565978+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9913,
+    "news_bear_score": 0.3263,
+    "blog_bull_score": 0.8704,
+    "blog_bear_score": 0.4136,
+    "article_count": 48,
+    "safe_haven_score": 0.0446,
+    "policy_risk_score": 0.2777,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.407,
+    "oil_shock_score": 0.1619,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.5186,
+    "geo_relief_score": 0.1475
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Trump to Address Iran Proposal ‘Soon’ as Oil Rises Further - Bloomberg",
+      "site": "bloomberg.com",
+      "bull_score": 1.4728,
+      "tags": [
+        "iran",
+        "oil rises"
+      ]
+    },
+    {
+      "title": "Explainer: The Hormuz digital chokepoint: How does the Iran war threaten subsea cables? - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2604,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran willing to share defensive capabilities with Asian partners, deputy defence minister says - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.221,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Treasury yields rise as U.S.-Iran peace talks hit an impasse - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 1.3298,
+      "tags": [
+        "iran",
+        "talks",
+        "yields rise"
+      ]
+    },
+    {
+      "title": "GBP/JPY slides to 215.25 after BoJ's hawkish pause; downside seems limited - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3576,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Extended ceasefire only prolongs market uncertainty, gold’s medium-term prospects strengthen while silver demand slides – Heraeus - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.3528,
+      "tags": [
+        "ceasefire"
+      ]
+    }
+  ],
+  "error": null
+}

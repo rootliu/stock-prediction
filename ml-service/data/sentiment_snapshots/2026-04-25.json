@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-04-25",
+  "snapshot_time_utc": "2026-04-25T11:00:28.933179+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9854,
+    "news_bear_score": 0.6025,
+    "blog_bull_score": 0.8777,
+    "blog_bear_score": 0.3498,
+    "article_count": 48,
+    "safe_haven_score": 0.1635,
+    "policy_risk_score": 0.3957,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.937,
+    "geo_relief_score": 0.1664
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Iran says it has hanged agent working for Israel over sabotage in protests - Tasnim - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2054,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran to make offer aimed at satisfying US demands, Trump says - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0774,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US legal adviser says Iran war justified by Tehran's 'aggression' over decades - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0591,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Meta Inks Multibillion-Dollar Deal to Use Amazon Chips for AI - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 0.3365,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "EU Opens Door to Talks With Ukraine on Next Membership Steps - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.1452,
+      "tags": [
+        "talks"
+      ]
+    },
+    {
+      "title": "Agnico Eagle moves to consolidate Finland's gold district in nearly C$4B deal - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.0445,
+      "tags": [
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

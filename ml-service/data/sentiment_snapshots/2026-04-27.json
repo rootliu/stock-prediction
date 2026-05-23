@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-04-27",
+  "snapshot_time_utc": "2026-04-27T11:00:28.900482+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9869,
+    "news_bear_score": 0.5899,
+    "blog_bull_score": 0.8803,
+    "blog_bear_score": 0.4089,
+    "article_count": 48,
+    "safe_haven_score": 0.0929,
+    "policy_risk_score": 0.0668,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.0772,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.9509,
+    "geo_relief_score": 0.0412
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Buy airline tickets now, Spain urges as Iran war lifts oil prices - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2282,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Renewables in vogue as Iran war drives up Europe power prices - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2265,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "King Charles jets to US for trip overshadowed by Iran quarrel and shooting - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2184,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Global stocks steady; oil climbs on stalled peace talks By Reuters - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.2852,
+      "tags": [
+        "talks"
+      ]
+    },
+    {
+      "title": "EU Opens Door to Talks With Ukraine on Next Membership Steps - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.082,
+      "tags": [
+        "talks"
+      ]
+    },
+    {
+      "title": "Gold reclaims ground as Iran ceasefire extends, Fed uncertainty lingers - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.1238,
+      "tags": [
+        "iran",
+        "ceasefire"
+      ]
+    }
+  ],
+  "error": null
+}

@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-05-20",
+  "snapshot_time_utc": "2026-05-20T11:00:15.480866+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9866,
+    "news_bear_score": 0.2676,
+    "blog_bull_score": 0.8363,
+    "blog_bear_score": 0.4995,
+    "article_count": 48,
+    "safe_haven_score": 0.1212,
+    "policy_risk_score": 0.6105,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.3941,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.6979,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Iran threatens war 'beyond the region' if US attacks - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2489,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Europe EV sales leap as Iran war pushes up petrol pump prices - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1844,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Reliance helps Indian shares, but Iran war caution persists - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1441,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold breaks below $4,540, silver tests $75 as yields rise, Hormuz talks cap oil - Kitco AM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.6143,
+      "tags": [
+        "talks",
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Forex Today: US Dollar benefits from hawkish Fed repricing, focus shifts to FOMC Minutes - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3766,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "XAG/USD Price Forecast: Silver struggles below key moving averages amid hawkish Fed bets - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3197,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

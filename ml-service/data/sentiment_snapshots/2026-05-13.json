@@ -1,0 +1,78 @@
+{
+  "snapshot_date": "2026-05-13",
+  "snapshot_time_utc": "2026-05-13T11:00:13.724482+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9925,
+    "news_bear_score": 0.2293,
+    "blog_bull_score": 0.8411,
+    "blog_bear_score": 0.4072,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.8073,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.2216,
+    "oil_shock_score": 0.2002,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.209,
+    "geo_relief_score": 0.4457
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "For Chinese exporters, Iran worries eclipse tariff woes as Trump, Xi prepare to meet - CNBC",
+      "site": "cnbc.com",
+      "bull_score": 1.4956,
+      "tags": [
+        "tariff",
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump says no need for China's help on Iran as shippers seek passage through Hormuz - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2595,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Global oil supply to plunge below demand this year due to Iran war, IEA says - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2376,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Silver Price Forecast: XAG/USD holds onto gains around $87, ignoring hawkish Fed bets - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.367,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Japanese Yen dips as US inflation surprise lifts Dollar, hawkish BoJ anchors JPY - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3093,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Gold, silver rally on weaker dollar after crude collapses on Iran ceasefire hopes - Kitco AM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.0639,
+      "tags": [
+        "iran",
+        "ceasefire"
+      ]
+    }
+  ],
+  "error": null
+}

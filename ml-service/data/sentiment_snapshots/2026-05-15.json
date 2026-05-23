@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-05-15",
+  "snapshot_time_utc": "2026-05-15T11:00:15.142105+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9798,
+    "news_bear_score": 0.1342,
+    "blog_bull_score": 0.7838,
+    "blog_bear_score": 0.5798,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.2391,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.4251,
+    "oil_shock_score": 0.0965,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.5812,
+    "geo_relief_score": 0.0461
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Trump says he and China's Xi agree Iran cannot have nuclear weapons - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2426,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "UAE Tried in Vain to Get Saudis to Coordinate on Iran Response - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1733,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump says he and Xi agree to keep Iran from having nuclear arms - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1696,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Silver drops 4.6% as yields rise, gold holds above $4,650 - Kitco PM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.4558,
+      "tags": [
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Gold slips toward $4,550 as hawkish Fed bets lift USD further - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.378,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Trump leaves China after talks dominated by trade, oil and Taiwan - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.3739,
+      "tags": [
+        "talks"
+      ]
+    }
+  ],
+  "error": null
+}
