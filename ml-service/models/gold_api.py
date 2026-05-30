@@ -37,9 +37,10 @@ def predict_direct_gbm(
     Returns:
         List of dicts, one per target_date, with keys:
             date, close, direction, confidence, range_low, range_high,
-            regime, horizon_days, pred_return_pct, up_probability,
-            test_mape_pct, test_direction_accuracy, jump_regime_code,
-            jump_signal, branch_name, effective_base
+            regime, horizon_days, pre_guard_return_pct, pred_return_pct,
+            direction_guard, confidence_guard, up_probability, test_mape_pct,
+            test_direction_accuracy, jump_regime_code, jump_signal,
+            branch_name, effective_base
     """
     from models.multi_day_direct_predictor import run_direct_multi_day_prediction
 
@@ -70,7 +71,10 @@ def predict_direct_gbm(
             "range_high": r["range_high"],
             "regime": r["regime"],
             "horizon_days": md.get("horizon_days"),
+            "pre_guard_return_pct": md.get("pre_guard_return_pct"),
             "pred_return_pct": md.get("pred_return_pct"),
+            "direction_guard": md.get("direction_guard"),
+            "confidence_guard": md.get("confidence_guard"),
             "up_probability": md.get("up_probability"),
             "test_mape_pct": md.get("test_mape_pct"),
             "test_direction_accuracy": md.get("test_direction_accuracy"),

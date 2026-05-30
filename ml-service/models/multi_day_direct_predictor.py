@@ -522,6 +522,8 @@ def _apply_directional_guard(
     up_prob: Optional[float],
     confidence: float,
     ret_1: float,
+    vol_5: float,
+    intraday_range_pct: float,
     ma_gap_5: float,
     ma_gap_10: float,
     close_vs_vwap: float,
@@ -556,6 +558,21 @@ def _apply_directional_guard(
     trend_down_branch = branch_name == "trend_down"
 
     if horizon <= 3:
+        capitulation_rebound_release = (
+            horizon <= 2
+            and float(ret_1) < -0.018
+            and float(ret_3) < -0.025
+            and float(ret_5) < -0.025
+            and float(ma_gap_5) < -0.018
+            and float(ma_gap_10) < -0.020
+            and float(close_vs_vwap) < -0.004
+            and float(close_vs_high) < -0.012
+            and float(intraday_range_pct) > max(0.015, 1.35 * abs(float(vol_5 or 0.0)))
+            and up_prob_value >= 0.62
+        )
+        if capitulation_rebound_release:
+            return pred_return, "capitulation_rebound_release"
+
         short_bearish_continuation = (
             float(ret_1) < -0.005
             and float(ma_gap_5) < -0.008
@@ -849,6 +866,7 @@ def run_direct_multi_day_prediction(
         ma_gap_10 = float(feature_row.get("ma_gap_10", 0.0))
         close_vs_vwap = float(feature_row.get("close_vs_vwap", 0.0))
         close_vs_high = float(feature_row.get("close_vs_high", 0.0))
+        intraday_range_pct = float(feature_row.get("intraday_range_pct", 0.0))
 
         pred_return = float(model_info["reg_model"].predict(x_row)[0])
         preferred_branch = _directional_jump_branch_name(jump_regime_code, overnight_gap_pct, ret_1)
@@ -909,6 +927,16 @@ def run_direct_multi_day_prediction(
         dir_acc = float(metrics.get("direction_accuracy") or 50.0) / 100.0
         horizon_decay = max(0.45, 1.0 - 0.10 * (horizon_days - 1))
         confidence = (0.55 * prob_conf + 0.45 * dir_acc) * 100 * horizon_decay
+        confidence_guard = "none"
+        whipsaw_reversal = (
+            horizon_days >= 2
+            and abs(ret_1) > 0.018
+            and (ret_1 * ret_3 < 0 or ret_1 * ret_5 < 0)
+            and (vol_5 > 0.014 or intraday_range_pct > 0.018)
+        )
+        if whipsaw_reversal:
+            confidence *= 0.72 if horizon_days == 2 else 0.60
+            confidence_guard = "whipsaw_confidence_dampen"
 
         pre_guard_return = pred_return
         pred_return, direction_guard = _apply_directional_guard(
@@ -919,6 +947,8 @@ def run_direct_multi_day_prediction(
             up_prob=up_prob,
             confidence=confidence,
             ret_1=ret_1,
+            vol_5=vol_5,
+            intraday_range_pct=intraday_range_pct,
             ma_gap_5=ma_gap_5,
             ma_gap_10=ma_gap_10,
             close_vs_vwap=close_vs_vwap,
@@ -969,6 +999,7 @@ def run_direct_multi_day_prediction(
                     "pre_guard_return_pct": round(pre_guard_return * 100, 3),
                     "pred_return_pct": round(pred_return * 100, 3),
                     "direction_guard": direction_guard,
+                    "confidence_guard": confidence_guard,
                     "up_probability": round(up_prob, 4) if up_prob is not None else None,
                     "test_mape_pct": metrics.get("mape_pct"),
                     "test_direction_accuracy": metrics.get("direction_accuracy"),
