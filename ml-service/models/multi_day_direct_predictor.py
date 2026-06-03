@@ -530,6 +530,7 @@ def _apply_directional_guard(
     close_vs_high: float,
     ret_3: float,
     ret_5: float,
+    comex_shfe_premium: float,
     branch_name: Optional[str],
 ) -> Tuple[float, str]:
     """
@@ -542,12 +543,27 @@ def _apply_directional_guard(
     not support them.
     """
     pred_return = float(pred_return)
-    if pred_return <= 0:
-        return pred_return, "none"
-
     horizon = max(int(horizon_days), 1)
     up_prob_value = float(up_prob) if up_prob is not None else 0.5
     trend_strength = min(max(float(trend_signal or 0.0), 0.0), 3.0)
+
+    if pred_return <= 0:
+        cross_market_rebound = (
+            horizon <= 2
+            and abs(pred_return) < 0.0030
+            and float(comex_shfe_premium) > 0.006
+            and float(ret_1) > -0.012
+            and float(ret_5) < -0.010
+            and float(ma_gap_5) > -0.003
+            and float(ma_gap_10) < -0.002
+            and float(close_vs_high) < -0.012
+            and float(intraday_range_pct) > max(0.016, 0.80 * abs(float(vol_5 or 0.0)))
+        )
+        if cross_market_rebound:
+            rebound_floor = 0.0008 * float(np.sqrt(horizon))
+            return float(max(abs(pred_return) * 0.75, rebound_floor)), "cross_market_rebound_release"
+        return pred_return, "none"
+
     bearish_structure = (
         float(trend_regime_code) <= -1.0
         or (float(ma_gap_5) < -0.003 and float(ma_gap_10) < -0.002)
@@ -572,6 +588,20 @@ def _apply_directional_guard(
         )
         if capitulation_rebound_release:
             return pred_return, "capitulation_rebound_release"
+
+        post_capitulation_rebound_fade = (
+            horizon == 1
+            and float(ret_1) > 0.020
+            and (float(ret_3) < 0.0 or float(ret_5) < 0.0)
+            and float(vol_5) > 0.015
+            and float(intraday_range_pct) > 0.018
+            and float(ma_gap_10) < 0.002
+            and float(comex_shfe_premium) < 0.0
+            and float(close_vs_high) < 0.002
+        )
+        if post_capitulation_rebound_fade:
+            floor = -0.0012
+            return float(min(pred_return * 0.18, floor)), "post_capitulation_rebound_fade"
 
         short_bearish_continuation = (
             float(ret_1) < -0.005
@@ -867,6 +897,7 @@ def run_direct_multi_day_prediction(
         close_vs_vwap = float(feature_row.get("close_vs_vwap", 0.0))
         close_vs_high = float(feature_row.get("close_vs_high", 0.0))
         intraday_range_pct = float(feature_row.get("intraday_range_pct", 0.0))
+        comex_shfe_premium = float(feature_row.get("comex_shfe_premium", 0.0))
 
         pred_return = float(model_info["reg_model"].predict(x_row)[0])
         preferred_branch = _directional_jump_branch_name(jump_regime_code, overnight_gap_pct, ret_1)
@@ -955,8 +986,27 @@ def run_direct_multi_day_prediction(
             close_vs_high=close_vs_high,
             ret_3=ret_3,
             ret_5=ret_5,
+            comex_shfe_premium=comex_shfe_premium,
             branch_name=branch_name if branch_used else None,
         )
+        post_guard_confidence_notes: List[str] = []
+        if direction_guard not in {"none", "capitulation_rebound_release"}:
+            guard_change = abs(pred_return - pre_guard_return)
+            if guard_change > 0.0005 or np.sign(pred_return) != np.sign(pre_guard_return):
+                confidence *= 0.68
+                post_guard_confidence_notes.append("direction_guard_dampen")
+        if abs(pred_return) < 0.0010:
+            confidence *= 0.45
+            post_guard_confidence_notes.append("tiny_edge_confidence_dampen")
+        elif horizon_days <= 3 and abs(pred_return) < max(0.0018, 0.12 * max(abs(vol_5), 0.005)):
+            confidence *= 0.62
+            post_guard_confidence_notes.append("low_edge_confidence_dampen")
+        if post_guard_confidence_notes:
+            confidence_guard = (
+                "|".join([confidence_guard] + post_guard_confidence_notes)
+                if confidence_guard != "none"
+                else "|".join(post_guard_confidence_notes)
+            )
         pred_return = _clip_return(
             pred_return,
             vol_5,
