@@ -224,6 +224,47 @@ def extract_insights(docs):
         insights.append({"num": int(num), "title": ttl, "summary": para})
     return insights
 
+# ---------- Keynote slide cards（用户手写，置于首页显著位置）----------
+KEYNOTE_FILE = os.path.join(VAULT, "AI-Agentic-架构整理", "02-Agentic架构Keynote高亮.md")
+
+def _field(block, label):
+    """从一个 slide 块里取 **label**：后面的内容（到下一个 ** 字段或块尾）。"""
+    m = re.search(r"\*\*"+label+r"\*\*[：:]*\s*(.+?)(?=\n\*\*|\Z)", block, re.DOTALL)
+    if not m:
+        return ""
+    return re.sub(r"\s+", " ", m.group(1).strip().strip("“”\"")).strip()
+
+def extract_keynote():
+    """返回 {axis, slides:[{num,title,page,talk,quote,srcTitles:[...]}]}。"""
+    if not os.path.isfile(KEYNOTE_FILE):
+        return None
+    raw = open(KEYNOTE_FILE, encoding="utf-8").read()
+    _, body = split_frontmatter(raw)
+    # 一句话主轴
+    axis = ""
+    am = re.search(r"##\s*一句话主轴\s*\n+(.+?)(?=\n##|\n###|\Z)", body, re.DOTALL)
+    if am:
+        axis = re.sub(r"\s+", " ", re.sub(r"\*\*", "", am.group(1)).strip())[:300]
+    slides = []
+    blocks = re.split(r"^###\s+(?:Slide\s+)?(\d+|N\d+)\.\s+(.+)$", body, flags=re.MULTILINE)
+    for k in range(1, len(blocks)-2, 3):
+        num = blocks[k]; ttl = blocks[k+1].strip(); content = blocks[k+2]
+        page = _field(content, "页面标题")
+        talk = _field(content, "可讲内容")
+        # 可引用句：标签后下一非空行（多为引号句）
+        quote = ""
+        qm = re.search(r"\*\*可引用句\*\*[：:]*\s*\n*\s*(.+)", content)
+        if qm:
+            quote = re.sub(r"\s+", " ", qm.group(1).strip().strip("“”\"")).strip()
+        # 证据来源 wikilink 标题
+        srcs = re.findall(r"\[\[([^\]|]+?)(?:\|[^\]]*)?\]\]", _field(content, "证据来源"))
+        srcs = [s.split("#")[0].strip() for s in srcs]
+        if page or quote or talk:
+            slides.append({"num": num, "title": ttl, "page": page,
+                           "talk": (talk[:240] if talk else ""),
+                           "quote": quote, "srcTitles": srcs})
+    return {"axis": axis, "slides": slides}
+
 # ---------- 主流程 ----------
 docs_raw = collect()
 docs = []
@@ -245,6 +286,27 @@ for d in sorted(docs_raw, key=lambda x: x["file"]):
     })
 
 insights = extract_insights(docs_raw)
+
+# Keynote slides（用户手写）+ 把证据来源标题解析为 doc id
+title2id = {d["title"]: d["id"] for d in docs}
+# 同时建立"文件名 stem / 论文标题前缀"的宽松匹配，便于 wikilink 命中
+stem2id = {}
+for d in docs:
+    stem = os.path.splitext(os.path.basename(d["file"]))[0]
+    stem2id[stem] = d["id"]
+def resolve_src(t):
+    if t in title2id: return title2id[t]
+    if t in stem2id: return stem2id[t]
+    # 论文标题为 "中文名 · English"，wikilink 多用文件名 stem
+    for st, i in stem2id.items():
+        if st == t or st.endswith(t) or t in st:
+            return i
+    return ""
+keynote = extract_keynote()
+if keynote:
+    for s in keynote["slides"]:
+        s["srcs"] = [{"title": t, "id": resolve_src(t)} for t in s.get("srcTitles", [])]
+        s.pop("srcTitles", None)
 
 # 金句墙：聚合所有 quotes（带来源）
 quote_wall = []
@@ -280,6 +342,7 @@ DATA = {
     "quoteWall": quote_wall,
     "tags": tag_list,
     "timeline": timeline,
+    "keynote": keynote or {"axis": "", "slides": []},
 }
 
 payload = json.dumps(DATA, ensure_ascii=False)
@@ -411,6 +474,25 @@ a:hover{text-decoration:underline;}
 
 .qwall{columns:2;column-gap:15px;}
 @media(max-width:820px){.qwall{columns:1;}}
+/* keynote cards (用户手写主张，首页最显著) */
+.kn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-bottom:8px;}
+.kn-card{position:relative;background:linear-gradient(155deg,rgba(84,217,201,.07),rgba(127,168,236,.05)),var(--panel);
+  border:1px solid var(--line2);border-radius:16px;padding:20px 20px 16px;cursor:pointer;overflow:hidden;
+  transition:transform .14s,border-color .14s,box-shadow .14s;}
+.kn-card::before{content:"";position:absolute;inset:0;border-radius:16px;padding:1px;background:var(--grad);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:.14s;}
+.kn-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);}
+.kn-card:hover::before{opacity:.6;}
+.kn-n{position:absolute;top:14px;right:16px;font-size:30px;font-weight:800;line-height:1;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;opacity:.45;}
+.kn-page{font-size:16px;font-weight:760;letter-spacing:.2px;margin-right:42px;line-height:1.35;
+  background:linear-gradient(120deg,#fff,#cfe7e2);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.kn-title{font-size:12px;color:var(--muted);margin:5px 0 10px;}
+.kn-quote{font-size:13px;line-height:1.55;color:var(--ink);border-left:2px solid var(--accent4);padding-left:11px;margin:10px 0;}
+.kn-src{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px;}
+.kn-link{font-size:10.5px;color:var(--accent3);background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:2px 9px;}
+.kn-link:hover{border-color:var(--accent3);color:#fff;}
+.kn-link.dead{color:var(--faint);cursor:default;}
 /* dashboard */
 .dash{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:28px 0 4px;}
 @media(max-width:900px){.dash{grid-template-columns:1fr;}}
@@ -673,16 +755,35 @@ function categoryBars(){
 
 function renderHome(){
   const ovId=titleById["研究总览 (Research Overview)"]||titleById["研究总览"]||"";
+  const kn=DATA.keynote||{slides:[]};
+  const axis=kn.axis||"Agentic AI 的关键变化，不是模型从聊天变得更会聊天，而是模型被放进了一个可记忆、可调用工具、可执行、可审计、可治理的架构里。";
   let h='<div class="hero">';
   // ── Hero + 主轴 + 统计
-  h+='<div class="axis"><div class="lbl">RESEARCH DASHBOARD · 一句话主轴</div><p>Agentic AI 的关键变化，不是模型从聊天变得更会聊天，而是模型被放进了一个可记忆、可调用工具、可执行、可审计、可治理的架构里。</p>'
+  h+='<div class="axis"><div class="lbl">RESEARCH KEYNOTE · 一句话主轴</div><p>'+inline(axis)+'</p>'
     +'<div class="stats">'
+    +'<div class="stat"><b>'+kn.slides.length+'</b><span>Keynote 张</span></div>'
     +'<div class="stat"><b>'+DATA.docCount+'</b><span>笔记</span></div>'
-    +'<div class="stat"><b>'+DATA.insights.length+'</b><span>核心洞察</span></div>'
+    +'<div class="stat"><b>'+DATA.insights.length+'</b><span>洞察</span></div>'
     +'<div class="stat"><b>'+DATA.quoteWall.length+'</b><span>金句</span></div>'
-    +'<div class="stat"><b>'+DATA.tags.length+'</b><span>标签</span></div>'
     +'<div class="stat"><b>'+DATA.timeline.length+'</b><span>研究月份</span></div>'
     +'</div></div>';
+
+  // ── ★ Keynote 演示卡组（用户手写，置于最显著位置）
+  if(kn.slides.length){
+    h+='<div class="sec-h"><span class="bar" style="background:var(--grad)"></span>🎤 Keynote · 我的研究主张<span class="cnt">'+kn.slides.length+' 张 · 点卡看证据</span></div>';
+    h+='<div class="kn-grid">';
+    kn.slides.forEach((s,i)=>{
+      const go=(s.srcs&&s.srcs.find(x=>x.id))?(' data-doc="'+s.srcs.find(x=>x.id).id+'"'):'';
+      h+='<div class="kn-card"'+go+'>'
+        +'<div class="kn-n">'+esc(String(s.num))+'</div>'
+        +'<div class="kn-page">'+esc(s.page||s.title)+'</div>'
+        +'<div class="kn-title">'+esc(s.title)+'</div>'
+        +(s.quote?'<div class="kn-quote">“'+esc(s.quote)+'”</div>':'')
+        +(s.srcs&&s.srcs.length?'<div class="kn-src">'+s.srcs.map(x=>x.id?'<span class="kn-link" data-doc="'+x.id+'">'+esc(x.title)+'</span>':'<span class="kn-link dead">'+esc(x.title)+'</span>').join('')+'</div>':'')
+        +'</div>';
+    });
+    h+='</div>';
+  }
 
   // ── 双栏仪表盘：时间线图 + 分类分布
   h+='<div class="dash">';
@@ -691,7 +792,7 @@ function renderHome(){
   h+='</div>';
 
   // ── 核心洞察（keynote）
-  h+='<div class="sec-h"><span class="bar"></span>核心洞察 · Keynote<span class="cnt">'+DATA.insights.length+' 条</span></div><div class="cards">';
+  h+='<div class="sec-h"><span class="bar"></span>研究总览 · 核心洞察<span class="cnt">'+DATA.insights.length+' 条</span></div><div class="cards">';
   DATA.insights.forEach(it=>{h+='<div class="card" data-doc="'+ovId+'"><div class="n">洞察 #'+it.num+'</div><div class="t">'+inline(it.title)+'</div><div class="s">'+inline(it.summary)+'</div></div>';});
   h+='</div>';
 
