@@ -245,6 +245,19 @@ def extract_keynote():
     am = re.search(r"##\s*一句话主轴\s*\n+(.+?)(?=\n##|\n###|\Z)", body, re.DOTALL)
     if am:
         axis = re.sub(r"\s+", " ", re.sub(r"\*\*", "", am.group(1)).strip())[:300]
+    # ★ 主线大纲（"Keynote 结构建议"下的 ```text 编号块）= 用户 deep insights，第一类内容
+    outline = []
+    om = re.search(r"##\s*Keynote\s*结构建议\s*\n+```[a-z]*\n(.*?)\n```", body, re.DOTALL)
+    if om:
+        for ln in om.group(1).splitlines():
+            mm = re.match(r"\s*(\d+)[.、]\s*(.+?)\s*$", ln)
+            if mm:
+                t = mm.group(2).strip()
+                # 拆 "主题：阐述" 为 head/sub
+                parts = re.split(r"[：:]", t, 1)
+                head = parts[0].strip()
+                sub = parts[1].strip() if len(parts) > 1 else ""
+                outline.append({"num": int(mm.group(1)), "head": head, "sub": sub, "full": t})
     slides = []
     blocks = re.split(r"^###\s+(?:Slide\s+)?(\d+|N\d+)\.\s+(.+)$", body, flags=re.MULTILINE)
     for k in range(1, len(blocks)-2, 3):
@@ -263,7 +276,8 @@ def extract_keynote():
             slides.append({"num": num, "title": ttl, "page": page,
                            "talk": (talk[:240] if talk else ""),
                            "quote": quote, "srcTitles": srcs})
-    return {"axis": axis, "slides": slides}
+    # 大纲与 slide 卡按序号对应（大纲第 N 条 ↔ slide N），便于展开
+    return {"axis": axis, "outline": outline, "slides": slides}
 
 # ---------- 主流程 ----------
 docs_raw = collect()
@@ -512,6 +526,22 @@ a:hover{text-decoration:underline;}
 .kn-slide-quote{font-size:15px;line-height:1.55;color:var(--ink);font-weight:560;border-left:3px solid var(--accent4);padding-left:14px;margin:14px 0 4px;}
 .kn-slide .kn-src{margin-top:14px;font-size:11px;color:var(--faint);align-items:center;}
 @media(max-width:680px){.kn-slide{grid-template-columns:1fr;}.kn-slide-no{text-align:left;font-size:34px;}}
+/* keynote 12 条主线（deep insights，演示主体）*/
+.kn-line{display:grid;grid-template-columns:56px 1fr;gap:18px;align-items:start;
+  background:linear-gradient(160deg,rgba(84,217,201,.06),rgba(127,168,236,.04)),var(--panel);
+  border:1px solid var(--line2);border-radius:14px;padding:20px 24px;margin-bottom:13px;}
+.kn-line-no{font-size:38px;font-weight:850;line-height:.9;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;opacity:.55;text-align:center;}
+.kn-line-head{font-size:19px;font-weight:780;line-height:1.4;
+  background:linear-gradient(120deg,#fff,#cfe7e2);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.kn-line-sub{font-size:14px;font-weight:600;color:var(--ink2);-webkit-text-fill-color:var(--ink2);}
+.kn-line-quote{font-size:14.5px;line-height:1.55;color:var(--ink);border-left:3px solid var(--accent4);padding-left:13px;margin:11px 0 2px;cursor:pointer;}
+.kn-line-quote:hover{color:var(--accent);}
+.kn-exp{margin-top:10px;}
+.kn-exp summary{font-size:11.5px;color:var(--accent3);cursor:pointer;user-select:none;list-style:none;}
+.kn-exp summary::-webkit-details-marker{display:none;}
+.kn-exp summary::before{content:"▸ ";}
+.kn-exp[open] summary::before{content:"▾ ";}
+.kn-line-talk{font-size:13.2px;line-height:1.65;color:var(--ink2);margin:8px 0;}
 /* dashboard */
 .dash{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:28px 0 4px;}
 @media(max-width:900px){.dash{grid-template-columns:1fr;}}
@@ -781,25 +811,26 @@ function renderHome(){
   // ── Hero + 主轴 + 统计
   h+='<div class="axis"><div class="lbl">RESEARCH KEYNOTE · 一句话主轴</div><p>'+inline(axis)+'</p>'
     +'<div class="stats">'
-    +'<div class="stat"><b>'+kn.slides.length+'</b><span>Keynote 张</span></div>'
+    +'<div class="stat"><b>'+((kn.outline||[]).length||kn.slides.length)+'</b><span>研究主线</span></div>'
     +'<div class="stat"><b>'+DATA.docCount+'</b><span>笔记</span></div>'
     +'<div class="stat"><b>'+DATA.insights.length+'</b><span>洞察</span></div>'
     +'<div class="stat"><b>'+DATA.quoteWall.length+'</b><span>金句</span></div>'
     +'<div class="stat"><b>'+DATA.timeline.length+'</b><span>研究月份</span></div>'
     +'</div></div>';
 
-  // ── ★ Keynote 演示卡组（用户手写，置于最显著位置）
-  if(kn.slides.length){
-    h+='<div class="sec-h"><span class="bar" style="background:var(--grad)"></span>🎤 Keynote · 我的研究主张<span class="cnt">'+kn.slides.length+' 张 · 点卡看证据</span></div>';
+  // ── ★ 我的 12 条主线（deep insights，置于最显著位置）
+  const ol=kn.outline||[];
+  if(ol.length){
+    h+='<div class="sec-h"><span class="bar" style="background:var(--grad)"></span>🎤 我的研究主线 · Deep Insights<span class="cnt">'+ol.length+' 条 · 点 🎤 看全文</span></div>';
     h+='<div class="kn-grid">';
-    kn.slides.forEach((s,i)=>{
-      const go=(s.srcs&&s.srcs.find(x=>x.id))?(' data-doc="'+s.srcs.find(x=>x.id).id+'"'):'';
+    ol.forEach(o=>{
+      const s=slideByNum(o.num);
+      const go=(s&&s.srcs&&s.srcs.find(x=>x.id))?(' data-doc="'+s.srcs.find(x=>x.id).id+'"'):'';
       h+='<div class="kn-card"'+go+'>'
-        +'<div class="kn-n">'+esc(String(s.num))+'</div>'
-        +'<div class="kn-page">'+esc(s.page||s.title)+'</div>'
-        +'<div class="kn-title">'+esc(s.title)+'</div>'
-        +(s.quote?'<div class="kn-quote">“'+esc(s.quote)+'”</div>':'')
-        +(s.srcs&&s.srcs.length?'<div class="kn-src">'+s.srcs.map(x=>x.id?'<span class="kn-link" data-doc="'+x.id+'">'+esc(x.title)+'</span>':'<span class="kn-link dead">'+esc(x.title)+'</span>').join('')+'</div>':'')
+        +'<div class="kn-n">'+o.num+'</div>'
+        +'<div class="kn-page">'+esc(o.head)+'</div>'
+        +(o.sub?'<div class="kn-title">'+esc(o.sub)+'</div>':'')
+        +(s&&s.quote?'<div class="kn-quote">“'+esc(s.quote)+'”</div>':'')
         +'</div>';
     });
     h+='</div>';
@@ -835,23 +866,40 @@ function renderHome(){
   document.getElementById("content").scrollTop=0;
 }
 
-/* ---------- keynote 演示视图（我的研究主张，第一类内容）---------- */
+/* ---------- keynote 演示视图：12 条主线(我的 deep insights)为主体，slide 卡为展开 ---------- */
+function slideByNum(n){return (DATA.keynote.slides||[]).find(s=>String(s.num)===String(n));}
 function renderKeynote(){
-  const kn=DATA.keynote||{slides:[]};
+  const kn=DATA.keynote||{slides:[],outline:[]};
+  const ol=kn.outline||[];
   let h='<div class="kn-stage">';
-  h+='<div class="kn-hero"><div class="lbl">MY RESEARCH KEYNOTE</div><p>'+inline(kn.axis||"")+'</p></div>';
-  kn.slides.forEach(s=>{
-    const go=(s.srcs&&s.srcs.find(x=>x.id))?(' data-doc="'+s.srcs.find(x=>x.id).id+'"'):'';
-    h+='<div class="kn-slide"'+go+'>'
-      +'<div class="kn-slide-no">'+esc(String(s.num))+'</div>'
-      +'<div class="kn-slide-body">'
-      +'<div class="kn-slide-page">'+esc(s.page||s.title)+'</div>'
-      +'<div class="kn-slide-sub">'+esc(s.title)+'</div>'
-      +(s.talk?'<div class="kn-slide-talk">'+inline(s.talk)+'</div>':'')
-      +(s.quote?'<div class="kn-slide-quote">“'+esc(s.quote)+'”</div>':'')
-      +(s.srcs&&s.srcs.length?'<div class="kn-src">证据：'+s.srcs.map(x=>x.id?'<span class="kn-link" data-doc="'+x.id+'">'+esc(x.title)+'</span>':'<span class="kn-link dead">'+esc(x.title)+'</span>').join('')+'</div>':'')
-      +'</div></div>';
-  });
+  h+='<div class="kn-hero"><div class="lbl">MY RESEARCH KEYNOTE · 12 条主线</div><p>'+inline(kn.axis||"")+'</p></div>';
+  if(ol.length){
+    ol.forEach(o=>{
+      const s=slideByNum(o.num);
+      const go=(s&&s.srcs&&s.srcs.find(x=>x.id))?(' data-doc="'+s.srcs.find(x=>x.id).id+'"'):'';
+      h+='<div class="kn-line">'
+        +'<div class="kn-line-no">'+o.num+'</div>'
+        +'<div class="kn-line-body">'
+        +'<div class="kn-line-head">'+esc(o.head)+(o.sub?'<span class="kn-line-sub"> — '+esc(o.sub)+'</span>':'')+'</div>'
+        +(s&&s.quote?'<div class="kn-line-quote"'+go+'>“'+esc(s.quote)+'”</div>':'')
+        +(s&&(s.talk||s.srcs.length)?'<details class="kn-exp"><summary>展开 · AI 论文佐证</summary>'
+            +(s.talk?'<div class="kn-line-talk">'+inline(s.talk)+'</div>':'')
+            +(s.srcs&&s.srcs.length?'<div class="kn-src">证据：'+s.srcs.map(x=>x.id?'<span class="kn-link" data-doc="'+x.id+'">'+esc(x.title)+'</span>':'<span class="kn-link dead">'+esc(x.title)+'</span>').join('')+'</div>':'')
+            +'</details>':'')
+        +'</div></div>';
+    });
+  }
+  // 其余 slide（无大纲对应，如 N1-N4 企业双引擎）作为补充
+  const extra=(kn.slides||[]).filter(s=>!ol.some(o=>String(o.num)===String(s.num)));
+  if(extra.length){
+    h+='<div class="sec-h" style="margin-top:34px"><span class="bar" style="background:var(--grad2)"></span>补充主张<span class="cnt">'+extra.length+' 张</span></div>';
+    extra.forEach(s=>{
+      const go=(s.srcs&&s.srcs.find(x=>x.id))?(' data-doc="'+s.srcs.find(x=>x.id).id+'"'):'';
+      h+='<div class="kn-slide"'+go+'><div class="kn-slide-no">'+esc(String(s.num))+'</div><div class="kn-slide-body">'
+        +'<div class="kn-slide-page">'+esc(s.page||s.title)+'</div><div class="kn-slide-sub">'+esc(s.title)+'</div>'
+        +(s.quote?'<div class="kn-slide-quote">“'+esc(s.quote)+'”</div>':'')+'</div></div>';
+    });
+  }
   h+='</div>';
   document.getElementById("content").innerHTML=h;
   document.getElementById("content").scrollTop=0;
