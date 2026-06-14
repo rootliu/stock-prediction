@@ -12,27 +12,16 @@ build_vault_site.py — 把整个 Obsidian vault 渲染成一个自包含的 HTM
   - Markdown 渲染（标题/列表/表格/代码块/引用/[[wikilink]]/**加粗**/`code`/高亮 ==mark==）
   - [[wikilink]] 点击跳转到对应笔记
   - 双栏：左侧分组目录树，右侧阅读区
-用法：
-  python3 build_vault_site.py [VAULT_DIR] [--out OUTPUT.html] [--overview 研究总览.md]
-  # 省略 VAULT_DIR 时，默认用脚本所在目录（适合把脚本放进 vault 根目录直接跑）。
+用法：  python3 build_vault_site.py
 """
-import os, re, json, html, datetime, sys, argparse
+import os, re, json, html, datetime, sys
 
 sys.stdout.reconfigure(encoding="utf-8")
 
-_p = argparse.ArgumentParser(description="Render an Obsidian vault into a single self-contained HTML site.")
-_p.add_argument("vault", nargs="?", default=os.path.dirname(os.path.abspath(__file__)),
-                help="vault 根目录（默认：脚本所在目录）")
-_p.add_argument("--out", default=None, help="输出 HTML 路径（默认：<vault>/vault-site.html）")
-_p.add_argument("--overview", default="研究总览.md", help="洞察来源笔记文件名（默认 研究总览.md）")
-_p.add_argument("--skip", default="", help="额外跳过的子目录，逗号分隔")
-_args = _p.parse_args()
-
-VAULT = os.path.abspath(_args.vault)
-OUT = _args.out or os.path.join(VAULT, "vault-site.html")
+VAULT = os.path.dirname(os.path.abspath(__file__))
+OUT = os.path.join(VAULT, "vault-site.html")
 SKIP_DIRS = {".git", ".obsidian", ".trash", "AI-Agentic-架构整理"}  # 后者已有独立 reader
-SKIP_DIRS |= {s.strip() for s in _args.skip.split(",") if s.strip()}
-OVERVIEW = _args.overview
+OVERVIEW = "研究总览.md"
 
 # ---------- 收集 markdown 文件 ----------
 def collect():
@@ -422,6 +411,36 @@ a:hover{text-decoration:underline;}
 
 .qwall{columns:2;column-gap:15px;}
 @media(max-width:820px){.qwall{columns:1;}}
+/* dashboard */
+.dash{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:28px 0 4px;}
+@media(max-width:900px){.dash{grid-template-columns:1fr;}}
+.panel{background:linear-gradient(160deg,var(--panel),var(--bg2));border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow);}
+.panel-h{font-size:13px;font-weight:720;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.panel-h small{color:var(--faint);font-weight:500;font-size:10.5px;margin-left:auto;}
+.chart-wrap{overflow-x:auto;}
+.tlchart{width:100%;height:150px;min-width:520px;}
+.tlchart .bar-g{cursor:pointer;}
+.tlchart .bar-r{fill:url(#none);fill:var(--accent-d);transition:fill .12s,transform .12s;transform-origin:bottom;}
+.tlchart .bar-g:hover .bar-r{fill:var(--accent);}
+.tlchart .bar-v{fill:var(--ink2);font-size:10px;text-anchor:middle;font-weight:700;}
+.tlchart .bar-x{fill:var(--faint);font-size:9px;text-anchor:middle;}
+.catbars{display:flex;flex-direction:column;gap:9px;}
+.catbar{display:grid;grid-template-columns:130px 1fr 28px;align-items:center;gap:10px;cursor:pointer;}
+.catbar:hover .cl{color:var(--accent);}
+.catbar .cl{font-size:12px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.catbar .ct{height:9px;background:var(--panel3);border-radius:6px;overflow:hidden;}
+.catbar .cf{display:block;height:100%;background:var(--grad);border-radius:6px;transition:filter .12s;}
+.catbar:hover .cf{filter:brightness(1.2);}
+.catbar .cc{font-size:11.5px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums;}
+.feed{display:flex;flex-direction:column;gap:3px;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;}
+.feeditem{display:grid;grid-template-columns:84px 52px 1fr auto;align-items:center;gap:12px;padding:10px 15px;cursor:pointer;border-bottom:1px solid var(--line);transition:.1s;}
+.feeditem:last-child{border-bottom:none;}
+.feeditem:hover{background:var(--panel);}
+.feeditem .fd{font-size:11px;color:var(--faint);font-variant-numeric:tabular-nums;font-weight:600;}
+.feeditem .fk{font-size:9.5px;padding:2px 7px;border-radius:999px;font-weight:680;text-align:center;}
+.feeditem .ft{font-size:13.2px;font-weight:560;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.feeditem .fg{font-size:10.5px;color:var(--faint);white-space:nowrap;}
+@media(max-width:760px){.feeditem{grid-template-columns:70px 1fr;}.feeditem .fk,.feeditem .fg{display:none;}}
 .quote{break-inside:avoid;position:relative;background:linear-gradient(160deg,var(--panel),var(--bg2));
   border:1px solid var(--line);border-radius:var(--r);padding:18px 18px 15px;margin-bottom:15px;cursor:pointer;transition:.14s;}
 .quote:hover{border-color:var(--accent4);transform:translateY(-2px);box-shadow:var(--shadow);}
@@ -449,10 +468,10 @@ a:hover{text-decoration:underline;}
 .tl-item .d{font-size:11px;color:var(--faint);font-variant-numeric:tabular-nums;min-width:74px;font-weight:600;}
 .tl-item .ti{flex:1;font-size:13.2px;font-weight:580;color:var(--ink);}
 .tl-item .k{font-size:10px;padding:2px 8px;border-radius:999px;font-weight:680;white-space:nowrap;}
-.k.read{background:rgba(84,217,201,.15);color:var(--accent);}
-.k.arxiv{background:rgba(127,168,236,.15);color:var(--accent3);}
-.k.journal{background:rgba(243,173,92,.15);color:var(--accent2);}
-.k.body{background:var(--panel3);color:var(--muted);}
+.k.read,.fk.read{background:rgba(84,217,201,.15);color:var(--accent);}
+.k.arxiv,.fk.arxiv{background:rgba(127,168,236,.15);color:var(--accent3);}
+.k.journal,.fk.journal{background:rgba(243,173,92,.15);color:var(--accent2);}
+.k.body,.fk.body{background:var(--panel3);color:var(--muted);}
 
 /* ---------- tag bar (reader) ---------- */
 .tagbar{display:flex;flex-wrap:wrap;gap:7px;padding:13px 18px;border-bottom:1px solid var(--line);
@@ -528,7 +547,7 @@ a:hover{text-decoration:underline;}
       <button class="x" id="qx" title="清除" style="display:none">×</button>
     </div>
     <div class="nav">
-      <button data-view="home" class="on">首页</button>
+      <button data-view="home" class="on">⊞ Dashboard</button>
       <button data-view="timeline">时间线</button>
       <button data-view="reader">阅读</button>
     </div>
@@ -612,20 +631,79 @@ function renderSide(){
 }
 
 /* ---------- home ---------- */
+function groupCounts(){
+  const g={}; DATA.docs.forEach(d=>g[d.group]=(g[d.group]||0)+1);
+  return Object.entries(g).sort((a,b)=>b[1]-a[1]);
+}
+function monthSeries(){
+  // 升序月份用于图表（timeline 本身是倒序）
+  return DATA.timeline.slice().sort((a,b)=>a.month.localeCompare(b.month));
+}
+function newestDocs(n){
+  return DATA.docs.filter(d=>d.date).slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,n);
+}
+/* 交互式时间线柱状图（SVG，按月计数，柱可点击跳时间线视图） */
+function timelineChart(){
+  const ms=monthSeries(); if(!ms.length) return "";
+  const W=Math.max(560, ms.length*64), H=150, pad=26, bw=34;
+  const max=Math.max(...ms.map(m=>m.items.length),1);
+  const x=i=>pad+i*((W-pad*2)/Math.max(ms.length,1))+6;
+  let bars="";
+  ms.forEach((m,i)=>{
+    const hgt=(m.items.length/max)*(H-pad-22);
+    const yy=H-22-hgt;
+    bars+='<g class="bar-g" data-month="'+m.month+'">'
+      +'<rect class="bar-r" x="'+x(i)+'" y="'+yy+'" width="'+bw+'" height="'+Math.max(hgt,2)+'" rx="4"></rect>'
+      +'<text class="bar-v" x="'+(x(i)+bw/2)+'" y="'+(yy-5)+'">'+m.items.length+'</text>'
+      +'<text class="bar-x" x="'+(x(i)+bw/2)+'" y="'+(H-7)+'">'+m.month.slice(2)+'</text></g>';
+  });
+  return '<div class="chart-wrap"><svg viewBox="0 0 '+W+' '+H+'" class="tlchart" preserveAspectRatio="xMinYMid meet">'+bars+'</svg></div>';
+}
+/* 交互式分类条（点击筛选） */
+function categoryBars(){
+  const gc=groupCounts(); const max=Math.max(...gc.map(g=>g[1]),1);
+  let h='<div class="catbars">';
+  gc.forEach(([g,c])=>{
+    h+='<div class="catbar" data-group="'+esc(g)+'"><span class="cl">'+esc(g)+'</span>'
+      +'<span class="ct"><span class="cf" style="width:'+(c/max*100)+'%"></span></span>'
+      +'<span class="cc">'+c+'</span></div>';
+  });
+  return h+'</div>';
+}
+
 function renderHome(){
+  const ovId=titleById["研究总览 (Research Overview)"]||titleById["研究总览"]||"";
   let h='<div class="hero">';
-  h+='<div class="axis"><div class="lbl">一句话主轴</div><p>Agentic AI 的关键变化，不是模型从聊天变得更会聊天，而是模型被放进了一个可记忆、可调用工具、可执行、可审计、可治理的架构里。</p>';
-  h+='<div class="stats">'
+  // ── Hero + 主轴 + 统计
+  h+='<div class="axis"><div class="lbl">RESEARCH DASHBOARD · 一句话主轴</div><p>Agentic AI 的关键变化，不是模型从聊天变得更会聊天，而是模型被放进了一个可记忆、可调用工具、可执行、可审计、可治理的架构里。</p>'
+    +'<div class="stats">'
     +'<div class="stat"><b>'+DATA.docCount+'</b><span>笔记</span></div>'
     +'<div class="stat"><b>'+DATA.insights.length+'</b><span>核心洞察</span></div>'
     +'<div class="stat"><b>'+DATA.quoteWall.length+'</b><span>金句</span></div>'
     +'<div class="stat"><b>'+DATA.tags.length+'</b><span>标签</span></div>'
-    +'<div class="stat"><b>'+DATA.timeline.length+'</b><span>时间跨月</span></div>'
+    +'<div class="stat"><b>'+DATA.timeline.length+'</b><span>研究月份</span></div>'
     +'</div></div>';
-  h+='<div class="sec-h"><span class="bar"></span>研究总览 · 核心洞察<span class="cnt">'+DATA.insights.length+' 条</span></div><div class="cards">';
-  const ovId=titleById["研究总览 (Research Overview)"]||titleById["研究总览"]||"";
+
+  // ── 双栏仪表盘：时间线图 + 分类分布
+  h+='<div class="dash">';
+  h+='<div class="panel"><div class="panel-h">📈 研究节奏 · 按月笔记数 <small>点击柱跳时间线</small></div>'+timelineChart()+'</div>';
+  h+='<div class="panel"><div class="panel-h">🗂️ 分类分布 <small>点击跳该类</small></div>'+categoryBars()+'</div>';
+  h+='</div>';
+
+  // ── 核心洞察（keynote）
+  h+='<div class="sec-h"><span class="bar"></span>核心洞察 · Keynote<span class="cnt">'+DATA.insights.length+' 条</span></div><div class="cards">';
   DATA.insights.forEach(it=>{h+='<div class="card" data-doc="'+ovId+'"><div class="n">洞察 #'+it.num+'</div><div class="t">'+inline(it.title)+'</div><div class="s">'+inline(it.summary)+'</div></div>';});
   h+='</div>';
+
+  // ── 最新研究（按新旧顺序）
+  const recent=newestDocs(12);
+  if(recent.length){
+    h+='<div class="sec-h"><span class="bar"></span>最新研究 · 按时间倒序<span class="cnt">'+recent.length+' / '+DATA.docs.filter(d=>d.date).length+'</span></div><div class="feed">';
+    recent.forEach(d=>{h+='<div class="feeditem" data-doc="'+d.id+'"><span class="fd">'+d.date+'</span><span class="fk '+d.dkind+'">'+(KIND[d.dkind]||'')+'</span><span class="ft">'+esc(d.title)+'</span><span class="fg">'+esc(d.group)+'</span></div>';});
+    h+='</div>';
+  }
+
+  // ── 金句墙
   if(DATA.quoteWall.length){
     h+='<div class="sec-h"><span class="bar"></span>金句墙<span class="cnt">'+DATA.quoteWall.length+' 条</span></div><div class="qwall">';
     DATA.quoteWall.forEach(q=>{h+='<div class="quote" data-doc="'+q.docId+'"><div class="mark">”</div><div class="qt">'+inline(q.q)+'</div><div class="qs">'+esc(q.src)+'</div></div>';});
@@ -706,7 +784,23 @@ function render(){
 }
 function openDoc(id){state.active=id;state.view="reader";state.q="";document.getElementById("q").value="";render();}
 
+function renderGroupList(group){
+  const docs=DATA.docs.filter(d=>d.group===group)
+    .sort((a,b)=>(b.date||"").localeCompare(a.date||"")||a.title.localeCompare(b.title,"zh"));
+  let h='<div class="hit">分类 <b>'+esc(group)+'</b> · '+docs.length+' 篇 · <a href="#" id="back-home">← 返回首页</a></div><div class="reslist">';
+  docs.forEach(d=>{h+='<div class="ritem" data-doc="'+d.id+'"><div class="rt">'+esc(d.title)+(d.date?'<span class="rg">'+d.date+'</span>':'')+'</div><div class="rs">'+esc((d.content||"").replace(/[#>*`\[\]]/g,"").replace(/\s+/g," ").slice(0,140))+'…</div></div>';});
+  h+='</div>';
+  document.getElementById("content").innerHTML=h;
+  document.getElementById("content").scrollTop=0;
+}
 document.addEventListener("click",e=>{
+  const bar=e.target.closest(".bar-g");
+  if(bar){state.view="timeline";state.q="";document.getElementById("q").value="";render();
+    const el=[...document.querySelectorAll(".m-label")].find(x=>x.textContent.includes(bar.dataset.month.split("-")[0]+" 年 "+parseInt(bar.dataset.month.split("-")[1])+" 月"));
+    if(el)el.scrollIntoView({behavior:"smooth",block:"center"});return;}
+  const cat=e.target.closest(".catbar");
+  if(cat){renderGroupList(cat.dataset.group);return;}
+  if(e.target.id==="back-home"){e.preventDefault();state.view="home";render();return;}
   const doc=e.target.closest("[data-doc]");
   if(doc&&doc.dataset.doc){openDoc(doc.dataset.doc);return;}
   const tag=e.target.closest(".tag");
