@@ -493,6 +493,25 @@ a:hover{text-decoration:underline;}
 .kn-link{font-size:10.5px;color:var(--accent3);background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:2px 9px;}
 .kn-link:hover{border-color:var(--accent3);color:#fff;}
 .kn-link.dead{color:var(--faint);cursor:default;}
+/* keynote 演示视图 */
+.kn-stage{max-width:1000px;margin:0 auto;padding:30px 40px 100px;}
+.kn-hero{border-radius:18px;padding:30px 34px;margin-bottom:24px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,rgba(84,217,201,.12),rgba(127,168,236,.10));border:1px solid var(--line2);box-shadow:var(--shadow-lg);}
+.kn-hero .lbl{font-size:11px;letter-spacing:3px;color:var(--accent);font-weight:700;}
+.kn-hero p{margin:12px 0 0;font-size:23px;font-weight:740;line-height:1.5;
+  background:linear-gradient(120deg,#fff,#cfe7e2);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.kn-slide{display:grid;grid-template-columns:72px 1fr;gap:20px;align-items:start;
+  background:linear-gradient(160deg,var(--panel),var(--bg2));border:1px solid var(--line);border-radius:16px;
+  padding:24px 26px;margin-bottom:16px;cursor:pointer;transition:transform .14s,border-color .14s,box-shadow .14s;}
+.kn-slide:hover{transform:translateY(-3px);border-color:var(--line2);box-shadow:var(--shadow-lg);}
+.kn-slide-no{font-size:46px;font-weight:850;line-height:.9;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;opacity:.55;text-align:center;}
+.kn-slide-page{font-size:21px;font-weight:780;line-height:1.35;
+  background:linear-gradient(120deg,#fff,#cfe7e2);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.kn-slide-sub{font-size:12.5px;color:var(--muted);margin:5px 0 12px;}
+.kn-slide-talk{font-size:13.8px;line-height:1.7;color:var(--ink2);}
+.kn-slide-quote{font-size:15px;line-height:1.55;color:var(--ink);font-weight:560;border-left:3px solid var(--accent4);padding-left:14px;margin:14px 0 4px;}
+.kn-slide .kn-src{margin-top:14px;font-size:11px;color:var(--faint);align-items:center;}
+@media(max-width:680px){.kn-slide{grid-template-columns:1fr;}.kn-slide-no{text-align:left;font-size:34px;}}
 /* dashboard */
 .dash{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:28px 0 4px;}
 @media(max-width:900px){.dash{grid-template-columns:1fr;}}
@@ -630,6 +649,7 @@ a:hover{text-decoration:underline;}
     </div>
     <div class="nav">
       <button data-view="home" class="on">⊞ Dashboard</button>
+      <button data-view="keynote">🎤 Keynote</button>
       <button data-view="timeline">时间线</button>
       <button data-view="reader">阅读</button>
     </div>
@@ -815,6 +835,28 @@ function renderHome(){
   document.getElementById("content").scrollTop=0;
 }
 
+/* ---------- keynote 演示视图（我的研究主张，第一类内容）---------- */
+function renderKeynote(){
+  const kn=DATA.keynote||{slides:[]};
+  let h='<div class="kn-stage">';
+  h+='<div class="kn-hero"><div class="lbl">MY RESEARCH KEYNOTE</div><p>'+inline(kn.axis||"")+'</p></div>';
+  kn.slides.forEach(s=>{
+    const go=(s.srcs&&s.srcs.find(x=>x.id))?(' data-doc="'+s.srcs.find(x=>x.id).id+'"'):'';
+    h+='<div class="kn-slide"'+go+'>'
+      +'<div class="kn-slide-no">'+esc(String(s.num))+'</div>'
+      +'<div class="kn-slide-body">'
+      +'<div class="kn-slide-page">'+esc(s.page||s.title)+'</div>'
+      +'<div class="kn-slide-sub">'+esc(s.title)+'</div>'
+      +(s.talk?'<div class="kn-slide-talk">'+inline(s.talk)+'</div>':'')
+      +(s.quote?'<div class="kn-slide-quote">“'+esc(s.quote)+'”</div>':'')
+      +(s.srcs&&s.srcs.length?'<div class="kn-src">证据：'+s.srcs.map(x=>x.id?'<span class="kn-link" data-doc="'+x.id+'">'+esc(x.title)+'</span>':'<span class="kn-link dead">'+esc(x.title)+'</span>').join('')+'</div>':'')
+      +'</div></div>';
+  });
+  h+='</div>';
+  document.getElementById("content").innerHTML=h;
+  document.getElementById("content").scrollTop=0;
+}
+
 /* ---------- timeline ---------- */
 function renderTimeline(){
   const terms=tokenize(state.q);
@@ -851,8 +893,22 @@ function snippet(content,terms){
 }
 function renderSearch(){
   const terms=tokenize(state.q);const res=searchDocs();
-  let h='<div class="hit">找到 <b>'+res.length+'</b> 篇 · 关键词「'+esc(state.q)+'」</div><div class="reslist">';
-  if(!res.length)h='<div class="empty"><div class="big">🔍</div>没有匹配「'+esc(state.q)+'」的笔记</div><div class="reslist">';
+  // Keynote slides 也参与搜索（你总结的核心内容，优先呈现）
+  const kn=(DATA.keynote||{slides:[]}).slides.filter(s=>{
+    const hay=((s.page||"")+" "+(s.title||"")+" "+(s.talk||"")+" "+(s.quote||"")).toLowerCase();
+    return terms.some(t=>hay.includes(t));
+  });
+  let h='<div class="hit">找到 <b>'+kn.length+'</b> 张 Keynote + <b>'+res.length+'</b> 篇笔记 · 关键词「'+esc(state.q)+'」</div>';
+  if(kn.length){
+    h+='<div class="reslist">';
+    kn.forEach(s=>{
+      const go=(s.srcs&&s.srcs.find(x=>x.id))?(' data-doc="'+s.srcs.find(x=>x.id).id+'"'):'';
+      h+='<div class="ritem"'+go+'><div class="rt">🎤 ['+esc(String(s.num))+'] '+esc(s.page||s.title)+'<span class="rg">Keynote</span></div><div class="rs">'+esc(s.quote||s.talk||"")+'</div></div>';
+    });
+    h+='</div>';
+  }
+  h+='<div class="reslist">';
+  if(!res.length&&!kn.length)h='<div class="empty"><div class="big">🔍</div>没有匹配「'+esc(state.q)+'」的内容</div><div class="reslist">';
   res.forEach(({d})=>{h+='<div class="ritem" data-doc="'+d.id+'"><div class="rt">'+esc(d.title)+'<span class="rg">'+esc(d.group)+'</span></div><div class="rs">'+snippet(d.content,terms)+'…</div></div>';});
   h+='</div>';
   document.getElementById("content").innerHTML=h;
@@ -880,6 +936,7 @@ function render(){
   renderSide();
   if(state.q){renderSearch();return;}
   if(state.view==="home")renderHome();
+  else if(state.view==="keynote")renderKeynote();
   else if(state.view==="timeline")renderTimeline();
   else renderReader();
 }
