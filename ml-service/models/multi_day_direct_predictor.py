@@ -531,7 +531,8 @@ def _apply_directional_guard(
     ret_3: float,
     ret_5: float,
     comex_shfe_premium: float,
-    branch_name: Optional[str],
+    jump_regime_code: float = 0.0,
+    branch_name: Optional[str] = None,
 ) -> Tuple[float, str]:
     """
     Convert weak/contradictory model output into a conservative return.
@@ -548,6 +549,20 @@ def _apply_directional_guard(
     trend_strength = min(max(float(trend_signal or 0.0), 0.0), 3.0)
 
     if pred_return <= 0:
+        short_trendup_classifier_release = (
+            horizon == 1
+            and branch_name == "trend_up"
+            and float(jump_regime_code) < 1.0
+            and float(trend_regime_code) >= 1.0
+            and up_prob_value >= 0.65
+            and float(trend_signal) >= 0.35
+            and pred_return > -0.0080
+        )
+        if short_trendup_classifier_release:
+            rebound_floor = 0.0008
+            rebound = max(abs(pred_return) * 0.55, rebound_floor)
+            return float(rebound), "short_trendup_classifier_release"
+
         cross_market_rebound = (
             horizon <= 2
             and abs(pred_return) < 0.0030
@@ -562,6 +577,43 @@ def _apply_directional_guard(
         if cross_market_rebound:
             rebound_floor = 0.0008 * float(np.sqrt(horizon))
             return float(max(abs(pred_return) * 0.75, rebound_floor)), "cross_market_rebound_release"
+
+        t1_premium_countertrend_release = (
+            horizon == 1
+            and branch_name == "trend_down"
+            and float(jump_regime_code) < 1.0
+            and up_prob_value < 0.10
+            and float(trend_signal) < 0.30
+            and float(ret_1) < -0.010
+            and float(ret_3) < -0.010
+            and float(ret_5) > -0.010
+            and float(ma_gap_10) < -0.008
+            and float(close_vs_vwap) < -0.004
+            and float(close_vs_high) < -0.010
+            and float(comex_shfe_premium) > 0.010
+            and pred_return > -0.0035
+        )
+        if t1_premium_countertrend_release:
+            rebound = max(abs(pred_return) * 0.25, 0.0006)
+            return float(rebound), "t1_premium_countertrend_release"
+
+        washout_rebound_release = (
+            3 <= horizon <= 6
+            and float(jump_regime_code) < 1.0
+            and float(trend_regime_code) <= -1.0
+            and float(ret_3) < -0.045
+            and float(ret_5) < -0.055
+            and float(ma_gap_10) < -0.045
+            and float(close_vs_high) < -0.030
+            and float(intraday_range_pct) > 0.040
+            and float(comex_shfe_premium) > 0.020
+        )
+        if washout_rebound_release:
+            rebound = max(
+                min(abs(pred_return) * 0.20, 0.0045),
+                0.0009 * float(np.sqrt(horizon)),
+            )
+            return float(rebound), "washout_rebound_release"
         return pred_return, "none"
 
     bearish_structure = (
@@ -585,6 +637,12 @@ def _apply_directional_guard(
             and float(close_vs_high) < -0.012
             and float(intraday_range_pct) > max(0.015, 1.35 * abs(float(vol_5 or 0.0)))
             and up_prob_value >= 0.62
+            and (
+                horizon == 1
+                or float(jump_regime_code) >= 1.0
+                or float(ret_5) < -0.055
+                or float(comex_shfe_premium) > 0.002
+            )
         )
         if capitulation_rebound_release:
             return pred_return, "capitulation_rebound_release"
@@ -602,6 +660,36 @@ def _apply_directional_guard(
         if post_capitulation_rebound_fade:
             floor = -0.0012
             return float(min(pred_return * 0.18, floor)), "post_capitulation_rebound_fade"
+
+        weak_t1_trendup_rollover = (
+            horizon == 1
+            and branch_name == "trend_up"
+            and float(jump_regime_code) < 1.0
+            and 0.50 <= up_prob_value <= 0.60
+            and float(trend_signal) < 0.25
+            and float(ret_3) < 0.0
+            and float(ma_gap_10) < -0.006
+            and float(close_vs_high) < 0.0
+            and pred_return > 0.0010
+        )
+        if weak_t1_trendup_rollover:
+            return float(min(pred_return * 0.15, -0.0009)), "weak_t1_trendup_rollover_guard"
+
+        t1_rebound_exhaustion = (
+            horizon == 1
+            and branch_name == "trend_up"
+            and float(jump_regime_code) < 1.0
+            and up_prob_value >= 0.80
+            and float(trend_signal) >= 0.75
+            and float(ret_3) > 0.030
+            and float(ret_5) > 0.020
+            and float(close_vs_vwap) < 0.0
+            and float(close_vs_high) < -0.004
+            and float(comex_shfe_premium) < 0.0
+            and pred_return > 0.0030
+        )
+        if t1_rebound_exhaustion:
+            return float(min(pred_return * 0.15, -0.0012)), "t1_rebound_exhaustion_guard"
 
         short_bearish_continuation = (
             float(ret_1) < -0.005
@@ -625,14 +713,184 @@ def _apply_directional_guard(
             and float(close_vs_high) < -0.006
         )
         if short_bearish_continuation or short_failed_bounce or short_top_rollover:
+            short_structure_classifier_rebound = (
+                2 <= horizon <= 3
+                and branch_name == "trend_down"
+                and float(jump_regime_code) < 1.0
+                and float(ret_5) > -0.025
+                and up_prob_value >= (0.85 if horizon == 2 else 0.90)
+                and float(trend_signal) >= 0.35
+                and pred_return > 0.0060
+            )
+            if short_structure_classifier_rebound:
+                rebound = max(
+                    min(pred_return * 0.18, 0.0040),
+                    0.0008 * float(np.sqrt(horizon)),
+                )
+                return float(rebound), "short_structure_classifier_rebound_release"
+
             floor = -0.0010 * float(np.sqrt(horizon))
             return float(min(pred_return * 0.15, floor)), "short_structure_guard"
+
+        short_trendup_classifier_veto = (
+            horizon == 2
+            and branch_name == "trend_up"
+            and float(jump_regime_code) < 1.0
+            and up_prob_value < 0.45
+            and float(ma_gap_10) < -0.005
+            and float(close_vs_high) < -0.004
+            and float(intraday_range_pct) > 0.012
+            and float(trend_signal) < 0.65
+            and pred_return > 0.0035
+        )
+        if short_trendup_classifier_veto:
+            floor = -0.0008 * float(np.sqrt(horizon))
+            return float(min(pred_return * 0.15, floor)), "short_trendup_classifier_veto_guard"
+
+        near_confirmed_breakdown = (
+            horizon == 3
+            and bearish_structure
+            and float(jump_regime_code) < 1.0
+            and float(ret_5) < -0.015
+            and float(close_vs_vwap) < -0.005
+            and float(close_vs_high) < -0.015
+            and abs(pred_return) > 0.0030
+        )
+        if near_confirmed_breakdown:
+            floor = -0.0010 * float(np.sqrt(horizon))
+            if classifier_bearish:
+                floor *= 1.35
+            return float(min(pred_return * 0.18, floor)), "near_breakdown_guard"
+
+    near_unresolved_breakdown = (
+        horizon <= 4
+        and bearish_structure
+        and float(jump_regime_code) < 1.0
+        and float(ret_1) < -0.004
+        and float(ret_5) < -0.004
+        and float(ret_5) > -0.025
+        and float(ma_gap_10) < -0.005
+        and float(close_vs_vwap) < -0.004
+        and float(close_vs_high) < -0.010
+        and (horizon > 1 or float(ret_5) > -0.010)
+        and abs(pred_return) > 0.0015
+    )
+    if near_unresolved_breakdown:
+        floor = -0.0009 * float(np.sqrt(horizon))
+        if horizon >= 3 or classifier_bearish:
+            floor *= 1.25
+        return float(min(pred_return * 0.16, floor)), "near_unresolved_breakdown_guard"
+
+    mid_failed_rebound = (
+        3 <= horizon <= 4
+        and float(jump_regime_code) < 1.0
+        and float(ret_1) >= -0.002
+        and float(ma_gap_10) < -0.004
+        and float(close_vs_high) < -0.002
+        and float(intraday_range_pct) > 0.011
+        and float(comex_shfe_premium) > -0.001
+        and abs(pred_return) > 0.0020
+    )
+    if mid_failed_rebound:
+        floor = -0.0011 * float(np.sqrt(horizon))
+        return float(min(pred_return * 0.20, floor)), "mid_failed_rebound_guard"
+
+    rebound_exhaustion = (
+        3 <= horizon <= 4
+        and branch_name == "normal"
+        and float(jump_regime_code) < 1.0
+        and float(trend_regime_code) >= 0.0
+        and float(ret_1) > 0.018
+        and float(ret_3) < 0.0
+        and float(ret_5) < 0.0
+        and float(intraday_range_pct) > 0.018
+        and float(comex_shfe_premium) < 0.0
+        and float(confidence) < 30.0
+        and pred_return > 0.0030
+    )
+    if rebound_exhaustion:
+        floor = -0.0010 * float(np.sqrt(horizon))
+        return float(min(pred_return * 0.15, floor)), "rebound_exhaustion_guard"
+
+    weak_trendup_fatigue = (
+        3 <= horizon <= 4
+        and branch_name == "trend_up"
+        and float(jump_regime_code) < 1.0
+        and float(trend_signal) < 0.50
+        and float(ret_5) < -0.003
+        and float(close_vs_high) < 0.001
+        and float(intraday_range_pct) > 0.015
+        and float(confidence) < 42.0
+        and 0.0 < pred_return < 0.0040
+    )
+    if weak_trendup_fatigue:
+        floor = -0.0008 * float(np.sqrt(horizon))
+        return float(min(pred_return * 0.12, floor)), "weak_trendup_fatigue_guard"
+
+    stalled_bullish_carry = (
+        horizon == 5
+        and float(jump_regime_code) < 1.0
+        and float(trend_regime_code) >= 0.0
+        and up_prob_value >= 0.92
+        and float(confidence) >= 40.0
+        and float(ret_5) < -0.006
+        and float(ma_gap_10) < -0.014
+        and float(close_vs_high) < -0.006
+        and pred_return > 0.0100
+    )
+    if stalled_bullish_carry:
+        floor = -0.0014 * float(np.sqrt(horizon / 5.0))
+        if float(ret_5) < -0.020:
+            floor *= 1.25
+        return float(min(pred_return * 0.12, floor)), "stalled_bullish_carry_guard"
+
+    delayed_capitulation_rebound = (
+        5 <= horizon <= 6
+        and bearish_structure
+        and float(trend_regime_code) <= -1.0
+        and float(trend_signal) >= 0.70
+        and float(ret_5) < -0.025
+        and float(ma_gap_10) < -0.020
+        and float(close_vs_high) < -0.004
+        and (horizon == 5 or float(jump_regime_code) >= 1.0)
+    )
+    if delayed_capitulation_rebound:
+        rebound = max(
+            min(abs(pred_return) * 0.12, 0.0040),
+            0.0008 * float(np.sqrt(horizon)),
+        )
+        return float(rebound), "delayed_capitulation_rebound_release"
 
     if bearish_structure and (weak_confidence or classifier_bearish or trend_down_branch):
         if horizon <= 3:
             return float(pred_return * 0.35), "near_bearish_decay"
 
         horizon_scale = float(np.sqrt(max(horizon, 1) / 5.0))
+        mid_horizon_confirmed_breakdown = (
+            horizon == 4
+            and float(jump_regime_code) < 1.0
+            and float(ret_5) < -0.015
+            and float(ret_5) > -0.060
+            and float(close_vs_vwap) < -0.005
+            and float(close_vs_high) < -0.015
+            and abs(pred_return) > 0.0030
+        )
+        if mid_horizon_confirmed_breakdown:
+            floor = -0.0015 * horizon_scale
+            if classifier_bearish:
+                floor = -0.0025 * horizon_scale
+            return float(min(pred_return * 0.18, floor)), "mid_horizon_breakdown_guard"
+
+        mid_horizon_unresolved_structure = (
+            horizon == 4
+            and float(ma_gap_10) < -0.004
+            and (float(close_vs_vwap) < 0.0 or float(close_vs_high) < -0.004)
+            and float(intraday_range_pct) > max(0.012, 1.05 * abs(float(vol_5 or 0.0)))
+            and abs(pred_return) > 0.0030
+        )
+        if mid_horizon_unresolved_structure:
+            return float(pred_return * 0.45), "mid_horizon_structure_decay"
+
         if horizon >= 5:
             floor = -0.0015 * horizon_scale
             if classifier_bearish:
@@ -642,6 +900,24 @@ def _apply_directional_guard(
             return float(min(pred_return * 0.18, floor)), "bearish_guard"
 
     if weak_confidence and horizon >= 5:
+        long_low_confidence_fragility = (
+            float(jump_regime_code) < 1.0
+            and float(close_vs_high) < 0.0
+            and (
+                float(ma_gap_10) < 0.003
+                or float(ret_3) < 0.0
+                or float(ret_5) < 0.0
+            )
+            and trend_strength < 0.65
+            and abs(pred_return) > 0.0015
+        )
+        if long_low_confidence_fragility:
+            horizon_scale = float(np.sqrt(max(horizon, 1) / 5.0))
+            floor = -0.0012 * horizon_scale
+            if float(ret_5) < -0.010 or float(close_vs_high) < -0.006:
+                floor *= 1.25
+            return float(min(pred_return * 0.12, floor)), "long_low_confidence_fragility_guard"
+
         scale = 0.35 if horizon <= 7 else 0.20
         return float(pred_return * scale), "low_confidence_decay"
 
@@ -987,6 +1263,7 @@ def run_direct_multi_day_prediction(
             ret_3=ret_3,
             ret_5=ret_5,
             comex_shfe_premium=comex_shfe_premium,
+            jump_regime_code=jump_regime_code,
             branch_name=branch_name if branch_used else None,
         )
         post_guard_confidence_notes: List[str] = []

@@ -62,7 +62,7 @@ cd stock-prediction
 python run.py --bot-output-dir /path/to/openclaw/stock-prediction
 ```
 
-OpenClaw 集成也可以直接用：
+OpenClaw 旧巡检包也可以直接用：
 
 ```bash
 /Users/rootliu/code/stock-prediction/scripts/run_openclaw_report.sh /path/to/openclaw/stock-prediction
@@ -165,7 +165,7 @@ python main.py
 
 Bot 模式默认也会使用 `4h` 作为黄金巡检图表与预测粒度。
 
-当前黄金预测默认策略为 `ensemble`，保留两种回退方式：
+旧巡检包的黄金预测默认策略为 `ensemble`，保留两种回退方式：
 
 - `boosting`
 - `linear`
@@ -179,8 +179,11 @@ Bot 模式默认也会使用 `4h` 作为黄金巡检图表与预测粒度。
 
 推荐调用约定：
 
-- 默认粒度使用 `4h`
-- 默认模型使用 `ensemble`
+- cron / agent 默认入口使用 `scripts/run_gold_direct_report.sh`
+- 默认预测链路使用 `run_gold_analysis.py --forecast-mode direct --skip-backtest`
+- direct V3 guards 保持开启
+- 旧巡检包默认粒度使用 `4h`
+- 旧巡检包默认模型使用 `ensemble`
 - 需要回退时显式指定 `boosting` 或 `linear`
 - 机器人模式以下游读取 `manifest.json` 作为完成标记
 - 现阶段不要把 `15min/30min` 作为 agent 默认入口
@@ -189,7 +192,7 @@ Bot 模式默认也会使用 `4h` 作为黄金巡检图表与预测粒度。
 最小调用示例：
 
 ```bash
-/Users/rootliu/code/stock-prediction/scripts/run_openclaw_report.sh /tmp/agent-gold-report
+/Users/rootliu/code/stock-prediction/scripts/run_gold_direct_report.sh /tmp/gold-direct-agent
 ```
 
 新黄金情景报告的最小调用示例：

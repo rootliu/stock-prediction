@@ -2,15 +2,16 @@
 
 ## Purpose
 
-Use `stock-prediction` in headless mode from `cron` or from an OpenClaw bot. The app writes a complete gold patrol bundle into a fixed directory, and the bot only needs to wait for `manifest.json` to appear.
+Use `stock-prediction` in headless mode from `cron` or from an OpenClaw bot. Cron and timed agents should use the direct V3 scenario wrapper; the older patrol bundle remains available for legacy OpenClaw consumers.
 
 ## Current Defaults
 
-Current gold patrol behavior is:
+Current cron / timed-agent behavior is:
 
-- forecast granularity: `4h`
-- default prediction strategy: `ensemble`
-- supported rollback strategies: `boosting`, `linear`
+- wrapper: `scripts/run_gold_direct_report.sh`
+- analysis command: `run_gold_analysis.py --forecast-mode direct --skip-backtest`
+- report type: `gold_direct_v3`
+- direct guards: enabled
 - recommended source: `SHFE_AU_MAIN`
 
 ## Entry Points
@@ -22,7 +23,7 @@ cd /Users/rootliu/code/stock-prediction
 python run.py --bot-output-dir /path/to/openclaw/stock-prediction
 ```
 
-OpenClaw wrapper script:
+Legacy OpenClaw patrol wrapper script:
 
 ```bash
 /Users/rootliu/code/stock-prediction/scripts/run_openclaw_report.sh /path/to/openclaw/stock-prediction
@@ -102,7 +103,19 @@ If `target-end` is omitted, the wrapper defaults to the third future SHFE tradin
 
 ## Environment Variables For Cron
 
-Optional environment variables used by `scripts/run_openclaw_report.sh`:
+Optional environment variables used by `scripts/run_gold_direct_report.sh`:
+
+- `GOLD_DIRECT_OUTPUT_DIR`
+- `GOLD_TARGET_END`
+- `MPLCONFIGDIR`
+
+The wrapper always calls:
+
+```bash
+run_gold_analysis.py --forecast-mode direct --skip-backtest
+```
+
+Optional environment variables used only by legacy `scripts/run_openclaw_report.sh`:
 
 - `OPENCLAW_OUTPUT_DIR`
 - `OPENCLAW_REPORT_SOURCE`
@@ -136,9 +149,9 @@ OPENCLAW_PREDICT_MODEL=linear /Users/rootliu/code/stock-prediction/scripts/run_o
 ## Cron Example
 
 ```cron
-0 8,12,20 * * 1-5 OPENCLAW_OUTPUT_DIR=/path/to/openclaw/stock-prediction /Users/rootliu/code/stock-prediction/scripts/run_openclaw_report.sh >> /tmp/openclaw-stock-prediction.log 2>&1
+0 9,20 * * 1-5 /Users/rootliu/code/stock-prediction/scripts/run_gold_direct_report.sh /tmp/gold-direct-agent >> /tmp/gold-direct-agent.log 2>&1
 ```
 
 ## Current Scope
 
-Current bot mode only generates the gold patrol bundle. MAG7 is not wired into the OpenClaw flow yet.
+The direct scenario wrapper generates the gold direct V3 report bundle. MAG7 is not wired into the OpenClaw flow yet.
