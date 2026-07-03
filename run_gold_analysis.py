@@ -63,9 +63,34 @@ def _flatten_yf(raw: pd.DataFrame) -> pd.DataFrame:
     return raw
 
 
+def _retry(fn, *, tries: int = 5, base_delay: float = 2.0, what: str = "request"):
+    """Call fn() with exponential backoff. Sina's finance endpoints intermittently
+    drop the TLS handshake (SSLEOFError / MaxRetryError); a single failure must not
+    crash the whole run, so retry before giving up."""
+    import time
+
+    last_exc: Optional[Exception] = None
+    for attempt in range(1, tries + 1):
+        try:
+            return fn()
+        except Exception as exc:  # noqa: BLE001 — network layer raises many types
+            last_exc = exc
+            if attempt < tries:
+                delay = base_delay * (2 ** (attempt - 1))
+                print(
+                    f"         [重试] {what} 第 {attempt}/{tries} 次失败"
+                    f"（{type(exc).__name__}），{delay:.0f}s 后重试 ..."
+                )
+                time.sleep(delay)
+    raise RuntimeError(f"{what} 连续 {tries} 次失败") from last_exc
+
+
 def fetch_shfe_au_daily() -> pd.DataFrame:
     print("  [数据] SHFE AU 日线 ...")
-    df = ak.futures_zh_daily_sina(symbol="AU0")
+    df = _retry(
+        lambda: ak.futures_zh_daily_sina(symbol="AU0"),
+        what="SHFE AU 日线 (Sina)",
+    )
     if df is None or df.empty:
         raise RuntimeError("SHFE AU 日线数据为空")
     rename_map = {}
@@ -92,7 +117,10 @@ def fetch_shfe_au_daily() -> pd.DataFrame:
 
 def fetch_shfe_au_60min() -> pd.DataFrame:
     print("  [数据] SHFE AU 60min K线 ...")
-    df = ak.futures_zh_minute_sina(symbol="AU0", period="60")
+    df = _retry(
+        lambda: ak.futures_zh_minute_sina(symbol="AU0", period="60"),
+        what="SHFE AU 60min (Sina)",
+    )
     if df is None or df.empty:
         raise RuntimeError("SHFE AU 60min 数据为空")
     # Normalize columns
