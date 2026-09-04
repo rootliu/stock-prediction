@@ -1,0 +1,330 @@
+{
+  "forecast_mode": "direct",
+  "latest_date": "2026-09-04",
+  "latest_close": 965.96,
+  "predictions": [
+    {
+      "date": "2026-09-07",
+      "close": 957.4,
+      "direction": "跌",
+      "confidence": 55.1,
+      "range_low": 950.72,
+      "range_high": 964.08,
+      "regime": "normal",
+      "n_models": 1,
+      "model_details": {
+        "model_name": "direct_gbm_multi_horizon_v2",
+        "horizon_days": 1,
+        "pre_guard_return_pct": -1.042,
+        "pred_return_pct": -1.042,
+        "direction_guard": "none",
+        "confidence_guard": "none",
+        "up_probability": 0.2971,
+        "test_mape_pct": 0.6976,
+        "test_direction_accuracy": 72.92,
+        "recent_weight_mean": 1.2215,
+        "recent_bias_return_pct": -0.303,
+        "jump_regime_code": 0.0,
+        "jump_signal": 0.463,
+        "trend_regime_code": 1.0,
+        "trend_signal": 0.385,
+        "branch_used": true,
+        "branch_name": "trend_up",
+        "effective_base": 965.96
+      },
+      "scenarios": {
+        "bear_close": 950.72,
+        "base_close": 957.4,
+        "bull_close": 964.08,
+        "bull_driver": "base_interval_fallback",
+        "bear_driver": "base_interval_fallback",
+        "gate_mode": "base",
+        "gating_reason": "no_backtest_history"
+      }
+    },
+    {
+      "date": "2026-09-08",
+      "close": 947.77,
+      "direction": "跌",
+      "confidence": 62.1,
+      "range_low": 933.45,
+      "range_high": 962.1,
+      "regime": "normal",
+      "n_models": 1,
+      "model_details": {
+        "model_name": "direct_gbm_multi_horizon_v2",
+        "horizon_days": 2,
+        "pre_guard_return_pct": -2.215,
+        "pred_return_pct": -2.215,
+        "direction_guard": "none",
+        "confidence_guard": "none",
+        "up_probability": 0.1196,
+        "test_mape_pct": 1.3492,
+        "test_direction_accuracy": 60.42,
+        "recent_weight_mean": 1.2611,
+        "recent_bias_return_pct": -0.483,
+        "jump_regime_code": 0.0,
+        "jump_signal": 0.463,
+        "trend_regime_code": 1.0,
+        "trend_signal": 0.385,
+        "branch_used": true,
+        "branch_name": "trend_up",
+        "effective_base": 965.96
+      },
+      "scenarios": {
+        "bear_close": 933.45,
+        "base_close": 947.77,
+        "bull_close": 962.1,
+        "bull_driver": "base_interval_fallback",
+        "bear_driver": "base_interval_fallback",
+        "gate_mode": "base",
+        "gating_reason": "no_backtest_history"
+      }
+    },
+    {
+      "date": "2026-09-09",
+      "close": 945.74,
+      "direction": "跌",
+      "confidence": 47.0,
+      "range_low": 921.94,
+      "range_high": 969.55,
+      "regime": "normal",
+      "n_models": 1,
+      "model_details": {
+        "model_name": "direct_gbm_multi_horizon_v2",
+        "horizon_days": 3,
+        "pre_guard_return_pct": -2.462,
+        "pred_return_pct": -2.462,
+        "direction_guard": "none",
+        "confidence_guard": "none",
+        "up_probability": 0.1537,
+        "test_mape_pct": 2.0297,
+        "test_direction_accuracy": 45.83,
+        "recent_weight_mean": 1.0722,
+        "recent_bias_return_pct": -0.8,
+        "jump_regime_code": 0.0,
+        "jump_signal": 0.463,
+        "trend_regime_code": 1.0,
+        "trend_signal": 0.385,
+        "branch_used": true,
+        "branch_name": "trend_up",
+        "effective_base": 965.96
+      },
+      "scenarios": {
+        "bear_close": 921.94,
+        "base_close": 945.74,
+        "bull_close": 969.55,
+        "bull_driver": "base_interval_fallback",
+        "bear_driver": "base_interval_fallback",
+        "gate_mode": "base",
+        "gating_reason": "no_backtest_history"
+      }
+    }
+  ],
+  "scenario_bundle": {
+    "feature_summary": {
+      "news_bull_score": 0.9824,
+      "news_bear_score": 0.2259,
+      "blog_bull_score": 0.7273,
+      "blog_bear_score": 0.4995,
+      "article_count": 44,
+      "safe_haven_score": 0.0,
+      "policy_risk_score": 0.5537,
+      "geo_risk_score": 0.9999,
+      "sell_the_news_score": 0.0,
+      "usd_pressure_score": 0.0765,
+      "rate_pressure_score": 0.7719,
+      "oil_shock_score": 0.0674,
+      "structural_support_score": 0.0,
+      "policy_relief_score": 0.2125,
+      "geo_relief_score": 0.0
+    },
+    "top_bull": [
+      {
+        "title": "Oil rallies for the week as U.S.-Iran fighting resumes; diesel hits record high - Reuters",
+        "link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxOQVZJdUE0TzFvS2xtSUJLOVUxZUVRZVRpMi1aUlNuSFZzX3h5TW4zSGJya0w3SjFlSno4QUlvdU90cHBBOS1xRllCZjR2aVRnUW16ZmQyN3M1SlRVSl9BYlk2Z2dvWGIzdEo3cXdTZjdWZkIzYXRNRzk3ZkM2cWMwN2ZWMVh1T09pNnRKVVAwRDhNSnJnSTFwVi1MZXdMNUNwOFJTU215REpkR1V0X1pVa09vNkVHeG9oX2lpVjdoTVl1ajI5MzU0dUN3?oc=5",
+        "published": "2026-09-04 01:28:00",
+        "site": "reuters.com",
+        "source_type": "news",
+        "bull_score": 1.265,
+        "bear_score": 0.0,
+        "weight": 1.15,
+        "tags": [
+          "iran"
+        ],
+        "buckets": {
+          "geo_risk": 1.1
+        }
+      },
+      {
+        "title": "US probes Iran wedding strike that analysis shows was likely direct hit by US munition - Reuters",
+        "link": "https://news.google.com/rss/articles/CBMiywFBVV95cUxPdWJyTEVVNzlNV2lCVktTZkk3dHZpYUFndlRkdTVXMzlnR0hEMXZYVnN5U3V5dC1JMEpWVDMwZng4YjhUc3pfOVpiNWNwdDRwbHY1TFhMLWZFZFh3YlF2SVEwYnJjNGkzTlpGR0hsRkwyMkQ4QVRSdmV4Ykxtd0xZamtOYkNNUV90TzhWdnF5ejhGRGhxSHgtcmp0SGdFVkhUa2owblM0QnN0aDRpeXlnRlBHUDdqZnE5TmRjd2FuR1dyVE5qY3VsNFJHWQ?oc=5",
+        "published": "2026-09-03 23:57:00",
+        "site": "reuters.com",
+        "source_type": "news",
+        "bull_score": 1.2642,
+        "bear_score": 0.0,
+        "weight": 1.1493,
+        "tags": [
+          "iran"
+        ],
+        "buckets": {
+          "geo_risk": 1.1
+        }
+      },
+      {
+        "title": "Deadly strike on Iranian wedding was likely a direct hit by a US munition, analysis shows - Reuters",
+        "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxQUEFXVU5xRXZGVUVkV3B2TUVQcTBseVZsSGd0blBwQktIaGlIc3R5TzMtNXFISkFTb1VOdlhWOXBmQ052RWFuT1pQaXJqQndNaXB3TmhLQTZPQXNQSFFXQ3JGY0NBdE1RY09razBPZFh2VnJiYmlBSld3akdLeHZxbVA5bWNqVWFycjFlUHFNd3VPdE4tYTFVaWxmdDBoOUlxUk80X0dkbkFqOV9SU3lxNkFsd0JGZnB5Qk9SV3JGWkxRWlhn?oc=5",
+        "published": "2026-09-03 22:13:00",
+        "site": "reuters.com",
+        "source_type": "news",
+        "bull_score": 1.2384,
+        "bear_score": 0.0,
+        "weight": 1.1258,
+        "tags": [
+          "iran"
+        ],
+        "buckets": {
+          "geo_risk": 1.1
+        }
+      }
+    ],
+    "top_bear": [
+      {
+        "title": "2-year yield rises to highest since January 2025 after hot jobs report boosts expectations that the Fed could raise rates - CNBC",
+        "link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxOWUUyd2ctTGxwTnFTeFBPOWdLdXFLZHZuMVdfUzBTWkpWMlEzaDhRWEhQOVNmNDJuWDZHSVNwVzJfMmNWdXpZdUN4NUZJQTdhVWJpMDFtZ2VyYWVEQ1YyV1NxY0Rxd2lsbnR1YXhibHNYOWN6MkJKR3BYRTJDaFgtckJXVng2RTcwRU9MMFBpdE3SAZYBQVVfeXFMUDNiZGd4WThYN1B4RjJ0d3BweFNNMkUxX0hrY29TMF9LTlNPU19wU1NiUFNsTjVvekFPN0otS0pJRFoybENlSHY5X052RGc5eFc4X1lDSG5JbjYxR3lOTWE5N2hrUVphaERJZGdlVks4bE1raWtSczZDTFM2SFdnZHRZU29tRHp3Skd1WG9lcG1xMzJGN3RR?oc=5",
+        "published": "2026-09-04 08:35:45",
+        "site": "cnbc.com",
+        "source_type": "news",
+        "bull_score": 0.0,
+        "bear_score": 0.88,
+        "weight": 0.8,
+        "tags": [
+          "yield rises"
+        ],
+        "buckets": {
+          "rate_pressure": 1.1
+        }
+      },
+      {
+        "title": "Gold Price Forecast: Tempered hawkish Fed bets lift XAU/USD near $4,500 - FXStreet",
+        "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxPQ2J0a3BYcTk1TWFWa21jcUtFYnZ6MzZablpYeGpTMFRyNzdydTRFcEZPOWNvd2xJNVFzTVFPYkZHX3NzQkkzY0dZbVJVTG9GU3g1X3BLMmJyX2E1M3RuMnVrMlJ6d0dnQ1g5TlA5TUowWDRQaWV6WU9OSFdhLWhNZDNXV1dZNXVzMlFTYWRQT0R1ZGlLSWpRWUFkSTJsNUF6UURUNGhhYkNTMkNySVM1alFKak9NNlU?oc=5",
+        "published": "2026-09-04 04:35:45",
+        "site": "fxstreet.com",
+        "source_type": "blog",
+        "bull_score": 0.0,
+        "bear_score": 0.3906,
+        "weight": 0.434,
+        "tags": [
+          "hawkish"
+        ],
+        "buckets": {
+          "rate_pressure": 0.9
+        }
+      },
+      {
+        "title": "British Pound strengthens above 1.3500 as BoE stays hawkish, traders brace for US NFP data - FXStreet",
+        "link": "https://news.google.com/rss/articles/CBMiywFBVV95cUxPck9DVkpGTlVrT3ZidjRrOGcwcWZKNkVKZG1hTlI1RnFfSm1zNTEyS2ZJN2ZDdzBiUkMxLVFNVHItV3dxYlVvaGJGT05RazNHcnptMkEwc2MxUU9wUkJwRFp3V3FOSHEzeUhxNE9TMEhDaGdMc0RyR0VNM1FCOXVQT1QydjdidkpRRktmY0dsT2Q4Nk1UcERCcGVfZ3Uwa1lubGVrUEhhLXgtRjlRUGdjeEc0U05PWG8zYi1uOVlxZUxsR1BxMndLWDJxYw?oc=5",
+        "published": "2026-09-04 05:50:52",
+        "site": "fxstreet.com",
+        "source_type": "blog",
+        "bull_score": 0.0,
+        "bear_score": 0.3906,
+        "weight": 0.434,
+        "tags": [
+          "hawkish"
+        ],
+        "buckets": {
+          "rate_pressure": 0.9
+        }
+      }
+    ],
+    "scenario_rows": [
+      {
+        "date": "2026-09-07",
+        "bear_close": 950.72,
+        "base_close": 957.4,
+        "bull_close": 964.08,
+        "base_low": 950.72,
+        "base_high": 964.08,
+        "bull_driver": "base_interval_fallback",
+        "bear_driver": "base_interval_fallback",
+        "calendar_score": 0.0,
+        "active_events": [],
+        "event_enabled": false,
+        "gate_mode": "base",
+        "gating_reason": "no_backtest_history",
+        "gating_improvement_pct": null,
+        "gating_base_hit_pct": null,
+        "gating_event_hit_pct": null,
+        "overlay_bear_close": 945.45,
+        "overlay_bull_close": 973.2
+      },
+      {
+        "date": "2026-09-08",
+        "bear_close": 933.45,
+        "base_close": 947.77,
+        "bull_close": 962.1,
+        "base_low": 933.45,
+        "base_high": 962.1,
+        "bull_driver": "base_interval_fallback",
+        "bear_driver": "base_interval_fallback",
+        "calendar_score": 0.0,
+        "active_events": [],
+        "event_enabled": false,
+        "gate_mode": "base",
+        "gating_reason": "no_backtest_history",
+        "gating_improvement_pct": null,
+        "gating_base_hit_pct": null,
+        "gating_event_hit_pct": null,
+        "overlay_bear_close": 931.95,
+        "overlay_bull_close": 967.41
+      },
+      {
+        "date": "2026-09-09",
+        "bear_close": 921.94,
+        "base_close": 945.74,
+        "bull_close": 969.55,
+        "base_low": 921.94,
+        "base_high": 969.55,
+        "bull_driver": "base_interval_fallback",
+        "bear_driver": "base_interval_fallback",
+        "calendar_score": 0.0,
+        "active_events": [],
+        "event_enabled": false,
+        "gate_mode": "base",
+        "gating_reason": "no_backtest_history",
+        "gating_improvement_pct": null,
+        "gating_base_hit_pct": null,
+        "gating_event_hit_pct": null,
+        "overlay_bear_close": 920.45,
+        "overlay_bull_close": 974.85
+      }
+    ],
+    "pathways": [
+      "Event gating kept all horizons on base interval because history did not improve hit rate.",
+      "Geopolitical risk is active and mainly widens the risk-premium scenario."
+    ],
+    "article_count": 44,
+    "calibration": {
+      "median_abs_return": 0.008163,
+      "p75_abs_return": 0.018014,
+      "pre_event_scale": 0.008201,
+      "post_event_scale": 0.005635,
+      "sell_the_news_scale": 0.016906
+    },
+    "gating": {
+      "enabled": false,
+      "reason": "no_backtest_history",
+      "source": "historical_interval_hit_rate",
+      "default_enabled": false,
+      "min_improvement_pct": 0.0,
+      "min_samples": 20,
+      "enabled_horizons": [],
+      "horizons": {}
+    },
+    "gating_applied": true
+  },
+  "backtest_metrics": [],
+  "event_backtest_metrics": []
+}
