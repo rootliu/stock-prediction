@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-08-07",
+  "snapshot_time_utc": "2026-08-07T11:00:22.496515+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9625,
+    "news_bear_score": 0.5727,
+    "blog_bull_score": 0.7733,
+    "blog_bear_score": 0.5034,
+    "article_count": 47,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.2293,
+    "geo_risk_score": 0.9999,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.4815,
+    "oil_shock_score": 0.1455,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.8894,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 47,
+  "top_bull": [
+    {
+      "title": "Oil Extends Gains as Iran Strikes Targets in Strait of Hormuz - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.114,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Saudi expects imminent two-pronged attack from Iran's allies, official says - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.08,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump says he thinks war with Iran will end 'pretty soon' - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0733,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Investors take profits in gold and silver as oil, yields rise after Hormuz deal doubts - Kitco PM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.607,
+      "tags": [
+        "deal",
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Proposed Hormuz passage deal not feasible for shipping industry, sources say - Reuters",
+      "site": "reuters.com",
+      "bear_score": 0.3755,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Gold price hits highest level since June on weak payrolls data and Hormuz deal hopes - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.2405,
+      "tags": [
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-06-12",
+  "snapshot_time_utc": "2026-06-12T11:00:13.829070+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9905,
+    "news_bear_score": 0.5871,
+    "blog_bull_score": 0.9314,
+    "blog_bear_score": 0.2189,
+    "article_count": 46,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.029,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.9252,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 46,
+  "top_bull": [
+    {
+      "title": "Oil falls to near two-month lows as Trump calls off threatened strikes on Iran - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1239,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran’s Oil Lifeline Faces ‘Biggest Test Yet’ as China Steps Back - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1103,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran says no final decision made on possible US agreement, IRNA says - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0704,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold gets no boost from geopolitical conflict, Russia makes outsized precious metals output claims for 2026 – Heraeus - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.0,
+      "tags": [
+        "geopolitical"
+      ]
+    },
+    {
+      "title": "Markets Are Treating the Iran Conflict as a Shock, Not a Structural Change - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.0,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Gold holds near $4,330 as oil pares Iran-Israel risk premium - Kitco PM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.0,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "error": null
+}

@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-08-01",
+  "snapshot_time_utc": "2026-08-01T11:00:24.198571+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9774,
+    "news_bear_score": 0.103,
+    "blog_bull_score": 0.7083,
+    "blog_bear_score": 0.5629,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.2298,
+    "geo_risk_score": 0.9999,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.1974,
+    "rate_pressure_score": 0.6009,
+    "oil_shock_score": 0.0347,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.2833,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "US Strikes Iran Again as Conflict Spreads Across Middle East - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.3281,
+      "tags": [
+        "iran",
+        "middle east"
+      ]
+    },
+    {
+      "title": "Exxon, Chevron warn of continued high fuel prices from Iran war - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0776,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US, Israel planning to bombard energy-related targets in Iran, CBS reports - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0758,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Dollar rebounds but posts monthly loss as softer inflation clouds Fed outlook - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.6,
+      "tags": [
+        "dollar rebounds"
+      ]
+    },
+    {
+      "title": "Gold has value at $4,000 as investors look beyond Fed hawkishness - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.3506,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Forecasting the upcoming week: US labor market takes center stage after hawkish Fed split - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3277,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

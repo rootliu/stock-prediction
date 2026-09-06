@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-06-04",
+  "snapshot_time_utc": "2026-06-04T11:00:17.546752+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.977,
+    "news_bear_score": 0.4379,
+    "blog_bull_score": 0.9183,
+    "blog_bear_score": 0.4036,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.2281,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.1205,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.4196,
+    "geo_relief_score": 0.7556
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Iranian oil slips to discount on poor Chinese demand despite tighter supply - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.236,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran's Khamenei warns against divisions after 'enemy's defeat on battlefield' - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2209,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Global airline chiefs to confront Iran war fuel shock at industry summit - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1942,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Oil falls after Lebanon and Israel agree on a ceasefire - Reuters",
+      "site": "reuters.com",
+      "bear_score": 1.0175,
+      "tags": [
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "Israel, Lebanon agree to fragile ceasefire - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.5609,
+      "tags": [
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "United States Dollar Index weakens after Israel-Lebanon ceasefire deal - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.5552,
+      "tags": [
+        "ceasefire",
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

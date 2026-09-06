@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-06-30",
+  "snapshot_time_utc": "2026-06-30T11:00:13.786674+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9756,
+    "news_bear_score": 0.5748,
+    "blog_bull_score": 0.8444,
+    "blog_bear_score": 0.2539,
+    "article_count": 45,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.3602,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.856,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 45,
+  "top_bull": [
+    {
+      "title": "Gold Holds Drop as US-Iran Tensions Weigh on Inflation Outlook - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1583,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Wall Street ends higher as US, Iran attacks ease; major tech-related shares jump - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0942,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US and Iran negotiators head to Doha, but meeting uncertain - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0835,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold faces biggest monthly drop since late 2008 on hawkish Fed stance - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.6648,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Bears abound on Wall Street and Main Street as markets digest Fed’s hawkish bias with June payrolls on deck - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.1472,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Gold faces make-or-break week at $4,000 as Fed hawkishness fuels bearish outlook - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.1464,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

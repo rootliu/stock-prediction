@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-07-24",
+  "snapshot_time_utc": "2026-07-24T11:00:28.812203+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9887,
+    "news_bear_score": 0.1026,
+    "blog_bull_score": 0.9019,
+    "blog_bear_score": 0.2171,
+    "article_count": 47,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.9302,
+    "geo_risk_score": 0.9999,
+    "sell_the_news_score": 0.1496,
+    "usd_pressure_score": 0.1161,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.3903,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.0,
+    "geo_relief_score": 0.1016
+  },
+  "article_count": 47,
+  "top_bull": [
+    {
+      "title": "In India, Iran war forces Diet Coke to roll out a bigger can, heftier price tag - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2107,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump vows to punish Iran and Houthis for attacks in Red Sea - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1638,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US military says it completed 13th consecutive night of strikes on Iran - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1355,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Retail investors remain confident in gold despite recent selling as healthy profit-taking replaces panic, says EverBank's Gaffney - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.4522,
+      "tags": [
+        "profit-taking"
+      ]
+    },
+    {
+      "title": "Global oil prices settle at one-month high despite new Iran ceasefire proposal, as blockade on Saudi Arabia by Yemen’s Houthis keeps market on edge - MarketWatch",
+      "site": "marketwatch.com",
+      "bear_score": 0.306,
+      "tags": [
+        "iran",
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "Asia stocks erase early gains as oil surge weighs; Alphabet results ahead - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.094,
+      "tags": [
+        "oil surge"
+      ]
+    }
+  ],
+  "error": null
+}

@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-08-21",
+  "snapshot_time_utc": "2026-08-21T11:00:15.251943+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9799,
+    "news_bear_score": 0.2285,
+    "blog_bull_score": 0.7756,
+    "blog_bear_score": 0.4066,
+    "article_count": 43,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.3132,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0806,
+    "rate_pressure_score": 0.7096,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.153,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 43,
+  "top_bull": [
+    {
+      "title": "Iranian oil offers to Chinese buyers fall as US blockade bites, sources say - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2318,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Oil set for second weekly gain as US ramps up pressure on Iran - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1342,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump Risks China Blowback With Plan to Choke Iran’s Economy - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.133,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Longer-dated Treasury yields rise as Bessent's bond buyback rally fizzles out - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.933,
+      "tags": [
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Euro gains on hawkish ECB outlook despite firm US Dollar - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3483,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Hudson River Signs Multibillion-Dollar CoreWeave Deal for AI Cloud - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 0.3317,
+      "tags": [
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

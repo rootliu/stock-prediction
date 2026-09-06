@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-07-26",
+  "snapshot_time_utc": "2026-07-26T11:00:14.402539+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9627,
+    "news_bear_score": 0.2226,
+    "blog_bull_score": 0.8488,
+    "blog_bear_score": 0.1775,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.671,
+    "geo_risk_score": 0.9998,
+    "sell_the_news_score": 0.0782,
+    "usd_pressure_score": 0.0658,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.5051,
+    "geo_relief_score": 0.0575
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "US Pauses Iran Strikes for Second Night as Red Sea Tensions Rise - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1464,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran war spreads to Red Sea and Caspian, Gulf quiet as US forgoes strikes - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1005,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US Pauses Nightly Strikes on Iran as Houthis, Saudis Clash - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.0762,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Kuwait's KPC signs $16 billion lease and leaseback deal for oil pipeline network - Reuters",
+      "site": "reuters.com",
+      "bear_score": 0.3266,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Retail investors remain confident in gold despite recent selling as healthy profit-taking replaces panic, says EverBank's Gaffney - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.2349,
+      "tags": [
+        "profit-taking"
+      ]
+    },
+    {
+      "title": "Kuwait signs $16 billion oil pipeline deal with Blackstone, KKR and Brookfield - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.164,
+      "tags": [
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

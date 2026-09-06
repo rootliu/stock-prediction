@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-09-01",
+  "snapshot_time_utc": "2026-09-01T11:00:21.864852+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9593,
+    "news_bear_score": 0.5087,
+    "blog_bull_score": 0.6107,
+    "blog_bear_score": 0.7366,
+    "article_count": 44,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.3809,
+    "geo_risk_score": 0.9996,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.2319,
+    "rate_pressure_score": 0.8751,
+    "oil_shock_score": 0.1696,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.591,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 44,
+  "top_bull": [
+    {
+      "title": "Oil rises as renewed US-Iran strikes stoke supply fears - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.4281,
+      "tags": [
+        "iran",
+        "oil rises"
+      ]
+    },
+    {
+      "title": "Iran says it has enough foreign currency despite US sanctions - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2016,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Asian Stocks to Fall as Iran Flare-Up Boosts Oil: Markets Wrap - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1998,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold drops over 1% as Treasury yields rise; investors eye US jobs data - Reuters",
+      "site": "reuters.com",
+      "bear_score": 1.2536,
+      "tags": [
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Canadian dollar rebounds from two-week low, helped by month-end hedging flows - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.5341,
+      "tags": [
+        "dollar rebounds"
+      ]
+    },
+    {
+      "title": "Trump's oil deal with Venezuela raises red flags for some major producers, sources say - Reuters",
+      "site": "reuters.com",
+      "bear_score": 0.4565,
+      "tags": [
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-06-14",
+  "snapshot_time_utc": "2026-06-14T11:00:56.386923+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9557,
+    "news_bear_score": 0.5681,
+    "blog_bull_score": 0.7973,
+    "blog_bear_score": 0.2995,
+    "article_count": 36,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 0.9999,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.1013,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.9356,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 36,
+  "top_bull": [
+    {
+      "title": "Iran says limited cyberattack disrupts services at four banks, state media says - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.209,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Fed and BOE Stay Guarded After 100 Days of Iran War - Bloomberg",
+      "site": "bloomberg.com",
+      "bull_score": 1.0052,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran says signing of Islamabad memorandum will not take place on Sunday - Reuters",
+      "site": "reuters.com",
+      "bull_score": 0.975,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Markets Are Treating the Iran Conflict as a Shock, Not a Structural Change - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.0,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US launches strikes at Iran after Trump vows response for shooting down helicopter - Investing.com UK",
+      "site": "investing.com",
+      "bear_score": 0.0,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US Strikes Iran; Gold Still Falls - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.0,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "error": null
+}

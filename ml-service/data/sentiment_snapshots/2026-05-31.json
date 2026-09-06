@@ -1,0 +1,80 @@
+{
+  "snapshot_date": "2026-05-31",
+  "snapshot_time_utc": "2026-05-31T11:00:15.970295+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9598,
+    "news_bear_score": 0.3787,
+    "blog_bull_score": 0.7816,
+    "blog_bear_score": 0.6053,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.1956,
+    "geo_risk_score": 0.9999,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.0123,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.8498,
+    "geo_relief_score": 0.4371
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "EU Weighs Temporary Freeze on Russia Oil Price Cap Over Iran War - Bloomberg",
+      "site": "bloomberg.com",
+      "bull_score": 1.1596,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US military says it turned away blockade runner trying to reach Iranian port - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0514,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Tiny Guyana poised for big Iran oil gains and growth strains - Reuters",
+      "site": "reuters.com",
+      "bull_score": 0.9891,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Iran says no final deal reached with U.S. as ceasefire talks continue - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.7191,
+      "tags": [
+        "iran",
+        "ceasefire",
+        "talks",
+        "deal"
+      ]
+    },
+    {
+      "title": "Forecasting the upcoming week: The US Dollar fell as ceasefire hopes supported risk sentiment - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.2732,
+      "tags": [
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "Oil rises, stocks mixed as new US strikes dampen peace deal optimism By Reuters - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.0736,
+      "tags": [
+        "oil rises",
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

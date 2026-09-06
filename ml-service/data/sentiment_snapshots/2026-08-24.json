@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-08-24",
+  "snapshot_time_utc": "2026-08-24T11:00:12.778820+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.988,
+    "news_bear_score": 0.2028,
+    "blog_bull_score": 0.8667,
+    "blog_bear_score": 0.1576,
+    "article_count": 44,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.9211,
+    "geo_risk_score": 0.9999,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0342,
+    "rate_pressure_score": 0.1183,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.4656,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 44,
+  "top_bull": [
+    {
+      "title": "Iran warns vessels violating Hormuz transit rules of fines, detention - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2316,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "UK briefs energy chiefs after Iran-linked cyber attack reports - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2292,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "China vows to protect its rights as US readies Iran sanction - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.222,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Euro gains on hawkish ECB outlook despite firm US Dollar - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.1478,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "TSX futures slip as bond yields rise on Mideast uncertainty - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.1027,
+      "tags": [
+        "yields rise"
+      ]
+    },
+    {
+      "title": "US yields rise amid Iran worries, broader selloff - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.1061,
+      "tags": [
+        "iran",
+        "yields rise"
+      ]
+    }
+  ],
+  "error": null
+}

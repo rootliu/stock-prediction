@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-08-19",
+  "snapshot_time_utc": "2026-08-19T11:00:14.044911+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9846,
+    "news_bear_score": 0.5226,
+    "blog_bull_score": 0.8444,
+    "blog_bear_score": 0.491,
+    "article_count": 43,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.7912,
+    "geo_risk_score": 0.9999,
+    "sell_the_news_score": 0.0339,
+    "usd_pressure_score": 0.196,
+    "rate_pressure_score": 0.2825,
+    "oil_shock_score": 0.0464,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.8674,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 43,
+  "top_bull": [
+    {
+      "title": "South Korea minister says Trump appears to be pressuring Seoul over Iran, investment - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1822,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Optimism on Europe Returns to Pre-Iran War Highs: Taking Stock - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1357,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump Takes Hard Line on Iran as Hormuz Standoff Drags On - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.0872,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "TSX futures slip as bond yields rise on Mideast uncertainty - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.4285,
+      "tags": [
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Venezuela Signs Deals With SLB, Hunt in Push to Boost Oil Output - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 0.3903,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Dollar rebounds from 2-month lows as Middle East war risks truncate FX momentum - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.5958,
+      "tags": [
+        "middle east",
+        "dollar rebounds"
+      ]
+    }
+  ],
+  "error": null
+}

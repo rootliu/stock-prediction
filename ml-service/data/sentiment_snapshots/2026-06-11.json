@@ -1,0 +1,78 @@
+{
+  "snapshot_date": "2026-06-11",
+  "snapshot_time_utc": "2026-06-11T11:00:15.347551+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.991,
+    "news_bear_score": 0.5182,
+    "blog_bull_score": 0.8973,
+    "blog_bear_score": 0.3446,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.1775,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.1685,
+    "rate_pressure_score": 0.1126,
+    "oil_shock_score": 0.0386,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.4807,
+    "geo_relief_score": 0.6607
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Oil falls as traders digest escalation in US-Iran strikes - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2466,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran and Ukraine loom over G7 as France accommodates Trump - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.223,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Gold Falls for Third Day as US Launches Fresh Strikes on Iran - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1855,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Forex Today: US Dollar rebounds after inflation data - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.5103,
+      "tags": [
+        "dollar rebounds"
+      ]
+    },
+    {
+      "title": "US and Iranian attacks dent ceasefire, Iranian sources say talks intensify - Reuters",
+      "site": "reuters.com",
+      "bear_score": 1.5924,
+      "tags": [
+        "iran",
+        "ceasefire",
+        "talks"
+      ]
+    },
+    {
+      "title": "Dow Jones Industrial Average finds out the ceasefire was load-bearing - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3491,
+      "tags": [
+        "ceasefire"
+      ]
+    }
+  ],
+  "error": null
+}

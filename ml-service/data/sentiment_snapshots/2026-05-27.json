@@ -1,0 +1,79 @@
+{
+  "snapshot_date": "2026-05-27",
+  "snapshot_time_utc": "2026-05-27T11:00:16.278522+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9821,
+    "news_bear_score": 0.5835,
+    "blog_bull_score": 0.9001,
+    "blog_bear_score": 0.7065,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.7394,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.2433,
+    "oil_shock_score": 0.0385,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.9539,
+    "geo_relief_score": 0.3467
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Iran’s Khamenei Says No Going Back For Middle East Rocked by War - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.6842,
+      "tags": [
+        "iran",
+        "middle east"
+      ]
+    },
+    {
+      "title": "Japan yen nears intervention zone; dollar steady as traders watch Iran - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1239,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Shares advance, oil prices ease as investors weigh shaky US-Iran truce - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1228,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold drops to one-week low, seems vulnerable below $4,500 on hawkish central banks - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.378,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Euro drifts higher against British Pound on hawkish ECB signals - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.367,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Asia-Pacific markets trade mixed as investors weigh Iran tensions and ceasefire talks - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 1.0501,
+      "tags": [
+        "iran",
+        "ceasefire",
+        "talks"
+      ]
+    }
+  ],
+  "error": null
+}

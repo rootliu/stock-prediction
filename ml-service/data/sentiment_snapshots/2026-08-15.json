@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-08-15",
+  "snapshot_time_utc": "2026-08-15T11:00:17.846591+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9567,
+    "news_bear_score": 0.1472,
+    "blog_bull_score": 0.7065,
+    "blog_bear_score": 0.2645,
+    "article_count": 42,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.6456,
+    "geo_risk_score": 0.9994,
+    "sell_the_news_score": 0.1084,
+    "usd_pressure_score": 0.1485,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.1371,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.2981,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 42,
+  "top_bull": [
+    {
+      "title": "Hormuz traffic slows further after US threatens more economic pressure on Iran - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0914,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran defiant on strait as Trump tells Americans to accept high gas prices - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0655,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US Readies Iran Penalties as Trump Downplays Midterms Impact - Bloomberg",
+      "site": "bloomberg.com",
+      "bull_score": 1.0131,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Materials Down as U.S. Dollar Rises - Materials Roundup - MarketWatch",
+      "site": "marketwatch.com",
+      "bear_score": 0.4489,
+      "tags": [
+        "dollar rises"
+      ]
+    },
+    {
+      "title": "$4,300 tested as Gold is down on profit-taking, but not out - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3265,
+      "tags": [
+        "profit-taking"
+      ]
+    },
+    {
+      "title": "Norsk Hydro’s Alunorte ramps up production after deal with gas supplier - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.149,
+      "tags": [
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

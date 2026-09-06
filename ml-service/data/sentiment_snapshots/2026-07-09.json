@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-07-09",
+  "snapshot_time_utc": "2026-07-09T11:00:23.060325+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9894,
+    "news_bear_score": 0.3669,
+    "blog_bull_score": 0.9081,
+    "blog_bear_score": 0.4366,
+    "article_count": 44,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0995,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.315,
+    "oil_shock_score": 0.2049,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.1903,
+    "geo_relief_score": 0.6354
+  },
+  "article_count": 44,
+  "top_bull": [
+    {
+      "title": "Iran to bury slain Supreme Leader in culmination of mass funeral - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2338,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Gulf companies are set to reveal the unequal toll of Iran war - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1652,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US, Iran Trade Airstrikes as Fears Grow of a Return to War - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1524,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Hormuz Traffic Grinds to a Near Halt as Ceasefire Under Threat - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 1.0814,
+      "tags": [
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "Investors flee gold ETFs in June as hawkish Fed expectations drive liquidation - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.3353,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Forex Today: US Dollar struggles despite hawkish FOMC Minutes - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3269,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

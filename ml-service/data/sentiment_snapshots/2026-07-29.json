@@ -1,0 +1,78 @@
+{
+  "snapshot_date": "2026-07-29",
+  "snapshot_time_utc": "2026-07-29T11:00:13.743309+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9885,
+    "news_bear_score": 0.3742,
+    "blog_bull_score": 0.8616,
+    "blog_bear_score": 0.459,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.4383,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0332,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.3863,
+    "oil_shock_score": 0.4178,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.6229,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Iran launches surprise ballistic missile attack on U.S. forces in the Middle East - CNBC",
+      "site": "cnbc.com",
+      "bull_score": 1.4701,
+      "tags": [
+        "iran",
+        "middle east"
+      ]
+    },
+    {
+      "title": "Oil Surges After Three-Day Drop as US Repels Iran Attack on Base - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.6259,
+      "tags": [
+        "iran",
+        "oil surge"
+      ]
+    },
+    {
+      "title": "EXCLUSIVE: US commander warns troops their videos help Iran, sources say - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2607,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "US Dollar: Hawkish Fed hold may support USD – MUFG - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3738,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Gold: Hawkish Fed delays Gold recovery path – Commerzbank - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3088,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "US Dollar: Stronger into FOMC on hawkish expectations – MUFG - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.2813,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

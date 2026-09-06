@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-07-28",
+  "snapshot_time_utc": "2026-07-28T11:00:44.073793+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9857,
+    "news_bear_score": 0.3294,
+    "blog_bull_score": 0.748,
+    "blog_bear_score": 0.4794,
+    "article_count": 42,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.6486,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.3175,
+    "rate_pressure_score": 0.1241,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.7291,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 42,
+  "top_bull": [
+    {
+      "title": "Germany Maps China’s Weaknesses in Preparation for a Trade War - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.254,
+      "tags": [
+        "trade war"
+      ]
+    },
+    {
+      "title": "Oman presented regional mechanism for Hormuz to Iran, source says - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2522,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Bab el-Mandeb shipping rises amid hopes of resolution in US-Iran war - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2138,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Dollar rises slightly as traders eye crucial Fed decision later in the week - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.5069,
+      "tags": [
+        "dollar rises"
+      ]
+    },
+    {
+      "title": "Gold struggles below $4,100 as US Dollar rebounds, Fed decision looms - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.4798,
+      "tags": [
+        "dollar rebounds"
+      ]
+    },
+    {
+      "title": "US Dollar: Stronger into FOMC on hawkish expectations – MUFG - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3744,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

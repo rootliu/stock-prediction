@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-07-25",
+  "snapshot_time_utc": "2026-07-25T11:00:15.356192+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9763,
+    "news_bear_score": 0.3798,
+    "blog_bull_score": 0.9423,
+    "blog_bear_score": 0.1918,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.9339,
+    "geo_risk_score": 0.9999,
+    "sell_the_news_score": 0.1128,
+    "usd_pressure_score": 0.0874,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.7007,
+    "geo_relief_score": 0.0765
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "US, Iran Exchange Strikes as Trump Mulls Wider Offensive - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1149,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Yemen teeters towards renewed war in shadow of Iran conflict - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0742,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump says he trusts Russia and China's leaders not to enable Iran - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0661,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Kuwait's KPC signs $16 billion lease and leaseback deal for oil pipeline network - Reuters",
+      "site": "reuters.com",
+      "bear_score": 0.4346,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Retail investors remain confident in gold despite recent selling as healthy profit-taking replaces panic, says EverBank's Gaffney - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.3398,
+      "tags": [
+        "profit-taking"
+      ]
+    },
+    {
+      "title": "Global oil prices settle at one-month high despite new Iran ceasefire proposal, as blockade on Saudi Arabia by Yemen’s Houthis keeps market on edge - MarketWatch",
+      "site": "marketwatch.com",
+      "bear_score": 0.23,
+      "tags": [
+        "iran",
+        "ceasefire"
+      ]
+    }
+  ],
+  "error": null
+}

@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-06-28",
+  "snapshot_time_utc": "2026-06-28T11:00:16.302246+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9783,
+    "news_bear_score": 0.4476,
+    "blog_bull_score": 0.5825,
+    "blog_bear_score": 0.3602,
+    "article_count": 45,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.1201,
+    "geo_risk_score": 0.9999,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0602,
+    "rate_pressure_score": 0.2889,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.4563,
+    "geo_relief_score": 0.5483
+  },
+  "article_count": 45,
+  "top_bull": [
+    {
+      "title": "Austria and Algeria advance to World Cup round of 32, Iran eliminated - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1687,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Austria draw with Algeria in World Cup thriller to progress and send Iran home - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1668,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US Launches Fresh Strikes on Iran Targets After Drone Hits - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.0466,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Bears abound on Wall Street and Main Street as markets digest Fed’s hawkish bias with June payrolls on deck - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.2607,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Gold faces make-or-break week at $4,000 as Fed hawkishness fuels bearish outlook - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.2592,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Gold holds $4,000 as Fed hawkishness offsets renewed Gulf risk - Kitco PM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.1925,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

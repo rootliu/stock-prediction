@@ -1,0 +1,80 @@
+{
+  "snapshot_date": "2026-06-02",
+  "snapshot_time_utc": "2026-06-02T11:00:13.489545+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9837,
+    "news_bear_score": 0.5951,
+    "blog_bull_score": 0.9138,
+    "blog_bear_score": 0.4827,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.5101,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.1265,
+    "oil_shock_score": 0.2368,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.9465,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Euro zone firms struggle to raise prices despite Iran war shock - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.185,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "The Iran War Is Pushing the Global Gas Trade Into the Shadows - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1323,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump administration proposes 25% tariff to punish Brazil over trade practices - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0543,
+      "tags": [
+        "tariff"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold bulls seem hesitant as Iran deal uncertainty and hawkish Fed bets counter softer USD - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.5509,
+      "tags": [
+        "iran",
+        "deal",
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Oil prices fall 4% after Rubio says U.S. will give Iran talks ‘every chance to succeed’ - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.0396,
+      "tags": [
+        "iran",
+        "talks"
+      ]
+    },
+    {
+      "title": "Metals dip as S&P, Nasdaq hit records on Iran deal hopes - Kitco PM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.0276,
+      "tags": [
+        "iran",
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

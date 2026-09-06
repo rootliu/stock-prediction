@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-06-24",
+  "snapshot_time_utc": "2026-06-24T11:00:13.820503+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9768,
+    "news_bear_score": 0.3031,
+    "blog_bull_score": 0.8093,
+    "blog_bear_score": 0.5975,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.603,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.6895,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Rubio kicks off Middle East trip as allies seek answers on Iran - Reuters",
+      "site": "reuters.com",
+      "bull_score": 2.2521,
+      "tags": [
+        "iran",
+        "middle east"
+      ]
+    },
+    {
+      "title": "China Says Iran Crisis Shows Nations Must Speed Up Energy Shift - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1599,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Global physical crude markets mired in discounts as Middle East ramps up supply - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1132,
+      "tags": [
+        "middle east"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold falls as hawkish Fed bets lift dollar to one-year peak - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.5101,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "BMO cuts gold price forecast as Fed’s hawkish shift weighs on precious metals - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.3408,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "US Dollar Index: Breakout risks build on hawkish Fed – OCBC - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.2985,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

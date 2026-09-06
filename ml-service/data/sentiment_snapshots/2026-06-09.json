@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-06-09",
+  "snapshot_time_utc": "2026-06-09T11:00:14.019474+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9794,
+    "news_bear_score": 0.5972,
+    "blog_bull_score": 0.8274,
+    "blog_bear_score": 0.4058,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0556,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.3376,
+    "oil_shock_score": 0.0068,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.6111,
+    "geo_relief_score": 0.7089
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Iran says ticket allocation for World Cup withdrawn days before tournament - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2382,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US Strikes India-Crewed Tanker That May Have Been Iran-Bound - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1658,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Copper Holds Gain With Easing Iran Tensions, China Data in Focus - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1623,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold erases losses despite strong U.S. jobs data after ceasefire hopes emerge - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.5539,
+      "tags": [
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "Gold flat lines below $4,350 as bulls remain on the sidelines amid hawkish Fed bets - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3803,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Gold: Uptrend delayed on hawkish Fed repricing – OCBC - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3756,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

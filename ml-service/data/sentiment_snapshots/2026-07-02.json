@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-07-02",
+  "snapshot_time_utc": "2026-07-02T11:00:14.216609+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9683,
+    "news_bear_score": 0.6614,
+    "blog_bull_score": 0.6511,
+    "blog_bear_score": 0.6689,
+    "article_count": 43,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 0.9999,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.8524,
+    "oil_shock_score": 0.0331,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.8814,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 43,
+  "top_bull": [
+    {
+      "title": "Iran warns US, Israel against attacks ahead of funeral processions for Khamenei - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2319,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran’s Floating Oil Hoard Swells as Major Buyers Stay Away - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1545,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "China’s Private Refiners Snap Up Middle East Oil as Prices Slide - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.0275,
+      "tags": [
+        "middle east"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "U.S. Treasury yields rise as investors await June jobs report - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.9077,
+      "tags": [
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Treasury yields rise as Fed Chairman Warsh says 'prices are too high' - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.7051,
+      "tags": [
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Yen surges on rate-check rumours; Dollar steadies on hawkish Fed rhetoric - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.4795,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

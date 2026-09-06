@@ -1,0 +1,78 @@
+{
+  "snapshot_date": "2026-07-08",
+  "snapshot_time_utc": "2026-07-08T11:00:15.356627+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9934,
+    "news_bear_score": 0.7014,
+    "blog_bull_score": 0.8731,
+    "blog_bear_score": 0.3265,
+    "article_count": 38,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0265,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.2672,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.5976,
+    "geo_relief_score": 0.8712
+  },
+  "article_count": 38,
+  "top_bull": [
+    {
+      "title": "Trump says interim accord to end war is 'over' after Iranian strikes - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.248,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump says interim accord with Iran to end war is \"over\" - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2315,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Oil Jumps on Iran Attack, Asian Stocks Set to Drop: Markets Wrap - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.5006,
+      "tags": [
+        "iran",
+        "oil jumps"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "NATO announces billions in defense deals. What investors should watch for now. - MarketWatch",
+      "site": "marketwatch.com",
+      "bear_score": 0.2683,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "TeraWulf’s stock gains after a $19 billion deal with Anthropic - MarketWatch",
+      "site": "marketwatch.com",
+      "bear_score": 0.2148,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Canadian firms' inflation outlook eased after Iran ceasefire, BoC survey finds - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.28,
+      "tags": [
+        "iran",
+        "ceasefire"
+      ]
+    }
+  ],
+  "error": null
+}

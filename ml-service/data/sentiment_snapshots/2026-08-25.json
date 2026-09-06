@@ -1,0 +1,78 @@
+{
+  "snapshot_date": "2026-08-25",
+  "snapshot_time_utc": "2026-08-25T11:00:36.924961+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9904,
+    "news_bear_score": 0.3472,
+    "blog_bull_score": 0.9045,
+    "blog_bear_score": 0.0781,
+    "article_count": 46,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.927,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.3623,
+    "usd_pressure_score": 0.0257,
+    "rate_pressure_score": 0.0522,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.3774,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 46,
+  "top_bull": [
+    {
+      "title": "Trump says U.S. will hike Canada auto tariffs to 50% as trade war escalates - CNBC",
+      "site": "cnbc.com",
+      "bull_score": 1.3685,
+      "tags": [
+        "tariff",
+        "trade war"
+      ]
+    },
+    {
+      "title": "Iran vows to retaliate after US widens sanctions - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2434,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Six months into Iran war, almost half of global oil flows from war zones - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2184,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold slips on profit-taking after rally to over three-month peak - Reuters",
+      "site": "reuters.com",
+      "bear_score": 1.1387,
+      "tags": [
+        "profit-taking"
+      ]
+    },
+    {
+      "title": "TSX futures slip as bond yields rise on Mideast uncertainty - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.0772,
+      "tags": [
+        "yields rise"
+      ]
+    },
+    {
+      "title": "US yields rise amid Iran worries, broader selloff - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.0797,
+      "tags": [
+        "iran",
+        "yields rise"
+      ]
+    }
+  ],
+  "error": null
+}

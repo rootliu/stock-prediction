@@ -1,0 +1,79 @@
+{
+  "snapshot_date": "2026-08-26",
+  "snapshot_time_utc": "2026-08-26T11:00:51.936751+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9867,
+    "news_bear_score": 0.3948,
+    "blog_bull_score": 0.8664,
+    "blog_bear_score": 0.4183,
+    "article_count": 42,
+    "safe_haven_score": 0.176,
+    "policy_risk_score": 0.7206,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.1378,
+    "usd_pressure_score": 0.0193,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.7781,
+    "geo_relief_score": 0.2449
+  },
+  "article_count": 42,
+  "top_bull": [
+    {
+      "title": "US-Iran war spurs Europe, Asia to boost renewables - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2298,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US-Iran war sinks into energy trench warfare six months on - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1919,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Some oil companies to avoid ships on Iran blacklist, sources say - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1752,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold edges higher as yields fall, silver slips on profit-taking - Kitco PM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.416,
+      "tags": [
+        "profit-taking"
+      ]
+    },
+    {
+      "title": "US-Iran agree ceasefire deal, sinks Oil – RIA Novosti - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.5098,
+      "tags": [
+        "iran",
+        "ceasefire",
+        "deal"
+      ]
+    },
+    {
+      "title": "Oil prices shed nearly 5% after report U.S. and Iran reach ceasefire agreement - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.3857,
+      "tags": [
+        "iran",
+        "ceasefire"
+      ]
+    }
+  ],
+  "error": null
+}

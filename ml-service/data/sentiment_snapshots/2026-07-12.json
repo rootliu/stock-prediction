@@ -1,0 +1,26 @@
+{
+  "snapshot_date": "2026-07-12",
+  "snapshot_time_utc": "2026-07-12T11:03:16.599809+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.0,
+    "news_bear_score": 0.0,
+    "blog_bull_score": 0.0,
+    "blog_bear_score": 0.0,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 0.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.0,
+    "geo_relief_score": 0.0,
+    "article_count": 0
+  },
+  "article_count": 0,
+  "top_bull": [],
+  "top_bear": [],
+  "error": null
+}

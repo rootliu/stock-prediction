@@ -1,0 +1,79 @@
+{
+  "snapshot_date": "2026-07-31",
+  "snapshot_time_utc": "2026-07-31T11:00:13.456230+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9853,
+    "news_bear_score": 0.1302,
+    "blog_bull_score": 0.8682,
+    "blog_bear_score": 0.2695,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.475,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.2682,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.154,
+    "policy_relief_score": 0.3412,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "US Strikes Iran Again as Conflict Spreads Across Middle East - Bloomberg",
+      "site": "bloomberg.com",
+      "bull_score": 1.7673,
+      "tags": [
+        "iran",
+        "middle east"
+      ]
+    },
+    {
+      "title": "CNBC Daily Open: Potential Iran tariffs, data centers and tech comments - CNBC",
+      "site": "cnbc.com",
+      "bull_score": 1.492,
+      "tags": [
+        "tariff",
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump says sanctions bill should include tariffs on Iran, despite 'trivial' trade with U.S. - CNBC",
+      "site": "cnbc.com",
+      "bull_score": 1.3944,
+      "tags": [
+        "tariff",
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Turkey Sees Ongoing Oil Flow From Iraq as Pipeline Talks Proceed - Bloomberg",
+      "site": "bloomberg.com",
+      "bear_score": 0.3988,
+      "tags": [
+        "talks"
+      ]
+    },
+    {
+      "title": "Gold holds above $4,100 as softer PCE offsets hawkish Fed - Kitco PM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.3426,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Fed’s ‘hawkish hold’ stabilizes gold and silver, but likely leaves markets in limbo until September – Experts - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.3362,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

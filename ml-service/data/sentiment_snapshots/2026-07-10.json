@@ -1,0 +1,78 @@
+{
+  "snapshot_date": "2026-07-10",
+  "snapshot_time_utc": "2026-07-10T11:00:20.686030+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9866,
+    "news_bear_score": 0.3674,
+    "blog_bull_score": 0.8371,
+    "blog_bear_score": 0.5131,
+    "article_count": 44,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.2237,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.4545,
+    "oil_shock_score": 0.0388,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.4477,
+    "geo_relief_score": 0.4863
+  },
+  "article_count": 44,
+  "top_bull": [
+    {
+      "title": "US-Iran escalation could threaten 2027 oil market surplus, IEA says - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2309,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Gold set for weekly loss as US-Iran tensions fuel rate-hike fears - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.153,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump’s Iran Truce in Limbo After Renewed Strikes and Sanctions - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.0489,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Australian Dollar edges higher to near 0.6950 on RBA hawkish rhetoric - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3527,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "HSBC lowers 2026-27 gold price forecasts on hawkish Fed tilt - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.3232,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "U.S. to continue 'technical talks' with Iran after Trump said ceasefire was 'over' - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 1.0714,
+      "tags": [
+        "iran",
+        "ceasefire",
+        "talks"
+      ]
+    }
+  ],
+  "error": null
+}

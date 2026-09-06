@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-08-02",
+  "snapshot_time_utc": "2026-08-02T11:00:12.722617+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9469,
+    "news_bear_score": 0.2401,
+    "blog_bull_score": 0.723,
+    "blog_bear_score": 0.4811,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0973,
+    "geo_risk_score": 0.9998,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.5503,
+    "oil_shock_score": 0.0261,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.5731,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Saudi Prince Concerned Over Trump’s Iran Strike Plan: Axios - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.057,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US Strikes Iran Again as Conflict Spreads Across Middle East - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 0.998,
+      "tags": [
+        "iran",
+        "middle east"
+      ]
+    },
+    {
+      "title": "Kuwait Intercepts Iranian Drones as Trump Weighs Fresh Strikes - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 0.9223,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Turkey Said to Extend Iraq Oil Pipeline Deal by One Year - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 0.3354,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Gold has value at $4,000 as investors look beyond Fed hawkishness - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.253,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Forecasting the upcoming week: US labor market takes center stage after hawkish Fed split - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.2462,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

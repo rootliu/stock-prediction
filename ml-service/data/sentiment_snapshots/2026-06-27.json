@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-06-27",
+  "snapshot_time_utc": "2026-06-27T11:00:16.659536+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9845,
+    "news_bear_score": 0.4223,
+    "blog_bull_score": 0.693,
+    "blog_bear_score": 0.4498,
+    "article_count": 46,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.5522,
+    "geo_risk_score": 0.9999,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.1788,
+    "rate_pressure_score": 0.407,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.2515,
+    "geo_relief_score": 0.6952
+  },
+  "article_count": 46,
+  "top_bull": [
+    {
+      "title": "Iran says it hits US-linked targets as Bahrain reports drone attack - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2466,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran says it struck US-linked targets in response to US attacks - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.212,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran wait on World Cup progress after late goal disallowed in Egypt draw - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1831,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Bears abound on Wall Street and Main Street as markets digest Fed’s hawkish bias with June payrolls on deck - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.3469,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Gold faces make-or-break week at $4,000 as Fed hawkishness fuels bearish outlook - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.3449,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Gold holds $4,000 as Fed hawkishness offsets renewed Gulf risk - Kitco PM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.2562,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

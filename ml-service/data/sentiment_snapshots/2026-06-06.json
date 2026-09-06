@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-06-06",
+  "snapshot_time_utc": "2026-06-06T11:00:15.609623+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9693,
+    "news_bear_score": 0.2151,
+    "blog_bull_score": 0.7647,
+    "blog_bear_score": 0.47,
+    "article_count": 48,
+    "safe_haven_score": 0.159,
+    "policy_risk_score": 0.1304,
+    "geo_risk_score": 0.9999,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0726,
+    "oil_shock_score": 0.0683,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.6158,
+    "geo_relief_score": 0.2756
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "US attacks Iranian sites after Iran launches drones, in latest Gulf flare-up - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1102,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US strikes Iran radar sites after Iranian drone launch - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0992,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran has launched multiple drones towards the Strait of Hormuz, CNN reports - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0874,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold surges $40 on ceasefire hopes - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.3082,
+      "tags": [
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "Oil snaps three-day win streak after Israel, Lebanon ceasefire eases tensions - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.2856,
+      "tags": [
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "US Dollar: Hawkish Fed pricing supports USD – BBH - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.2182,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

@@ -1,0 +1,80 @@
+{
+  "snapshot_date": "2026-05-29",
+  "snapshot_time_utc": "2026-05-29T11:00:14.862707+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9849,
+    "news_bear_score": 0.8539,
+    "blog_bull_score": 0.8931,
+    "blog_bear_score": 0.4872,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0516,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.0217,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.976,
+    "geo_relief_score": 0.7743
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "US, Iran Agree to 60-Day Truce Renewal Pending Trump Signoff - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.0971,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US military denies claim US aircraft downed near Iran's Bushehr - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0961,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US imposes fresh sanctions on Iran's military oil sales, Treasury says - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0636,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Oil eyes weekly drop on Hormuz deal hopes; AI sends stocks to record highs - Reuters",
+      "site": "reuters.com",
+      "bear_score": 0.4138,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "US, Iran Reach Deal on Extended Ceasefire Pending Trump Approval - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 1.4575,
+      "tags": [
+        "iran",
+        "ceasefire",
+        "deal"
+      ]
+    },
+    {
+      "title": "Oil steadies as market awaits possible US-Iran ceasefire deal - Reuters",
+      "site": "reuters.com",
+      "bear_score": 1.4338,
+      "tags": [
+        "iran",
+        "ceasefire",
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

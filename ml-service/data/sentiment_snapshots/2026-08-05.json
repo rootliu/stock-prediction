@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-08-05",
+  "snapshot_time_utc": "2026-08-05T11:00:19.605306+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9621,
+    "news_bear_score": 0.7021,
+    "blog_bull_score": 0.7542,
+    "blog_bear_score": 0.4832,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 0.9999,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.2791,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.9737,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "US and Iran having 'very good discussions', Trump says - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1803,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Dozens of Idling Iranian Oil Tankers Show US Blockade Is Working - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1644,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Yen drifts after intervention whirlwind; Iran optimism dents dollar - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1311,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Stocks get AI-boost; investors on tenterhooks over Mideast peace talks - Reuters",
+      "site": "reuters.com",
+      "bear_score": 0.5142,
+      "tags": [
+        "talks"
+      ]
+    },
+    {
+      "title": "Oil Holds Two-Day Drop on Signs of Progress Toward Hormuz Deal - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 0.4207,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "EUR/USD Price Forecast: Hawkish ECB bets back fresh upside - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3671,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

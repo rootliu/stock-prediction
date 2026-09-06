@@ -1,0 +1,78 @@
+{
+  "snapshot_date": "2026-05-23",
+  "snapshot_time_utc": "2026-05-23T11:00:14.519674+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9747,
+    "news_bear_score": 0.6563,
+    "blog_bull_score": 0.8553,
+    "blog_bear_score": 0.6391,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.1492,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.064,
+    "rate_pressure_score": 0.291,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.9094,
+    "geo_relief_score": 0.6002
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Three months in, is Trump losing the Iran war? - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1785,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US arms sales to Taiwan unrelated to Iran war, source says - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1661,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Indian retailers raise fuel prices for a third time amid Iran war - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1221,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "S&P 500 Rally Defies Weak Sentiment and Hawkish Fed Signals - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.413,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Iran Peace Deal Push Intensifies as Fragile Ceasefire Holds - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 1.4988,
+      "tags": [
+        "iran",
+        "ceasefire",
+        "deal"
+      ]
+    },
+    {
+      "title": "Gold price slips as Waller’s hawkish comments lift USD - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3197,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

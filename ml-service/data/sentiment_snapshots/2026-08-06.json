@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-08-06",
+  "snapshot_time_utc": "2026-08-06T11:00:22.313012+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9779,
+    "news_bear_score": 0.6167,
+    "blog_bull_score": 0.8312,
+    "blog_bear_score": 0.4114,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.8935,
+    "geo_risk_score": 0.9997,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.1187,
+    "rate_pressure_score": 0.2231,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.9463,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Trump Trade War Puts Indonesia’s Batam on Global Factory Map - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1365,
+      "tags": [
+        "trade war"
+      ]
+    },
+    {
+      "title": "European stocks rise on earnings optimism as traders weigh Iran proposals - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.129,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "The Iran War Revealed China Has a New Oil Weapon - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1059,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Oil prices little changed on negotiations to manage ship traffic in Strait of Hormuz - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.4149,
+      "tags": [
+        "negotiation"
+      ]
+    },
+    {
+      "title": "Gold tops $4,200 on softer US labour data as Fed outlook turns less hawkish - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3051,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "InPlay Oil Buys Oil-and-Gas Producer in $38.6 Million Deal - MarketWatch",
+      "site": "marketwatch.com",
+      "bear_score": 0.2585,
+      "tags": [
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

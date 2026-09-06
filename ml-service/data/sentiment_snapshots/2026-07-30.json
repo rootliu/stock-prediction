@@ -1,0 +1,78 @@
+{
+  "snapshot_date": "2026-07-30",
+  "snapshot_time_utc": "2026-07-30T11:00:13.677486+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9879,
+    "news_bear_score": 0.3119,
+    "blog_bull_score": 0.884,
+    "blog_bear_score": 0.3978,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.3349,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.025,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.6319,
+    "oil_shock_score": 0.3049,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.2368,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "US Strikes Iran Again as Conflict Widens Across Middle East - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 2.2456,
+      "tags": [
+        "iran",
+        "middle east"
+      ]
+    },
+    {
+      "title": "Oil rises for second straight day as US resumes attacks on Iran - reuters.com",
+      "site": "reuters.com",
+      "bull_score": 1.4222,
+      "tags": [
+        "iran",
+        "oil rises"
+      ]
+    },
+    {
+      "title": "US military says it hit dozens of Iran's IRGC targets - reuters.com",
+      "site": "reuters.com",
+      "bull_score": 1.199,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Fed's 'hawkish hold' muddies path for stocks and bonds - reuters.com",
+      "site": "reuters.com",
+      "bear_score": 0.9674,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Euro rises despite Fed hawkish hold, eyes on Warsh’s speech - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.32,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Gold surges after Fed holds as hawkish dissent fuels volatility - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3196,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-08-27",
+  "snapshot_time_utc": "2026-08-27T11:01:04.007750+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9675,
+    "news_bear_score": 0.285,
+    "blog_bull_score": 0.6004,
+    "blog_bear_score": 0.2709,
+    "article_count": 36,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.8373,
+    "geo_risk_score": 0.9989,
+    "sell_the_news_score": 0.124,
+    "usd_pressure_score": 0.174,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.5758,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 36,
+  "top_bull": [
+    {
+      "title": "OPEC+ loses oil market sway in Iran war as China gains influence - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2096,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Six consequences of six months of war in Iran - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1792,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Six months of war: How the Middle East conflict has shaped financial markets - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1058,
+      "tags": [
+        "middle east"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Dollar rises as PCE, GDP data keeps traders on edge about Fed rate outlook - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.5272,
+      "tags": [
+        "dollar rises"
+      ]
+    },
+    {
+      "title": "Oil Edges Lower as Traders Weigh Hormuz Talks and Russia Risk - Bloomberg",
+      "site": "bloomberg.com",
+      "bear_score": 0.5099,
+      "tags": [
+        "talks"
+      ]
+    },
+    {
+      "title": "Gold edges higher as yields fall, silver slips on profit-taking - Kitco PM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.374,
+      "tags": [
+        "profit-taking"
+      ]
+    }
+  ],
+  "error": null
+}

@@ -1,0 +1,80 @@
+{
+  "snapshot_date": "2026-07-11",
+  "snapshot_time_utc": "2026-07-11T11:01:16.625520+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9536,
+    "news_bear_score": 0.2334,
+    "blog_bull_score": 0.8036,
+    "blog_bear_score": 0.4742,
+    "article_count": 39,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.2751,
+    "geo_risk_score": 0.9999,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.2554,
+    "oil_shock_score": 0.0291,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.2797,
+    "geo_relief_score": 0.5348
+  },
+  "article_count": 39,
+  "top_bull": [
+    {
+      "title": "Iran oil stuck at sea surges as China's teapots turn to rival Middle East supplies, traders say - Reuters",
+      "site": "reuters.com",
+      "bull_score": 2.0093,
+      "tags": [
+        "iran",
+        "middle east"
+      ]
+    },
+    {
+      "title": "Fed report cites 'stepped-up' inflation due to tariffs, Iran war, AI buildout - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.9378,
+      "tags": [
+        "tariff",
+        "iran"
+      ]
+    },
+    {
+      "title": "U.S. seeks Iranian pledge to free up Strait of Hormuz - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1745,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Crude Oil fades another war spike as the ceasefire dies its daily death - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3506,
+      "tags": [
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "HSBC lowers 2026-27 gold price forecasts on hawkish Fed tilt - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.2429,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Trump says U.S. to continue talks with Iran despite scrapped ceasefire - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.8052,
+      "tags": [
+        "iran",
+        "ceasefire",
+        "talks"
+      ]
+    }
+  ],
+  "error": null
+}

@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-07-21",
+  "snapshot_time_utc": "2026-07-21T11:00:15.298066+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9855,
+    "news_bear_score": 0.467,
+    "blog_bull_score": 0.8862,
+    "blog_bear_score": 0.2647,
+    "article_count": 47,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.7064,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.1091,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.2298,
+    "geo_relief_score": 0.7741
+  },
+  "article_count": 47,
+  "top_bull": [
+    {
+      "title": "US Vows Fresh 50% Tariff on Canada as New Trade War Looms - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 2.0345,
+      "tags": [
+        "tariff",
+        "trade war"
+      ]
+    },
+    {
+      "title": "Iranian forces target Bahrain and Kuwait after US hits Iran's south - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2541,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Gold rises 1% as hopes for US-Iran diplomacy pause oil rally - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1657,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Lionheart Closes In on $400 Million Venezuela Oil Field Deal - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 0.3586,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "You are missing the bond deal of the decade — and it is guaranteed to beat inflation - MarketWatch",
+      "site": "marketwatch.com",
+      "bear_score": 0.1567,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Gold breaks $4,000 as yields rise, Fed-rate relief fades - Kitco PM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.147,
+      "tags": [
+        "yields rise"
+      ]
+    }
+  ],
+  "error": null
+}

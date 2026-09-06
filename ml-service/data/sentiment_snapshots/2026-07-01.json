@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-07-01",
+  "snapshot_time_utc": "2026-07-01T11:00:20.951844+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.977,
+    "news_bear_score": 0.6172,
+    "blog_bull_score": 0.8166,
+    "blog_bear_score": 0.4394,
+    "article_count": 45,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.4525,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.4415,
+    "oil_shock_score": 0.0441,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.9164,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 45,
+  "top_bull": [
+    {
+      "title": "The next Iran war may come sooner than you think - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2389,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "S&P 500, Nasdaq register best quarter since 2020 despite Iran war - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0903,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran War Delivers Massive Swings in Chinese Petrochemicals Trade - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.07,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold set for worst quarterly loss in 13 years on hawkish Fed stance - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.4996,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "U.S. Treasury yields edge higher as investors await Fed Chair Warsh’s talks in Europe - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.3909,
+      "tags": [
+        "talks"
+      ]
+    },
+    {
+      "title": "Australian Dollar advances as hawkish RBA Minutes meet firmer US confidence data - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3132,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

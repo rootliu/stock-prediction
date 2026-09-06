@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-08-03",
+  "snapshot_time_utc": "2026-08-03T11:00:16.105631+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9673,
+    "news_bear_score": 0.6599,
+    "blog_bull_score": 0.851,
+    "blog_bear_score": 0.5916,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.2908,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.9754,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "How Iran is widening its pressure campaign to force US concessions - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.249,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran war ushers in oil refining golden era. It won’t last - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1921,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "U.S. Treasury yields fall as oil prices plunge on Iran de-escalation hopes - CNBC",
+      "site": "cnbc.com",
+      "bull_score": 0.8548,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold gains as US dollar declines, hopes of Mideast deal hit oil - Reuters",
+      "site": "reuters.com",
+      "bear_score": 0.4068,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Turkey Said to Extend Iraq Oil Pipeline Deal by One Year - bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 0.2521,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Gold has value at $4,000 as investors look beyond Fed hawkishness - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.1901,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-06-19",
+  "snapshot_time_utc": "2026-06-19T11:00:15.266695+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9829,
+    "news_bear_score": 0.8926,
+    "blog_bull_score": 0.6795,
+    "blog_bear_score": 0.8861,
+    "article_count": 48,
+    "safe_haven_score": 0.066,
+    "policy_risk_score": 0.1924,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0453,
+    "rate_pressure_score": 0.9568,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.9888,
+    "geo_relief_score": 0.2389
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Brent heading for over 8% weekly loss as traders weigh US-Iran truce outlook - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.235,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "EXCLUSIVE: Iran's Revolutionary Guards set up covert Iraqi cells to attack Gulf neighbors, sources say - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1926,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Abu Dhabi’s $1 Trillion Man Emerges as Iran Troubleshooter - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 0.9377,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Currency Traders Pile Into Dollar Call Options After Hawkish Fed - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 0.9329,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Hawkish Fed signals send gold to third straight weekly loss - Reuters",
+      "site": "reuters.com",
+      "bear_score": 0.9212,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "US Dollar Index: Breakout fuelled by hawkish Fed repricing – Societe Generale - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3798,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

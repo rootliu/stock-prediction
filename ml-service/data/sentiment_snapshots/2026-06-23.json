@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-06-23",
+  "snapshot_time_utc": "2026-06-23T11:00:30.887257+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9699,
+    "news_bear_score": 0.5891,
+    "blog_bull_score": 0.8691,
+    "blog_bear_score": 0.6476,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.754,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.885,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Can Pakistan's peacekeeping role in Iran war give it an economic dividend? - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2148,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Undoing the 'tangled nest' of Iran sanctions won't be easy or quick - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1806,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Rubio faces tough task of selling Iran reset to wary Gulf allies - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1806,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold slides nearly 2% as hawkish Fed bets lift dollar to one-year peak - Reuters",
+      "site": "reuters.com",
+      "bear_score": 0.9245,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Silver Price Forecast: XAG/USD slips to near $64.50 due to hawkish Fed stance - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3496,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "SpaceX Inks Multibillion-Dollar Computing Deal With Reflection AI - Bloomberg",
+      "site": "bloomberg.com",
+      "bear_score": 0.3448,
+      "tags": [
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

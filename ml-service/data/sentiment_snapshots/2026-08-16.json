@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-08-16",
+  "snapshot_time_utc": "2026-08-16T11:00:17.208661+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9336,
+    "news_bear_score": 0.103,
+    "blog_bull_score": 0.6572,
+    "blog_bear_score": 0.2864,
+    "article_count": 41,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.048,
+    "geo_risk_score": 0.9996,
+    "sell_the_news_score": 0.1603,
+    "usd_pressure_score": 0.049,
+    "rate_pressure_score": 0.0505,
+    "oil_shock_score": 0.0456,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.3425,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 41,
+  "top_bull": [
+    {
+      "title": "Explainer: Trump wants more economic pressure on Iran. What are his options? - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2509,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran disputes Qatar, Kuwait accounts of captured Iranian personnel - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2274,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "What Bessent’s Economic Isolation Of Iran Could Look Like - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 0.9304,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "$4,300 tested as Gold is down on profit-taking, but not out - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.2453,
+      "tags": [
+        "profit-taking"
+      ]
+    },
+    {
+      "title": "Gold retreats on profit-taking after hitting two-month peak following inflation data - kitco.com",
+      "site": "kitco.com",
+      "bear_score": 0.2399,
+      "tags": [
+        "profit-taking"
+      ]
+    },
+    {
+      "title": "Silver Price Forecast: XAG/USD wobbles around $65.40, easing hawkish Fed bets strengthen outlook - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.1516,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

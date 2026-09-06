@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-06-21",
+  "snapshot_time_utc": "2026-06-21T11:00:14.426119+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9749,
+    "news_bear_score": 0.7107,
+    "blog_bull_score": 0.7451,
+    "blog_bear_score": 0.7552,
+    "article_count": 48,
+    "safe_haven_score": 0.0373,
+    "policy_risk_score": 0.1096,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0256,
+    "rate_pressure_score": 0.57,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.9381,
+    "geo_relief_score": 0.6174
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Iran coach questions inconsistency as preparation for Belgium match cut short - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1549,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "U.S. defends Iran World Cup travel restrictions, says discussions ongoing - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0844,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Paris police arrest 20 as demonstrators defy ban on Iran opposition rally - Reuters",
+      "site": "reuters.com",
+      "bull_score": 0.9825,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Hawkish Fed keeps pressure on gold as physical premiums soften - Kitco PM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.2535,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Gold's bull market remains intact even with a hawkish Fed, says Axel Merk - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.2453,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Gold: Fed hawkishness and Dollar strength weigh on prices – UOB - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.2204,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

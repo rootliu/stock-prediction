@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-06-22",
+  "snapshot_time_utc": "2026-06-22T11:00:12.119462+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9823,
+    "news_bear_score": 0.7176,
+    "blog_bull_score": 0.8411,
+    "blog_bear_score": 0.7019,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.2526,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.6997,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.9705,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Treasuries Decline as Trump’s Iran Threats Stoke Inflation Fears - Bloomberg",
+      "site": "bloomberg.com",
+      "bull_score": 1.1893,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran leave note of thanks in LA locker room after draw with Belgium - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1678,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iranian Crude Oil Flows Via Hormuz Surge as More Ships Transit - Bloomberg",
+      "site": "bloomberg.com",
+      "bull_score": 1.165,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Treasury yields rise ahead of key inflation data; markets resume trading after public holiday - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.9448,
+      "tags": [
+        "yields rise"
+      ]
+    },
+    {
+      "title": "US Dollar Index Price Forecast: Heading towards 102.00 as hawkish Fed bets intensify - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3729,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Hawkish Fed keeps pressure on gold as physical premiums soften - Kitco PM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.1905,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

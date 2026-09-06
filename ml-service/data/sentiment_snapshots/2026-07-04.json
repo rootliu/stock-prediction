@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-07-04",
+  "snapshot_time_utc": "2026-07-04T11:00:14.576240+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.936,
+    "news_bear_score": 0.1997,
+    "blog_bull_score": 0.5961,
+    "blog_bear_score": 0.2174,
+    "article_count": 39,
+    "safe_haven_score": 0.2956,
+    "policy_risk_score": 0.123,
+    "geo_risk_score": 0.9991,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0828,
+    "rate_pressure_score": 0.3573,
+    "oil_shock_score": 0.0187,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.3032,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 39,
+  "top_bull": [
+    {
+      "title": "'Let us wail!' Iranians flock to Khamenei's funeral after wartime death - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2619,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Energy-Hungry Asia Is Already Drawing Lessons From Iran Crisis - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.0542,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "EXCLUSIVE: Iran exploring oil sales to Japan, buyers seek longer sanctions waiver, sources say - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0209,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Asian Landlords Are Ready for a Hawkish Fed - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 0.6108,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Gamer trades in $1,000 of physical discs at GameStop, days after Sony announces end of disc era - MarketWatch",
+      "site": "marketwatch.com",
+      "bear_score": 0.2187,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Oil prices edge lower ahead of U.S. holiday weekend with Mideast talks in focus - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.2122,
+      "tags": [
+        "talks"
+      ]
+    }
+  ],
+  "error": null
+}

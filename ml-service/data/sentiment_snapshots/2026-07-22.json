@@ -1,0 +1,78 @@
+{
+  "snapshot_date": "2026-07-22",
+  "snapshot_time_utc": "2026-07-22T11:00:15.948688+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9897,
+    "news_bear_score": 0.2099,
+    "blog_bull_score": 0.8881,
+    "blog_bear_score": 0.1191,
+    "article_count": 46,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.9282,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0574,
+    "oil_shock_score": 0.0922,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.2842,
+    "geo_relief_score": 0.1787
+  },
+  "article_count": 46,
+  "top_bull": [
+    {
+      "title": "CNBC Daily Open: AI race, potential tariffs and Middle East conflict continue to heat up - CNBC",
+      "site": "cnbc.com",
+      "bull_score": 1.4179,
+      "tags": [
+        "tariff",
+        "middle east"
+      ]
+    },
+    {
+      "title": "Iran War Latest: Key Oil Chokepoints in Mideast Face Disruption as Threats Mount - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1796,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Rubio says US still willing to negotiate over Iran crisis - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1549,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold breaks $4,000 as yields rise, Fed-rate relief fades - Kitco PM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.1105,
+      "tags": [
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Fed won’t hike but hold, Warsh may have started too hawkish, and U.S. policy is driving sovereign gold demand – Natixis’ Christopher Hodge - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.0617,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Crude Oil Slumps As Iran Leaves Door Open For Talks Despite Recent U.S. Strikes - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.0411,
+      "tags": [
+        "iran",
+        "talks"
+      ]
+    }
+  ],
+  "error": null
+}

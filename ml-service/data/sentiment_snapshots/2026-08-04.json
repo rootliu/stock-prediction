@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-08-04",
+  "snapshot_time_utc": "2026-08-04T11:00:14.657940+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9855,
+    "news_bear_score": 0.7004,
+    "blog_bull_score": 0.9042,
+    "blog_bear_score": 0.5816,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.3102,
+    "oil_shock_score": 0.23,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.9736,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "BP's quarterly profit doubles to over $5 billion after Iran war oil surge - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.7367,
+      "tags": [
+        "iran",
+        "oil surge"
+      ]
+    },
+    {
+      "title": "EXCLUSIVE: US has used 'virtually all' of its long-range precision missiles during Iran war, sources say - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2585,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Aramco Profit Jumps 33% as US-Iran War Boosts Oil Prices - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1307,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Treasury yields are broadly flat as investors mull uncertainty around peace talks - cnbc.com",
+      "site": "cnbc.com",
+      "bear_score": 0.3866,
+      "tags": [
+        "talks"
+      ]
+    },
+    {
+      "title": "US Dollar: Labour data and hawkish risks in focus – Deutsche Bank - fxstreet.com",
+      "site": "fxstreet.com",
+      "bear_score": 0.2968,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Gold has value at $4,000 as investors look beyond Fed hawkishness - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.1429,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

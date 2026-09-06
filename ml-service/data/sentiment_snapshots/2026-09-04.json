@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-09-04",
+  "snapshot_time_utc": "2026-09-04T11:00:21.330566+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9672,
+    "news_bear_score": 0.1145,
+    "blog_bull_score": 0.6314,
+    "blog_bear_score": 0.4331,
+    "article_count": 44,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.4984,
+    "geo_risk_score": 0.9996,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0671,
+    "rate_pressure_score": 0.5283,
+    "oil_shock_score": 0.1101,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.2668,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 44,
+  "top_bull": [
+    {
+      "title": "EXCLUSIVE: US military turns off ad trackers on devices amid Middle East targeting reports - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1448,
+      "tags": [
+        "middle east"
+      ]
+    },
+    {
+      "title": "Oil Heads for Biggest Weekly Gain Since July on Iran War Risks - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1438,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "European Gas Heads for Fourth Weekly Gain as Iran War Drags On - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1381,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold Price Forecast: Tempered hawkish Fed bets lift XAU/USD near $4,500 - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3619,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Carney claps back at Lutnick, says Canada will resume trade talks 'when the Americans are ready' - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.3194,
+      "tags": [
+        "talks"
+      ]
+    },
+    {
+      "title": "Japanese Yen strengthens sharply on hawkish BoJ signals - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3059,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

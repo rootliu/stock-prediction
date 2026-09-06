@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-06-15",
+  "snapshot_time_utc": "2026-06-15T11:00:13.189644+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9886,
+    "news_bear_score": 0.7644,
+    "blog_bull_score": 0.9357,
+    "blog_bear_score": 0.498,
+    "article_count": 48,
+    "safe_haven_score": 0.2044,
+    "policy_risk_score": 0.2587,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.9917,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "What the US and Iran say they have agreed in the memorandum to end the war - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2554,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran, US agree to halt war and reopen Hormuz, sending oil prices tumbling - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1839,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump veers toward exit in Iran war but risks loom - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1322,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Shipowners Seek Clarity on Hormuz Deal as 600 Vessels Eye Exit - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 0.4248,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Gold gets no boost from geopolitical conflict, Russia makes outsized precious metals output claims for 2026 – Heraeus - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.0,
+      "tags": [
+        "geopolitical"
+      ]
+    },
+    {
+      "title": "Gold holds near $4,330 as oil pares Iran-Israel risk premium - Kitco PM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.0,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "error": null
+}

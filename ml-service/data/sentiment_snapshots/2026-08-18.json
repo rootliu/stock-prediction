@@ -1,0 +1,78 @@
+{
+  "snapshot_date": "2026-08-18",
+  "snapshot_time_utc": "2026-08-18T11:00:17.153883+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9876,
+    "news_bear_score": 0.7377,
+    "blog_bull_score": 0.8784,
+    "blog_bear_score": 0.5959,
+    "article_count": 42,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.1768,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0451,
+    "usd_pressure_score": 0.2583,
+    "rate_pressure_score": 0.8404,
+    "oil_shock_score": 0.1526,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.4271,
+    "geo_relief_score": 0.6178
+  },
+  "article_count": 42,
+  "top_bull": [
+    {
+      "title": "Trump Takes Hard Line on Iran as Hormuz Standoff Drags On - Bloomberg",
+      "site": "bloomberg.com",
+      "bull_score": 1.1521,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Tanker Stops in Hormuz as Iran Raises Efforts to Control Strait - Bloomberg",
+      "site": "bloomberg.com",
+      "bull_score": 1.1498,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Dollar feeble as rate hike bets dwindle, Iran conflict in focus - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1344,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Utilities Down as Treasury Yields Rise - Utilities Roundup - MarketWatch",
+      "site": "marketwatch.com",
+      "bear_score": 0.8634,
+      "tags": [
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Bond yields rise, oil extends gains as US-Iran ceasefire expires By Reuters - Investing.com",
+      "site": "investing.com",
+      "bear_score": 1.207,
+      "tags": [
+        "iran",
+        "ceasefire",
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Japanese Yen remains near two-week low against US Dollar despite hawkish BoJ bets - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.357,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

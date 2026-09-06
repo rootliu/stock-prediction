@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-08-11",
+  "snapshot_time_utc": "2026-08-11T11:00:57.627030+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9457,
+    "news_bear_score": 0.2411,
+    "blog_bull_score": 0.8284,
+    "blog_bear_score": 0.3618,
+    "article_count": 39,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 0.9999,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0484,
+    "oil_shock_score": 0.079,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.7143,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 39,
+  "top_bull": [
+    {
+      "title": "Oil climbs 2%, extending gains on dimming U.S.-Iran peace hopes - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.254,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump boarded secret Turkey flight via catering truck due to Iran threat – media - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.241,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US-Iran standoff sends oil up, dents stocks - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1322,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Archer strikes deal with Boeing in latest bid to transform aviation through AI - MarketWatch",
+      "site": "marketwatch.com",
+      "bear_score": 0.2943,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Oil Extends Gains as Hormuz Deal Remains Elusive: Markets Wrap - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 0.2819,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Oil prices upbeat after sharp gains on waning Hormuz deal hopes - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.2061,
+      "tags": [
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

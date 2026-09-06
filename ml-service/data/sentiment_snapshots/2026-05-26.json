@@ -1,0 +1,78 @@
+{
+  "snapshot_date": "2026-05-26",
+  "snapshot_time_utc": "2026-05-26T11:00:17.615009+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9892,
+    "news_bear_score": 0.792,
+    "blog_bull_score": 0.8704,
+    "blog_bear_score": 0.6268,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0272,
+    "rate_pressure_score": 0.1247,
+    "oil_shock_score": 0.1524,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.9816,
+    "geo_relief_score": 0.4929
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Gold falls as renewed US-Iran tensions dampen peace hopes, clouds interest rate outlook - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2449,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "European stocks falter, oil rises, as US strikes Iran - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.4335,
+      "tags": [
+        "iran",
+        "oil rises"
+      ]
+    },
+    {
+      "title": "Iran War Boosts $10 Billion Kazakh Rail Plan Linking EU to China - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1056,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Oil rises, stocks mixed as new US strikes dampen peace deal optimism By Reuters - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.3071,
+      "tags": [
+        "oil rises",
+        "deal"
+      ]
+    },
+    {
+      "title": "Gold price rallies as Hormuz deal bets batter the US Dollar - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.144,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Gold and silver rally as Hormuz deal hopes sink oil - Kitco AM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.1434,
+      "tags": [
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

@@ -1,0 +1,78 @@
+{
+  "snapshot_date": "2026-08-23",
+  "snapshot_time_utc": "2026-08-23T11:00:53.047435+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9697,
+    "news_bear_score": 0.3794,
+    "blog_bull_score": 0.7125,
+    "blog_bear_score": 0.2676,
+    "article_count": 43,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.9749,
+    "geo_risk_score": 0.9957,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0456,
+    "rate_pressure_score": 0.2516,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.7199,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 43,
+  "top_bull": [
+    {
+      "title": "Iran says Pakistan's army chief to visit Tehran on Monday - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2475,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Two US tanker aircraft leave Bulgaria a month after deployment upset Iran - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.006,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "U.S., Canada fail to reach a tariff deal, deepening trade war - CNBC",
+      "site": "cnbc.com",
+      "bull_score": 1.2238,
+      "tags": [
+        "tariff",
+        "trade war",
+        "deal"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Euro gains on hawkish ECB outlook despite firm US Dollar - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.1967,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "TSX futures slip as bond yields rise on Mideast uncertainty - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.1366,
+      "tags": [
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Gold rallies as buyback sinks yields despite Fed hawkish minutes - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.136,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

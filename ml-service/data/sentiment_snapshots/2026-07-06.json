@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-07-06",
+  "snapshot_time_utc": "2026-07-06T11:00:25.386835+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9458,
+    "news_bear_score": 0.0499,
+    "blog_bull_score": 0.6089,
+    "blog_bear_score": 0.11,
+    "article_count": 35,
+    "safe_haven_score": 0.1704,
+    "policy_risk_score": 0.1452,
+    "geo_risk_score": 0.9995,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.063,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.182,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 35,
+  "top_bull": [
+    {
+      "title": "Iranian mourners call for vengeance on Trump during Khamenei funeral procession - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2548,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "World absorbs historic Iran war oil supply loss, but depleted stocks bring risks - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2177,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Alternative-fuel vehicles hit record market share in June after Iran war - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1585,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gamer trades in $1,000 of physical discs at GameStop, days after Sony announces end of disc era - MarketWatch",
+      "site": "marketwatch.com",
+      "bear_score": 0.218,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Silver Price Forecast: XAG/USD rises above $60.00 amid less hawkish Fed tone - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.1142,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Australian Dollar advances as hawkish RBA Minutes meet firmer US confidence data - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.0751,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

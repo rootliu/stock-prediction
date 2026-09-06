@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-07-14",
+  "snapshot_time_utc": "2026-07-14T11:00:13.927619+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9803,
+    "news_bear_score": 0.2982,
+    "blog_bull_score": 0.8954,
+    "blog_bear_score": 0.2311,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.2004,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.4316,
+    "oil_shock_score": 0.2454,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.0,
+    "geo_relief_score": 0.3002
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Wall St futures mixed ahead of CPI, bank earnings; US-Iran tensions in focus - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2426,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US-Iran Truce Collapses as Attacks Worsen and Blockade Returns - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1775,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran Sneaking Out Tankers Via Hormuz as Trump Amps Up Threats - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1578,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Treasury yields rise as Fed rate hike expectations grow ahead of June inflation print - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.9334,
+      "tags": [
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Treasury Two-Year Yields Rise to Highest Since 2025 as Oil Jumps - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.4366,
+      "tags": [
+        "oil jumps",
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Crude Oil fades another war spike as the ceasefire dies its daily death - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.1488,
+      "tags": [
+        "ceasefire"
+      ]
+    }
+  ],
+  "error": null
+}

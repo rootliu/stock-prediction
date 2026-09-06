@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-05-25",
+  "snapshot_time_utc": "2026-05-25T11:00:14.537556+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9774,
+    "news_bear_score": 0.6637,
+    "blog_bull_score": 0.9051,
+    "blog_bear_score": 0.447,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0362,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.9759,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Iran and US play down hopes for imminent breakthrough in war - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1848,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Gold climbs as Middle East peace hopes push oil and dollar lower - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1372,
+      "tags": [
+        "middle east"
+      ]
+    },
+    {
+      "title": "Bond Strategists Warn Yields to Stay High Even If Iran War Ends - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.0356,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Dollar drifts lower as oil falls on Hormuz deal optimism - Reuters",
+      "site": "reuters.com",
+      "bear_score": 0.4057,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Dollar slumps as signs of deal to reopen Hormuz spur risk appetite - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.2844,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Dollar rises to six-week high on rate hike bets and war uncertainty - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.1086,
+      "tags": [
+        "dollar rises"
+      ]
+    }
+  ],
+  "error": null
+}

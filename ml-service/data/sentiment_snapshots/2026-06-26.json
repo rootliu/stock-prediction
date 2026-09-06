@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-06-26",
+  "snapshot_time_utc": "2026-06-26T11:00:13.846643+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9533,
+    "news_bear_score": 0.3522,
+    "blog_bull_score": 0.655,
+    "blog_bear_score": 0.3888,
+    "article_count": 45,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 0.9998,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.4121,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.6884,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 45,
+  "top_bull": [
+    {
+      "title": "Vance, Rubio strike different tone on Iran and Israel - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1787,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran fired on cargo ship, US officials tell Reuters - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0438,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Crude shipments through Hormuz at highest since Iran war began - Reuters",
+      "site": "reuters.com",
+      "bull_score": 0.9708,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold holds $4,000 as Fed hawkishness offsets renewed Gulf risk - Kitco PM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.3546,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "UN agency pauses Hormuz ship evacuation plan after first vessel attack under peace deal - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.2879,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "BMO cuts gold price forecast as Fed’s hawkish shift weighs on precious metals - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.1853,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

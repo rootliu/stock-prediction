@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-08-20",
+  "snapshot_time_utc": "2026-08-20T11:01:54.180531+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.8852,
+    "news_bear_score": 0.0647,
+    "blog_bull_score": 0.7678,
+    "blog_bear_score": 0.5518,
+    "article_count": 31,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.1836,
+    "geo_risk_score": 0.9989,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.107,
+    "rate_pressure_score": 0.6157,
+    "oil_shock_score": 0.0379,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.2109,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 31,
+  "top_bull": [
+    {
+      "title": "The Iran war energy crisis is just getting started - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1919,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Hormuz shipping unchanged amid US-Iran stalemate, data shows - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1496,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump warns of economic consequences for any country that supports Iran - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.143,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Fed Minutes Lean Hawkish, but We Don’t Expect a Hike - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.4355,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Why Silver reflects sheer strength despite hawkish FOMC minutes? - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3591,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Euro surges as traders ignore Fed’s hawkish minutes - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3272,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

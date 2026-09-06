@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-09-03",
+  "snapshot_time_utc": "2026-09-03T11:00:23.054127+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.8803,
+    "news_bear_score": 0.1313,
+    "blog_bull_score": 0.6752,
+    "blog_bear_score": 0.5145,
+    "article_count": 32,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0905,
+    "geo_risk_score": 0.9986,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.1878,
+    "rate_pressure_score": 0.5605,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.2807,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 32,
+  "top_bull": [
+    {
+      "title": "Iran war escalation raises concern over civilian death toll - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2266,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Oil falls from recent highs as investors weigh uncertainty over US-Iran strikes - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2235,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran warns US against Israeli attack on south Lebanon ridge held by Hezbollah, sources say - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2104,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Hongkong Land Eyes Billion-Dollar Property Deals to Enter Japan - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 0.4154,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Chevron, Eni Lead Wave of Deals to Lift Venezuela Oil Output - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 0.377,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Sterling today: Pound slips as hawkish Fed outlook lifts dollar broadly - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.3746,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

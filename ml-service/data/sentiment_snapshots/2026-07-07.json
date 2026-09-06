@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-07-07",
+  "snapshot_time_utc": "2026-07-07T11:00:26.992135+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9053,
+    "news_bear_score": 0.3907,
+    "blog_bull_score": 0.7806,
+    "blog_bear_score": 0.1153,
+    "article_count": 37,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.1095,
+    "geo_risk_score": 0.9994,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0352,
+    "rate_pressure_score": 0.0188,
+    "oil_shock_score": 0.103,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.6456,
+    "geo_relief_score": 0.1236
+  },
+  "article_count": 37,
+  "top_bull": [
+    {
+      "title": "Iranian mourners call for vengeance on Trump during Khamenei funeral procession - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0269,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "As Khamenei mourners fill Iran's streets, discontent still simmers - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0045,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Khamenei funeral signals Iran's defiance and new regional order - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0024,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Qatari LNG Ship Struck in Strait of Hormuz, Testing US Talks - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 0.5302,
+      "tags": [
+        "talks"
+      ]
+    },
+    {
+      "title": "Peace Deal Doesn’t Restore Pre-War Situation, ECB’s Schnabel Says - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 0.3508,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "TeraWulf’s stock gains after a $19 billion deal with Anthropic - MarketWatch",
+      "site": "marketwatch.com",
+      "bear_score": 0.2858,
+      "tags": [
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

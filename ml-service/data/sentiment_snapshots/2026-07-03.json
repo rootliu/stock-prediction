@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-07-03",
+  "snapshot_time_utc": "2026-07-03T11:00:15.217441+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9622,
+    "news_bear_score": 0.2575,
+    "blog_bull_score": 0.6044,
+    "blog_bear_score": 0.3681,
+    "article_count": 43,
+    "safe_haven_score": 0.3845,
+    "policy_risk_score": 0.5649,
+    "geo_risk_score": 0.999,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.11,
+    "rate_pressure_score": 0.2492,
+    "oil_shock_score": 0.0249,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.6473,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 43,
+  "top_bull": [
+    {
+      "title": "Iran's slain leader Khamenei laid in state in Tehran for week of mass funeral events - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2628,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Safe havens aren't behaving like they used to. Here's what's changed - CNBC",
+      "site": "cnbc.com",
+      "bull_score": 1.2162,
+      "tags": [
+        "safe haven"
+      ]
+    },
+    {
+      "title": "EU trade with US hits record high despite tariff tensions, study shows - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0909,
+      "tags": [
+        "tariff"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Silver Price Forecast: XAG/USD rises above $60.00 amid less hawkish Fed tone - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.2691,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Gold set for worst quarterly loss in 13 years on hawkish Fed stance - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.1933,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Australian Dollar advances as hawkish RBA Minutes meet firmer US confidence data - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.1769,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-07-16",
+  "snapshot_time_utc": "2026-07-16T11:00:21.001616+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9859,
+    "news_bear_score": 0.219,
+    "blog_bull_score": 0.8754,
+    "blog_bear_score": 0.363,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.6651,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.6756,
+    "oil_shock_score": 0.0566,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.0972,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Iran warns Strait of Hormuz is a 'red line' and will resist until the end - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2589,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran war leaves crisis-weary European airlines ready for a shakeout - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1928,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran-US Skirmishes Worsen as Hormuz Shipping Traffic Dwindles - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1445,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Treasury yields rise as Wall Street awaits key employment data - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.9415,
+      "tags": [
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Gold steadies above $4,000 as PPI cools, yields rise - Kitco AM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.4326,
+      "tags": [
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Why is Silver price down over 1% even as traders scale back hawkish Fed bets? - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3696,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

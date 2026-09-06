@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-06-18",
+  "snapshot_time_utc": "2026-06-18T11:00:14.193026+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9647,
+    "news_bear_score": 0.8579,
+    "blog_bull_score": 0.8835,
+    "blog_bear_score": 0.8191,
+    "article_count": 48,
+    "safe_haven_score": 0.0877,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0602,
+    "rate_pressure_score": 0.9408,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.9718,
+    "geo_relief_score": 0.3275
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "LNG Tanker Heads Toward Hormuz as US-Iran Pact Goes Into Effect - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1207,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump: unfair for Iran to lack ballistic missiles if other countries have them - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0536,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "America’s Loss to Iran Will Unravel Geopolitics - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 0.9736,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold inches up as lower oil prices counter firm dollar, hawkish Fed - Reuters",
+      "site": "reuters.com",
+      "bear_score": 0.9421,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Indian shares pause as oil slide balances out hawkish Fed - Reuters",
+      "site": "reuters.com",
+      "bear_score": 0.9308,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Markets are misreading Fed comments as too hawkish, says Allianz's Mohamed El-Erian - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.6026,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

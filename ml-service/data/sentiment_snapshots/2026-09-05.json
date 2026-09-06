@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-09-05",
+  "snapshot_time_utc": "2026-09-05T11:00:15.301684+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9228,
+    "news_bear_score": 0.3476,
+    "blog_bull_score": 0.4378,
+    "blog_bear_score": 0.6283,
+    "article_count": 43,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.2211,
+    "geo_risk_score": 0.9978,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.1069,
+    "rate_pressure_score": 0.8939,
+    "oil_shock_score": 0.0445,
+    "structural_support_score": 0.1225,
+    "policy_relief_score": 0.1807,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 43,
+  "top_bull": [
+    {
+      "title": "Iranian tanker hit by US attack near Iran's Kharg Island, Tasnim says - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2332,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump says US may hit Iran's Pickaxe Mountain soon - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0606,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US sanctions Turkish bank, two subsidiaries in latest pressure on Iran - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0379,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Wall Street ends lower as solid jobs data fuels hawkish Fed bets - Reuters",
+      "site": "reuters.com",
+      "bear_score": 0.8968,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "2-year yield rises to highest since January 2025 after hot jobs report boosts expectations that the Fed could raise rates - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.6426,
+      "tags": [
+        "yield rises"
+      ]
+    },
+    {
+      "title": "Yields rise, stocks mostly ease after solid U.S. jobs report By Reuters - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.4691,
+      "tags": [
+        "yields rise"
+      ]
+    }
+  ],
+  "error": null
+}

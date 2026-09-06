@@ -1,0 +1,78 @@
+{
+  "snapshot_date": "2026-06-05",
+  "snapshot_time_utc": "2026-06-05T11:00:14.053958+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9729,
+    "news_bear_score": 0.604,
+    "blog_bull_score": 0.901,
+    "blog_bear_score": 0.5091,
+    "article_count": 48,
+    "safe_haven_score": 0.2102,
+    "policy_risk_score": 0.404,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0965,
+    "oil_shock_score": 0.0908,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.8581,
+    "geo_relief_score": 0.609
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Iranian oil exports fall to lowest level in six years, data shows - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.032,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump's latest tariff salvo no fix for global issue of forced labour - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0155,
+      "tags": [
+        "tariff"
+      ]
+    },
+    {
+      "title": "Bitcoin Falls to Pre-Iran Conflict Low as Crypto Slide Extends - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.015,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Oil falls as Lebanon and Israel agree to implement ceasefire - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.5501,
+      "tags": [
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "US Dollar: Hawkish Fed pricing supports USD – BBH - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.2903,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Lebanon ceasefire part of Iran’s initial condition for peace deal, IRGC says - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.5332,
+      "tags": [
+        "iran",
+        "ceasefire",
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

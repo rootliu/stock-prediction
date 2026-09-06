@@ -1,0 +1,78 @@
+{
+  "snapshot_date": "2026-06-29",
+  "snapshot_time_utc": "2026-06-29T11:00:14.937424+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9822,
+    "news_bear_score": 0.3584,
+    "blog_bull_score": 0.8567,
+    "blog_bear_score": 0.5702,
+    "article_count": 46,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0905,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0749,
+    "rate_pressure_score": 0.4743,
+    "oil_shock_score": 0.2504,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.5077,
+    "geo_relief_score": 0.2959
+  },
+  "article_count": 46,
+  "top_bull": [
+    {
+      "title": "Oil prices mixed as fresh U.S.-Iran clashes reignite Middle East supply fears - CNBC",
+      "site": "cnbc.com",
+      "bull_score": 1.4738,
+      "tags": [
+        "iran",
+        "middle east"
+      ]
+    },
+    {
+      "title": "Oil Jumps After Crude Tanker Hit in Latest Middle East Flare-Up - Bloomberg",
+      "site": "bloomberg.com",
+      "bull_score": 1.5993,
+      "tags": [
+        "middle east",
+        "oil jumps"
+      ]
+    },
+    {
+      "title": "Gold Declines as Fresh US-Iran Tension Fans Inflation Concerns - Bloomberg",
+      "site": "bloomberg.com",
+      "bull_score": 1.1869,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Hawkish Fed Throws Down Challenge for Emerging-Market Bond Rally - Bloomberg",
+      "site": "bloomberg.com",
+      "bear_score": 0.9327,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Asia stocks mixed as ceasefire hopes support sentiment; AI names diverge - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.5548,
+      "tags": [
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "Canadian dollar rebounds from 14-month low after US inflation data - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.2252,
+      "tags": [
+        "dollar rebounds"
+      ]
+    }
+  ],
+  "error": null
+}

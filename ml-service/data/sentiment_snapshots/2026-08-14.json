@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-08-14",
+  "snapshot_time_utc": "2026-08-14T11:00:21.845707+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9815,
+    "news_bear_score": 0.3394,
+    "blog_bull_score": 0.6983,
+    "blog_bear_score": 0.3926,
+    "article_count": 43,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.6897,
+    "geo_risk_score": 0.9999,
+    "sell_the_news_score": 0.2741,
+    "usd_pressure_score": 0.1965,
+    "rate_pressure_score": 0.3814,
+    "oil_shock_score": 0.1527,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.2702,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 43,
+  "top_bull": [
+    {
+      "title": "Oil rises after US threatens indefinite blockade of Iran; set for weekly gains - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.4395,
+      "tags": [
+        "iran",
+        "oil rises"
+      ]
+    },
+    {
+      "title": "US to Roll Out ‘Economic Isolation’ Plan for Iran Next Week - Bloomberg",
+      "site": "bloomberg.com",
+      "bull_score": 1.1829,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Hormuz shipping traffic capped amid competing claims from US and Iran - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1611,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Materials Down as U.S. Dollar Rises - Materials Roundup - MarketWatch",
+      "site": "marketwatch.com",
+      "bear_score": 0.5974,
+      "tags": [
+        "dollar rises"
+      ]
+    },
+    {
+      "title": "$4,300 tested as Gold is down on profit-taking, but not out - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.4344,
+      "tags": [
+        "profit-taking"
+      ]
+    },
+    {
+      "title": "Gold retreats on profit-taking after hitting two-month peak following inflation data - kitco.com",
+      "site": "kitco.com",
+      "bear_score": 0.4096,
+      "tags": [
+        "profit-taking"
+      ]
+    }
+  ],
+  "error": null
+}

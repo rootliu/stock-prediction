@@ -1,0 +1,79 @@
+{
+  "snapshot_date": "2026-08-22",
+  "snapshot_time_utc": "2026-08-22T11:00:13.777060+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9708,
+    "news_bear_score": 0.3744,
+    "blog_bull_score": 0.8433,
+    "blog_bear_score": 0.2604,
+    "article_count": 43,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.9096,
+    "geo_risk_score": 0.9995,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0606,
+    "rate_pressure_score": 0.667,
+    "oil_shock_score": 0.0773,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.2778,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 43,
+  "top_bull": [
+    {
+      "title": "U.S., Canada fail to reach a tariff deal, deepen trade war - CNBC",
+      "site": "cnbc.com",
+      "bull_score": 1.6285,
+      "tags": [
+        "tariff",
+        "trade war",
+        "deal"
+      ]
+    },
+    {
+      "title": "Iran grants permission for a number of Iraqi oil tankers to pass through Hormuz - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2307,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "U.S., Iran trade warnings as new sanctions loom and Hormuz oil flows stall - Investing.com",
+      "site": "investing.com",
+      "bull_score": 1.1784,
+      "tags": [
+        "trade war",
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Utilities Down as Treasury Yields Rise - Utilities Roundup - MarketWatch",
+      "site": "marketwatch.com",
+      "bear_score": 0.8661,
+      "tags": [
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Longer-dated Treasury yields rise as Bessent's bond buyback rally fizzles out - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.7012,
+      "tags": [
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Euro gains on hawkish ECB outlook despite firm US Dollar - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.2618,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

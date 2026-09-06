@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-06-07",
+  "snapshot_time_utc": "2026-06-07T11:00:14.546763+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9497,
+    "news_bear_score": 0.1106,
+    "blog_bull_score": 0.6315,
+    "blog_bear_score": 0.4447,
+    "article_count": 48,
+    "safe_haven_score": 0.1199,
+    "policy_risk_score": 0.0982,
+    "geo_risk_score": 0.9997,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0635,
+    "rate_pressure_score": 0.1393,
+    "oil_shock_score": 0.0412,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.4038,
+    "geo_relief_score": 0.1984
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "US eyes Iranian assets for Gulf allies' reconstruction, source says - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0896,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US strikes Iranian sites after Iran launches drones in latest Gulf flare-up - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0866,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US Floats Steering Frozen Iran Assets to Gulf Allies for Repairs - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.0354,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Bitcoin briefly tips $60K, stocks decline as strong labor data fuels hawkish Fed expectations - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.2566,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Gold surges $40 on ceasefire hopes - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.2316,
+      "tags": [
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "Ukraine targets St. Petersburg again after Putin rejects Zelenskyy’s offer for direct talks - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.197,
+      "tags": [
+        "talks"
+      ]
+    }
+  ],
+  "error": null
+}

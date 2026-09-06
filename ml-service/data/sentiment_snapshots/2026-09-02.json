@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-09-02",
+  "snapshot_time_utc": "2026-09-02T11:00:19.419527+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.985,
+    "news_bear_score": 0.1732,
+    "blog_bull_score": 0.7167,
+    "blog_bear_score": 0.5637,
+    "article_count": 44,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.2476,
+    "rate_pressure_score": 0.5583,
+    "oil_shock_score": 0.2477,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.2747,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 44,
+  "top_bull": [
+    {
+      "title": "Trump aides, fearing a midterm rout, push to keep Iran war 'quiet' for now - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2606,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran War Latest: US Attacks Prompt Iranian Retaliation as Fighting Intensifies - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1882,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US pounds Iran, Tehran strikes back at bases in biggest exchange since July - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1457,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Wall Street slides to kick off historically worst month as oil prices, yields rise - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.4571,
+      "tags": [
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Canadian dollar rebounds from two-week low, helped by month-end hedging flows - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.4014,
+      "tags": [
+        "dollar rebounds"
+      ]
+    },
+    {
+      "title": "Gold Price Forecast: Hawkish Fed prospects drag XAU/USD further below $4,300 - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3604,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-08-30",
+  "snapshot_time_utc": "2026-08-30T11:00:15.760520+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.8761,
+    "news_bear_score": 0.4035,
+    "blog_bull_score": 0.5087,
+    "blog_bear_score": 0.6231,
+    "article_count": 45,
+    "safe_haven_score": 0.0566,
+    "policy_risk_score": 0.6153,
+    "geo_risk_score": 0.9902,
+    "sell_the_news_score": 0.2323,
+    "usd_pressure_score": 0.1026,
+    "rate_pressure_score": 0.4025,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.7715,
+    "geo_relief_score": 0.0387
+  },
+  "article_count": 45,
+  "top_bull": [
+    {
+      "title": "Iran's Khamenei urges Gulf rulers in written message to confront 'real enemy' - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.26,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Egypt's Banque Misr reviews US Iran sanctions notice, UAE central bank launches urgent examination - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0377,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Republicans See Trump’s Unceasing Iran War as Midterm Threat - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 0.9968,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Pentagon in Talks With Venezuelan Mogul for Massive Oil Deal - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 0.6262,
+      "tags": [
+        "talks",
+        "deal"
+      ]
+    },
+    {
+      "title": "Stocks fall while dollar, bond yields rise as Warsh prompts rate hike bets By Reuters - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.4845,
+      "tags": [
+        "yields rise"
+      ]
+    },
+    {
+      "title": "Trump’s Oil Deal Riles Both Sides of Venezuelan Political Divide - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 0.396,
+      "tags": [
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

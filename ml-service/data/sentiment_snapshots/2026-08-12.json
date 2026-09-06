@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-08-12",
+  "snapshot_time_utc": "2026-08-12T11:00:23.629145+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9668,
+    "news_bear_score": 0.4,
+    "blog_bull_score": 0.8057,
+    "blog_bear_score": 0.266,
+    "article_count": 43,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 0.9999,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0363,
+    "oil_shock_score": 0.3567,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.73,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 43,
+  "top_bull": [
+    {
+      "title": "Iran to join BRICS development bank soon, central bank governor says - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2234,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump Claims Hormuz Control as US, Iran Harden Their Positions - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1786,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Dollar ticks up on Iran tensions, with US data in focus - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1223,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "An inflation report Wednesday should be a big deal for the Fed. Here's what to expect - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.2632,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Hormuz deadlock: Where oil prices could head next as prospects for an imminent deal fade - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.224,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Investors take profits in gold and silver as oil, yields rise after Hormuz deal doubts - Kitco PM Report - kitco.com",
+      "site": "kitco.com",
+      "bear_score": 0.1455,
+      "tags": [
+        "deal",
+        "yields rise"
+      ]
+    }
+  ],
+  "error": null
+}

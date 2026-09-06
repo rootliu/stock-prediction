@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-08-31",
+  "snapshot_time_utc": "2026-08-31T11:00:27.759825+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9842,
+    "news_bear_score": 0.1624,
+    "blog_bull_score": 0.787,
+    "blog_bear_score": 0.409,
+    "article_count": 44,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.4501,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0332,
+    "usd_pressure_score": 0.0772,
+    "rate_pressure_score": 0.3497,
+    "oil_shock_score": 0.261,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.2552,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 44,
+  "top_bull": [
+    {
+      "title": "U.S. Treasury's Bessent faces G20 diplomacy test amid tariffs, Iran war, bond turmoil - CNBC",
+      "site": "cnbc.com",
+      "bull_score": 1.2955,
+      "tags": [
+        "tariff",
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran dismisses Trump's post of attack on key energy hub of Kharg - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2523,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Stocks cautious on US-Iran escalation, bond yields hit multi-year highs - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2337,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold: Fed hawkishness caps upside – ING - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3762,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Gold declines as hawkish Fed signals lift rate hike expectations - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3692,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Venezuela’s Maduro Resurfaces on Social Media Amid US Oil Deal - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 0.3626,
+      "tags": [
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

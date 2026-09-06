@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-08-08",
+  "snapshot_time_utc": "2026-08-08T11:00:14.870483+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9171,
+    "news_bear_score": 0.5062,
+    "blog_bull_score": 0.6603,
+    "blog_bear_score": 0.4454,
+    "article_count": 47,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.1461,
+    "geo_risk_score": 0.9992,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.3113,
+    "oil_shock_score": 0.0567,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.884,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 47,
+  "top_bull": [
+    {
+      "title": "US sanctions Dubai crypto exchange for aiding Iran's IRGC, following a Reuters report - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.037,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Saudi Arabia, Turkey, Pakistan pledge mutual defence as Middle East turmoil escalates - Reuters",
+      "site": "reuters.com",
+      "bull_score": 0.9895,
+      "tags": [
+        "middle east"
+      ]
+    },
+    {
+      "title": "Brent climbs $1 on uncertainty over end to Iran war - Reuters",
+      "site": "reuters.com",
+      "bull_score": 0.8417,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Investors take profits in gold and silver as oil, yields rise after Hormuz deal doubts - Kitco PM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.4742,
+      "tags": [
+        "deal",
+        "yields rise"
+      ]
+    },
+    {
+      "title": "US expects deal soon on Strait of Hormuz; Sunni powers unite in defense pact - Reuters",
+      "site": "reuters.com",
+      "bear_score": 0.3989,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Yardeni explains why the Fed should be turning more hawkish - Investing.com",
+      "site": "investing.com",
+      "bear_score": 0.3433,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

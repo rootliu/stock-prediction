@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-08-17",
+  "snapshot_time_utc": "2026-08-17T11:00:55.487101+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9467,
+    "news_bear_score": 0.4851,
+    "blog_bull_score": 0.7343,
+    "blog_bear_score": 0.2069,
+    "article_count": 39,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 0.9999,
+    "sell_the_news_score": 0.121,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.2928,
+    "oil_shock_score": 0.0114,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.3808,
+    "geo_relief_score": 0.4685
+  },
+  "article_count": 39,
+  "top_bull": [
+    {
+      "title": "Iran says two French embassy employees barred from returning - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2455,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Trump Reduces US-South Korea Drills, Citing Lack of Help on Iran - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.1599,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Oil prices mixed amid Iran war stalemate, near-term potential for gains seen limited - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1166,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Goldman Says Markets Too Hawkish on Betting Fed Will Hike Rates - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bear_score": 0.905,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "$4,300 tested as Gold is down on profit-taking, but not out - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.1844,
+      "tags": [
+        "profit-taking"
+      ]
+    },
+    {
+      "title": "Gold retreats on profit-taking after hitting two-month peak following inflation data - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.1803,
+      "tags": [
+        "profit-taking"
+      ]
+    }
+  ],
+  "error": null
+}

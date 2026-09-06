@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-05-28",
+  "snapshot_time_utc": "2026-05-28T11:00:14.476534+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9869,
+    "news_bear_score": 0.453,
+    "blog_bull_score": 0.9357,
+    "blog_bear_score": 0.2068,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0686,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.0,
+    "oil_shock_score": 0.1172,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.681,
+    "geo_relief_score": 0.341
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Not everybody is a loser from the Iran war. Just ask Brunei - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1767,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran's IRGC say they targeted US airbase after strike near Bandar Abbas - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1546,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US Strikes Iran Targets Near Hormuz With No Accord in Sight - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 1.146,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "The market isn’t fully pricing in a peace deal yet, as investors see no alternative to U.S. stocks, says Barclays - MarketWatch",
+      "site": "marketwatch.com",
+      "bear_score": 0.251,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Gold and silver rally as Hormuz deal hopes sink oil - Kitco AM Report - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.081,
+      "tags": [
+        "deal"
+      ]
+    },
+    {
+      "title": "Dollar drifts lower as oil falls on Hormuz deal optimism - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.0702,
+      "tags": [
+        "deal"
+      ]
+    }
+  ],
+  "error": null
+}

@@ -1,0 +1,76 @@
+{
+  "snapshot_date": "2026-06-08",
+  "snapshot_time_utc": "2026-06-08T11:00:13.898213+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9829,
+    "news_bear_score": 0.7571,
+    "blog_bull_score": 0.8488,
+    "blog_bear_score": 0.2148,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0739,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.1249,
+    "oil_shock_score": 0.1748,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.4577,
+    "geo_relief_score": 0.9126
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Iran blames US for latest exchanges of fire with Israel - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2351,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Hormuz strait will be open but with transit fees, Iran envoy to Moscow quoted - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1708,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "China's global e-commerce push stalls as Iran war lifts costs, dampens demand - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1648,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Euro: Hawkish ECB may not stop downside pressure versus US Dollar – ING - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3766,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Gold surges $40 on ceasefire hopes - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.174,
+      "tags": [
+        "ceasefire"
+      ]
+    },
+    {
+      "title": "Ukraine targets St. Petersburg again after Putin rejects Zelenskyy’s offer for direct talks - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.148,
+      "tags": [
+        "talks"
+      ]
+    }
+  ],
+  "error": null
+}

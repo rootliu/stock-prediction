@@ -1,0 +1,78 @@
+{
+  "snapshot_date": "2026-06-25",
+  "snapshot_time_utc": "2026-06-25T11:00:14.253685+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9679,
+    "news_bear_score": 0.4996,
+    "blog_bull_score": 0.6776,
+    "blog_bear_score": 0.4782,
+    "article_count": 46,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.0,
+    "geo_risk_score": 0.9999,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.6113,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.7935,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 46,
+  "top_bull": [
+    {
+      "title": "Rubio in Middle East tour says any Iran deal will ensure security of Gulf allies - Reuters",
+      "site": "reuters.com",
+      "bull_score": 2.2489,
+      "tags": [
+        "iran",
+        "middle east",
+        "deal"
+      ]
+    },
+    {
+      "title": "Oil touches pre-war levels on rising Middle East supply - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1392,
+      "tags": [
+        "middle east"
+      ]
+    },
+    {
+      "title": "Trump says it may never be known who was at fault for strike on girls' school in Iran - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1034,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Gold falls below $4,000/oz on strong dollar, hawkish Fed signals - Reuters",
+      "site": "reuters.com",
+      "bear_score": 0.7965,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Oil Holds Drop as More Tankers Cross Hormuz After Peace Talks - Bloomberg",
+      "site": "bloomberg.com",
+      "bear_score": 0.352,
+      "tags": [
+        "talks"
+      ]
+    },
+    {
+      "title": "Japanese Yen: Watching 162 resistance after hawkish BoJ – Scotiabank - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.3186,
+      "tags": [
+        "hawkish"
+      ]
+    }
+  ],
+  "error": null
+}

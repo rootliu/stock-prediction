@@ -1,0 +1,79 @@
+{
+  "snapshot_date": "2026-07-27",
+  "snapshot_time_utc": "2026-07-27T11:00:26.285604+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9908,
+    "news_bear_score": 0.318,
+    "blog_bull_score": 0.9226,
+    "blog_bear_score": 0.0441,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.721,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0588,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.1079,
+    "oil_shock_score": 0.0,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.5776,
+    "geo_relief_score": 0.0
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Middle East Tensions Ease as the US and Iran Pause Hostilities - Bloomberg.com",
+      "site": "bloomberg.com",
+      "bull_score": 2.2051,
+      "tags": [
+        "iran",
+        "middle east"
+      ]
+    },
+    {
+      "title": "Wall St futures rise as US, Iran pause hostilities - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2563,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Crude oil futures are pricing market adaptability, not hopeful Iran peace - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.2357,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Retail investors remain confident in gold despite recent selling as healthy profit-taking replaces panic, says EverBank's Gaffney - KITCO",
+      "site": "kitco.com",
+      "bear_score": 0.1766,
+      "tags": [
+        "profit-taking"
+      ]
+    },
+    {
+      "title": "U.S. and Iran pause fighting to give peace talks 'space.' Here's where negotiations stand - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.9256,
+      "tags": [
+        "iran",
+        "talks",
+        "negotiation"
+      ]
+    },
+    {
+      "title": "Gold Rises on Dip-Buying as Traders Weigh Middle East Clashes - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.0,
+      "tags": [
+        "middle east"
+      ]
+    }
+  ],
+  "error": null
+}

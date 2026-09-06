@@ -1,0 +1,77 @@
+{
+  "snapshot_date": "2026-07-15",
+  "snapshot_time_utc": "2026-07-15T11:00:13.397385+00:00",
+  "window_days": 7,
+  "feature_summary": {
+    "news_bull_score": 0.9753,
+    "news_bear_score": 0.2501,
+    "blog_bull_score": 0.891,
+    "blog_bear_score": 0.2802,
+    "article_count": 48,
+    "safe_haven_score": 0.0,
+    "policy_risk_score": 0.242,
+    "geo_risk_score": 1.0,
+    "sell_the_news_score": 0.0,
+    "usd_pressure_score": 0.0,
+    "rate_pressure_score": 0.4622,
+    "oil_shock_score": 0.3501,
+    "structural_support_score": 0.0,
+    "policy_relief_score": 0.1509,
+    "geo_relief_score": 0.0186
+  },
+  "article_count": 48,
+  "top_bull": [
+    {
+      "title": "Iran-linked vessels pass through Hormuz ahead of US blockade - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.1544,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "Iran threatens to block more vital seaways as Trump orders renewed Iran blockade - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.115,
+      "tags": [
+        "iran"
+      ]
+    },
+    {
+      "title": "US Senate Democrats block $1.15 trillion defense bill over Iran war objections - Reuters",
+      "site": "reuters.com",
+      "bull_score": 1.0816,
+      "tags": [
+        "iran"
+      ]
+    }
+  ],
+  "top_bear": [
+    {
+      "title": "Treasury yields rise as investors await latest producer price inflation data - CNBC",
+      "site": "cnbc.com",
+      "bear_score": 0.943,
+      "tags": [
+        "yields rise"
+      ]
+    },
+    {
+      "title": "US Dollar: Fed pricing stays hawkish – BBH - FXStreet",
+      "site": "fxstreet.com",
+      "bear_score": 0.2947,
+      "tags": [
+        "hawkish"
+      ]
+    },
+    {
+      "title": "Treasury Two-Year Yields Rise to Highest Since 2025 as Oil Jumps - GoldSeek",
+      "site": "goldseek.com",
+      "bear_score": 0.3281,
+      "tags": [
+        "oil jumps",
+        "yields rise"
+      ]
+    }
+  ],
+  "error": null
+}
