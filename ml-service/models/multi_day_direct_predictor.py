@@ -354,6 +354,7 @@ def _build_training_dataset(
     horizon_days: int,
     lookback_days: int = 240,
     cot_daily: Optional[pd.DataFrame] = None,
+    feature_cache: Optional[Dict[int, Dict[str, float]]] = None,
 ) -> Tuple[pd.DataFrame, pd.Series, pd.Series, pd.Series, pd.Series]:
     daily_sorted = daily_df.sort_values("date").reset_index(drop=True)
     usable_end = len(daily_sorted) - horizon_days
@@ -378,17 +379,21 @@ def _build_training_dataset(
             continue
 
         daily_history = daily_sorted.iloc[max(0, idx - 20): idx + 1].copy()
-        feature_row = _build_direct_feature_row(
-            daily_history=daily_history,
-            current_close=current_close,
-            current_date=current_date,
-            comex_daily=comex_daily,
-            usdcny_daily=usdcny_daily,
-            cross_market=cross_market,
-            horizon_days=horizon_days,
-            cot_daily=cot_daily,
-        )
-        rows.append(feature_row)
+        feature_row = feature_cache.get(idx) if feature_cache is not None else None
+        if feature_row is None:
+            feature_row = _build_direct_feature_row(
+                daily_history=daily_history,
+                current_close=current_close,
+                current_date=current_date,
+                comex_daily=comex_daily,
+                usdcny_daily=usdcny_daily,
+                cross_market=cross_market,
+                horizon_days=horizon_days,
+                cot_daily=cot_daily,
+            )
+            if feature_cache is not None:
+                feature_cache[idx] = feature_row
+        rows.append({**feature_row, "horizon_days": float(horizon_days)})
         ret = target_close / current_close - 1
         y_return.append(float(ret))
         y_direction.append(1 if ret > 0 else 0)
@@ -1342,6 +1347,7 @@ def _train_horizon_model(
     horizon_days: int,
     lookback_days: int,
     cot_daily: Optional[pd.DataFrame] = None,
+    feature_cache: Optional[Dict[int, Dict[str, float]]] = None,
 ) -> Dict[str, Any]:
     x, y_ret, y_dir, bases, sample_dates = _build_training_dataset(
         daily_df=daily_df,
@@ -1351,6 +1357,7 @@ def _train_horizon_model(
         horizon_days=horizon_days,
         lookback_days=lookback_days,
         cot_daily=cot_daily,
+        feature_cache=feature_cache,
     )
     if len(x) < 50:
         return {"trained": False, "reason": f"insufficient data ({len(x)} < 50)"}
@@ -1525,6 +1532,8 @@ def run_direct_multi_day_prediction(
         else list(range(1, len(target_dates) + 1))
     )
     models: Dict[int, Dict[str, Any]] = {}
+    # Input frames are fixed for this invocation; never share across origins/runs.
+    feature_cache: Dict[int, Dict[str, float]] = {}
     for horizon_days in horizons_iter:
         if verbose:
             print(f"  [Train] T+{horizon_days} direct model ...", end=" ")
@@ -1536,6 +1545,7 @@ def run_direct_multi_day_prediction(
             horizon_days=horizon_days,
             lookback_days=lookback_days,
             cot_daily=cot_daily,
+            feature_cache=feature_cache,
         )
         models[horizon_days] = model_info
         if verbose:

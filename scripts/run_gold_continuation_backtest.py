@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+import time
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -54,9 +55,13 @@ def _build_records(
             pd.Timestamp(shfe.iloc[origin_idx + horizon]["date"])
             for horizon in range(1, available_horizon + 1)
         ]
-        if not any(date > cutoff for date in future_dates):
+        horizons = [h for h, date in enumerate(future_dates, 1) if date > cutoff]
+        if not horizons:
             continue
 
+        started = time.monotonic()
+        print(f"[Origin {origin_idx - start_idx + 1}/{end_idx - start_idx + 1}] "
+              f"{origin_date.date()} horizons={horizons}", flush=True)
         predictions = run_direct_multi_day_prediction(
             daily_df=history,
             comex_daily=comex[comex["date"] <= origin_date],
@@ -66,11 +71,15 @@ def _build_records(
             lookback_days=lookback,
             verbose=False,
             cot_daily=None,
+            horizons_to_train=horizons,
         )
 
-        for horizon, pred in enumerate(predictions, start=1):
+        for pred in predictions:
+            horizon = int(pred["model_details"]["horizon_days"])
             target_idx = origin_idx + horizon
             target_date = pd.Timestamp(shfe.iloc[target_idx]["date"])
+            if pd.Timestamp(pred["date"]) != target_date:
+                raise ValueError("prediction target date does not match its horizon")
             if target_date <= cutoff:
                 continue
 
@@ -111,6 +120,8 @@ def _build_records(
                     "branch_used": model_details.get("branch_used"),
                 }
             )
+        print(f"  completed in {time.monotonic() - started:.1f}s; "
+              f"records={len(records)}", flush=True)
 
     result = pd.DataFrame(records)
     if result.empty:

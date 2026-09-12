@@ -217,6 +217,25 @@ curl -sS -X POST http://127.0.0.1:8000/api/v1/gold/predict/SHFE_AU_MAIN \
   -d '{"horizon": 5, "lookback": 120, "model_type": "ensemble"}'
 ```
 
+## 黄金续接回测（2026-09-12）
+
+生产调用保持 `scripts/run_gold_direct_report.sh`，仍使用 V3 direct + guards；
+本次没有替换预测模型或调整权重。
+
+```bash
+cd /Users/rootliu/code/stock-prediction
+MPLCONFIGDIR=/tmp/mpl-stock .venv/bin/python scripts/run_gold_continuation_backtest.py \
+  --cutoff 2026-09-04 --report-dir /tmp/gold-backtest --repo-report-dir /tmp/gold-backtest
+MPLCONFIGDIR=/tmp/mpl-stock .venv/bin/python scripts/test_gold_continuation.py
+```
+
+`--cutoff` 为目标日期的排他下界，拉取最新数据后只评估已实现的目标。
+脚本逐起点打印进度；同一起点跨周期复用特征，但不跨起点共享缓存。
+返回预测按模型的实际 horizon 和目标日期匹配，避免缺失周期导致错位。
+CSV 包含逐条预测、实际价格、误差、方向和信心评分。
+信心评分不是校准后的正确概率；日线跨市场数据尚有可用时间对齐限制。
+详见 [本轮回测及限制](report/gold_review_2026-09-12/review.md)。
+
 ## ✨ 功能特性
 
 - 📊 K线图表（支持日/周/月K线切换）
