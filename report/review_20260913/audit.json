@@ -1,0 +1,16 @@
+{
+  "status": "passed",
+  "variants": 3,
+  "origins_per_variant": 69,
+  "predictions_per_variant": 261,
+  "predictions_total": 783,
+  "common_origins_per_horizon": 60,
+  "missing_predictions": 0,
+  "data_and_code_hashes": "verified",
+  "packages": {
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "scikit-learn": "1.9.0",
+    "matplotlib": "3.11.0"
+  }
+}

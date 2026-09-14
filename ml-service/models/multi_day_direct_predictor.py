@@ -18,6 +18,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import GradientBoostingClassifier, GradientBoostingRegressor
+from models.market_availability import available_observations, availability_audit, daily_cutoff
 
 from models.multi_bar_features import (
     FEATURE_COLUMNS_COT,
@@ -277,16 +278,18 @@ def _build_direct_feature_row(
     cross_market: pd.DataFrame,
     horizon_days: int,
     cot_daily: Optional[pd.DataFrame] = None,
+    prediction_at: Optional[pd.Timestamp] = None,
 ) -> Dict[str, float]:
     daily = build_daily_features(daily_history)
     if isinstance(daily_history, pd.DataFrame):
         daily_closes = pd.to_numeric(daily_history["close"], errors="coerce").astype(float)
     else:
         daily_closes = pd.to_numeric(daily_history, errors="coerce").astype(float)
+    cutoff = daily_cutoff(current_date, prediction_at)
     cross = build_cross_market_features(
-        comex_daily=comex_daily,
-        usdcny_daily=usdcny_daily,
-        cross_market=cross_market,
+        comex_daily=available_observations(comex_daily, cutoff),
+        usdcny_daily=available_observations(usdcny_daily, cutoff),
+        cross_market=available_observations(cross_market, cutoff),
         shfe_close=current_close,
         target_date=current_date,
     )
@@ -1363,11 +1366,17 @@ def _train_horizon_model(
         return {"trained": False, "reason": f"insufficient data ({len(x)} < 50)"}
 
     split = int(len(x) * 0.8)
-    x_train, x_test = x.iloc[:split], x.iloc[split:]
-    y_ret_train, y_ret_test = y_ret.iloc[:split], y_ret.iloc[split:]
-    y_dir_train, y_dir_test = y_dir.iloc[:split], y_dir.iloc[split:]
+    # Purge by actual label maturity, including when invalid prices removed rows.
+    calendar = pd.DatetimeIndex(pd.to_datetime(daily_df.sort_values("date")["date"]))
+    positions = calendar.get_indexer(pd.DatetimeIndex(sample_dates))
+    label_dates = pd.Series(calendar[positions + horizon_days], index=x.index)
+    validation_origin = pd.Timestamp(sample_dates.iloc[split])
+    train_mask = (x.index < split) & (label_dates <= validation_origin)
+    x_train, x_test = x.loc[train_mask], x.iloc[split:]
+    y_ret_train, y_ret_test = y_ret.loc[train_mask], y_ret.iloc[split:]
+    y_dir_train, y_dir_test = y_dir.loc[train_mask], y_dir.iloc[split:]
     base_test = bases.iloc[split:]
-    train_dates = sample_dates.iloc[:split]
+    train_dates = sample_dates.loc[train_mask]
     train_weights = _build_recency_weights(train_dates, horizon_days)
 
     reg, cls = _fit_branch_pair(x_train, y_ret_train, y_dir_train, train_weights)
@@ -1375,25 +1384,31 @@ def _train_horizon_model(
     metrics = _evaluate(reg, cls, x_test, y_ret_test, y_dir_test, base_test)
     metrics["train_size"] = len(x_train)
     metrics["test_size"] = len(x_test)
+    metrics["purged_size"] = int(split - len(x_train))
+    metrics["last_validation_train_label"] = str(label_dates.loc[train_mask].max().date())
+    metrics["first_validation_origin"] = str(validation_origin.date())
+    metrics["refit_size"] = len(x)
+    metrics["last_refit_label"] = str(label_dates.max().date())
     metrics["train_weight_mean"] = round(float(train_weights.mean()), 4)
     metrics["recent_weight_mean"] = round(float(train_weights.tail(min(len(train_weights), 10)).mean()), 4)
 
-    tail_size = min(len(x_train), 10 if horizon_days <= 2 else 6)
+    # Bias estimates must be out of sample, not residuals of the fitted model.
+    tail_size = min(len(x_test), 10 if horizon_days <= 2 else 6)
     recent_bias_return = 0.0
     if tail_size > 0:
-        tail_pred = reg.predict(x_train.tail(tail_size))
-        tail_actual = y_ret_train.tail(tail_size).values
+        tail_pred = reg.predict(x_test.tail(tail_size))
+        tail_actual = y_ret_test.tail(tail_size).values
         recent_bias_return = float(np.mean(tail_actual - tail_pred))
         bias_cap = 0.012 if horizon_days <= 2 else 0.008
         recent_bias_return = float(np.clip(recent_bias_return, -bias_cap, bias_cap))
     metrics["recent_bias_return_pct"] = round(recent_bias_return * 100, 3)
 
     drift_bias_by_regime: Dict[str, float] = {}
-    drift_tail = min(len(x_train), 14 if horizon_days <= 2 else 8)
+    drift_tail = min(len(x_test), 14 if horizon_days <= 2 else 8)
     if drift_tail > 0:
-        drift_x = x_train.tail(drift_tail)
+        drift_x = x_test.tail(drift_tail)
         drift_pred = reg.predict(drift_x)
-        drift_actual = y_ret_train.tail(drift_tail).values
+        drift_actual = y_ret_test.tail(drift_tail).values
         drift_resid = drift_actual - drift_pred
         trend_tail = drift_x["trend_regime_code"]
         drift_masks = {
@@ -1408,6 +1423,11 @@ def _train_horizon_model(
             regime_bias = float(np.mean(drift_resid[regime_mask.values]))
             drift_bias_by_regime[regime_name] = float(np.clip(regime_bias, -drift_cap, drift_cap))
 
+    # Keep validation metrics above; fit deployable base/branch models on all
+    # labels already known at this origin. Never refit on future target labels.
+    x_train, y_ret_train, y_dir_train = x, y_ret, y_dir
+    train_weights = _build_recency_weights(sample_dates, horizon_days)
+    reg, cls = _fit_branch_pair(x_train, y_ret_train, y_dir_train, train_weights)
     branch_models: Dict[str, Any] = {}
     branch_blend_weights: Dict[str, float] = {}
     if horizon_days <= 10:
@@ -1451,13 +1471,8 @@ def _train_horizon_model(
             branch_weights = train_weights.loc[mask]
             branch_reg, branch_cls = _fit_branch_pair(branch_x, branch_y_ret, branch_y_dir, branch_weights)
 
-            branch_tail = min(len(branch_x), 8)
+            # No branch-specific out-of-sample calibration available yet.
             branch_bias = 0.0
-            if branch_tail > 0:
-                tail_pred = branch_reg.predict(branch_x.tail(branch_tail))
-                tail_actual = branch_y_ret.tail(branch_tail).values
-                branch_bias = float(np.mean(tail_actual - tail_pred))
-                branch_bias = float(np.clip(branch_bias, -0.014, 0.014))
 
             branch_models[branch_name] = {
                 "reg_model": branch_reg,
@@ -1506,18 +1521,27 @@ def run_direct_multi_day_prediction(
     verbose: bool = True,
     cot_daily: Optional[pd.DataFrame] = None,
     horizons_to_train: Optional[Sequence[int]] = None,
+    prediction_at: Optional[pd.Timestamp] = None,
 ) -> List[Dict[str, Any]]:
     """
     horizons_to_train: optional subset of horizons (1..N) to train. If None,
     train all horizons from 1 to len(target_dates). Use this to skip wasted
     training when only a specific horizon (e.g. T+20) is needed.
     """
-    if not target_dates:
+    if len(target_dates) == 0:
         return []
 
     daily_sorted = daily_df.sort_values("date").reset_index(drop=True)
     current_close = float(daily_sorted.iloc[-1]["close"])
     current_date = pd.Timestamp(daily_sorted.iloc[-1]["date"])
+    cutoff = daily_cutoff(current_date, prediction_at)
+    dates = pd.DatetimeIndex(target_dates)
+    if not dates.is_monotonic_increasing or dates.has_duplicates or (dates <= current_date).any():
+        raise ValueError("target_dates must be unique, increasing future trading dates")
+    if horizons_to_train is not None and any(int(h) < 1 or int(h) > len(dates) for h in horizons_to_train):
+        raise ValueError("horizons_to_train must index target_dates (1-based)")
+    external_audit = {name: availability_audit(frame, cutoff) for name, frame in
+                      [("comex", comex_daily), ("usdcny", usdcny_daily), ("cross_market", cross_market)]}
     regime_info = compute_regime_info(daily_sorted["close"].astype(float))
     regime = regime_info["regime"]
 
@@ -1574,6 +1598,7 @@ def run_direct_multi_day_prediction(
             cross_market=cross_market,
             horizon_days=horizon_days,
             cot_daily=cot_daily,
+            prediction_at=cutoff,
         )
         x_row = pd.DataFrame([[feature_row[col] for col in DIRECT_FEATURE_COLUMNS]], columns=DIRECT_FEATURE_COLUMNS)
         vol_5 = float(feature_row.get("vol_5", 0.0))
@@ -1741,6 +1766,19 @@ def run_direct_multi_day_prediction(
                 "n_models": 1,
                 "model_details": {
                     "model_name": "direct_gbm_multi_horizon_v2",
+                    "training_policy": "purged_validation_full_refit",
+                    "prediction_at": cutoff.isoformat(),
+                    "external_availability": {
+                        name: "explicit" if "available_at" in frame else "assumed_next_day_0800_shanghai"
+                        for name, frame in [("comex", comex_daily), ("usdcny", usdcny_daily), ("cross_market", cross_market)]
+                    },
+                    "external_observations": external_audit,
+                    "confidence_kind": "heuristic_score_not_probability",
+                    "probability_kind": "uncalibrated_classifier",
+                    "validation_train_size": metrics.get("train_size"),
+                    "validation_purged_size": metrics.get("purged_size"),
+                    "refit_size": metrics.get("refit_size"),
+                    "last_refit_label": metrics.get("last_refit_label"),
                     "horizon_days": horizon_days,
                     "pre_guard_return_pct": round(pre_guard_return * 100, 3),
                     "pred_return_pct": round(pred_return * 100, 3),
@@ -1809,13 +1847,15 @@ def rolling_backtest_direct(
                 verbose=False,
                 cot_daily=cot_truncated,
             )
-        except Exception:
-            continue
+        except Exception as exc:
+            raise RuntimeError(f"Gold backtest failed at origin {origin_date.date()}") from exc
 
-        for h_idx, pred in enumerate(preds):
+        by_date = {pd.Timestamp(pred["date"]): pred for pred in preds}
+        if len(by_date) != len(preds) or set(by_date) != set(future_dates):
+            raise RuntimeError(f"Missing/duplicate forecast targets at origin {origin_date.date()}")
+        for h_idx, target_date in enumerate(future_dates):
+            pred = by_date[target_date]
             ti = oi + h_idx + 1
-            if ti >= len(daily_sorted):
-                break
             records.append(
                 {
                     "horizon": h_idx + 1,

@@ -1,0 +1,91 @@
+{
+  "source_commit": "c74f7d2",
+  "retrieved_on": "2026-09-06",
+  "python": "3.14.6",
+  "packages": {
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "scikit-learn": "1.9.0",
+    "akshare": "1.18.94",
+    "yfinance": "1.7.0",
+    "matplotlib": "3.11.0",
+    "torch": "2.14.0+cpu",
+    "einops": "0.8.1",
+    "huggingface_hub": "0.33.1",
+    "safetensors": "0.6.2"
+  },
+  "data_sha256": {
+    "usdcny.csv": "73219c33189952cb1091aab59d897b4f21759170f99ea96503ceecec5ea16d0d",
+    "cross.csv": "bee263bdd69da2e8ffa8b41e52b895a2a8974d4455e3933b7489fe383ec5236f",
+    "shfe.csv": "6f38f0dad7a7195d8c8327427afe1bb07f138a8eff8d863ec51c1442ebed71e6",
+    "comex.csv": "e658f43887b22af2585ee78f6e2e0ae0b982fd41022266c56c5d2726833e7a4a"
+  },
+  "kronos_executed": true,
+  "kronos_code_commit": "67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+  "experiment": {
+    "gbm_origins": 8,
+    "horizons": [
+      1,
+      3,
+      5
+    ],
+    "gbm_variants": 3,
+    "gbm_predictions": 72,
+    "train_lookback": 240,
+    "stride": 5,
+    "external_delay": "one calendar day; sensitivity diagnostic, not exact publication-time reconstruction"
+  },
+  "kronos_weights": {
+    "tokenizer": {
+      "repo": "NeoQuasar/Kronos-Tokenizer-base",
+      "revision": "0e0117387f39004a9016484a186a908917e22426"
+    },
+    "small": {
+      "repo": "NeoQuasar/Kronos-small",
+      "revision": "901c26c1332695a2a8f243eb2f37243a37bea320"
+    }
+  },
+  "kronos_parameters": {
+    "model": "Kronos-small",
+    "context": 240,
+    "max_context": 512,
+    "pred_len": 5,
+    "seeds": [
+      17,
+      29,
+      43
+    ],
+    "sample_count_per_seed": 8,
+    "temperature": 1.0,
+    "top_p": 0.9,
+    "device": "cpu",
+    "threads": 2,
+    "eval_mode": true,
+    "amount": "official OHLC-mean times volume proxy",
+    "fine_tuned": false,
+    "contexts_tested": [
+      240,
+      128
+    ],
+    "calls": 48,
+    "seed_horizon_records": 144,
+    "context128_exploratory_followup": true
+  },
+  "artifacts_sha256": {
+    "kronos_summary.csv": "c9339be9f6a0c8a4b51432a4a1d09302392cddf45c142642b4e2480117ce4352",
+    "archive_comparison.csv": "5b0185fc21bb9f1938307567fdf7f4adacbbc102fd759b2fcf297f88c3d14c4f",
+    "fresh_predictions.csv": "0eaa81d8568771b32e458d54c96c9fb7009b7803fea55bae039b7ec6fd851a4e",
+    "fresh_summary.csv": "9e2da29ea3526e158e3645e6f3d600aef2b711833e7ebca2e9799f29b6ab9eb0",
+    "combined_predictions.csv": "a04461d5c51909babc2650f88faf80debe0aa4e273fefa5b9df8e34e376d35c8",
+    "kronos_seed_predictions.csv": "0a85a898beadc274dbea287a37b5babe4fab7d4bef953a73a26e6dd93b639200",
+    "kronos_predictions.csv": "984f55e2dffa1f836009db2e7fd02fe21ba952a69d1d98a4257188fe2c726895",
+    "combined_summary.csv": "89ec583de4643d1da35fda4b0d9c1d7851eb2684ac0d6fe28f189611a1829d23",
+    "data/usdcny.csv": "73219c33189952cb1091aab59d897b4f21759170f99ea96503ceecec5ea16d0d",
+    "data/cross.csv": "bee263bdd69da2e8ffa8b41e52b895a2a8974d4455e3933b7489fe383ec5236f",
+    "data/shfe.csv": "6f38f0dad7a7195d8c8327427afe1bb07f138a8eff8d863ec51c1442ebed71e6",
+    "data/comex.csv": "e658f43887b22af2585ee78f6e2e0ae0b982fd41022266c56c5d2726833e7a4a",
+    "context128/kronos_summary.csv": "22bb2c5b4ab10f5c518a6653daad3f8750b02b2f9fe143a39ad2c50388f26243",
+    "context128/kronos_seed_predictions.csv": "7df160c1a7f1341d00f52d902dc447d01ee3b62eb68c643f941bd5f91c7cbd9a",
+    "context128/kronos_predictions.csv": "630a1a2ec88a1eb500fdd895e487cd9d08ee252526cb5fefcab87f3ec48f7cde"
+  }
+}

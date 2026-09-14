@@ -1,0 +1,1876 @@
+"""
+Direct multi-horizon daily predictor for gold close extrapolation.
+
+This module preserves the existing Multi-Bar path and adds a separate
+non-recursive predictor for T+1...T+N daily close forecasting.
+
+Recent upgrades:
+- stronger emphasis on the latest 5-10 trading days for near horizons
+- extra high-volatility day features from OHLC history
+- event overlays remain outside this module and should be interpreted as
+  explanation layers, not core accuracy drivers
+"""
+
+from __future__ import annotations
+
+from typing import Any, Dict, List, Optional, Sequence, Tuple
+
+import numpy as np
+import pandas as pd
+from sklearn.ensemble import GradientBoostingClassifier, GradientBoostingRegressor
+from models.market_availability import available_observations, availability_audit, daily_cutoff
+
+from models.multi_bar_features import (
+    FEATURE_COLUMNS_COT,
+    FEATURE_COLUMNS_CROSS,
+    FEATURE_COLUMNS_DAILY,
+    build_cot_features,
+    build_cross_market_features,
+    build_daily_features,
+)
+from models.volatility_regime import (
+    classify_regime,
+    compute_regime_info,
+    dampen_prediction,
+    realized_volatility,
+)
+
+
+REGIME_TO_CODE = {
+    "low": 0.0,
+    "normal": 1.0,
+    "high": 2.0,
+    "extreme": 3.0,
+}
+
+DIRECT_META_COLUMNS = [
+    "horizon_days",
+    "day_of_week",
+    "month",
+    "regime_code",
+    "jump_regime_code",
+    "jump_signal",
+    "trend_regime_code",
+    "trend_signal",
+]
+
+DIRECT_FEATURE_COLUMNS = (
+    FEATURE_COLUMNS_DAILY
+    + FEATURE_COLUMNS_CROSS
+    + FEATURE_COLUMNS_COT
+    + DIRECT_META_COLUMNS
+)
+
+
+def _safe_quantile(values: pd.Series, q: float, fallback: float) -> float:
+    clean = pd.to_numeric(values, errors="coerce").replace([np.inf, -np.inf], np.nan).dropna()
+    if clean.empty:
+        return float(fallback)
+    return float(max(clean.quantile(q), fallback))
+
+
+def _build_gbm_pair() -> Tuple[GradientBoostingRegressor, GradientBoostingClassifier]:
+    reg = GradientBoostingRegressor(
+        n_estimators=220,
+        learning_rate=0.03,
+        max_depth=3,
+        min_samples_leaf=8,
+        subsample=0.85,
+        random_state=42,
+    )
+    cls = GradientBoostingClassifier(
+        n_estimators=160,
+        learning_rate=0.04,
+        max_depth=2,
+        subsample=0.85,
+        random_state=42,
+    )
+    return reg, cls
+
+
+def _fit_branch_pair(
+    x_train: pd.DataFrame,
+    y_ret_train: pd.Series,
+    y_dir_train: pd.Series,
+    weights: pd.Series,
+) -> Tuple[GradientBoostingRegressor, Optional[GradientBoostingClassifier]]:
+    reg, cls = _build_gbm_pair()
+    reg.fit(x_train, y_ret_train, sample_weight=weights.values)
+
+    if y_dir_train.nunique() > 1:
+        cls.fit(x_train, y_dir_train, sample_weight=weights.values)
+    else:
+        cls = None
+    return reg, cls
+
+
+def _compute_jump_signal(
+    overnight_gap_pct: float,
+    intraday_range_pct: float,
+    comex_shfe_premium: float,
+    vol_5: float,
+    gap_threshold: float,
+    gap_extreme_threshold: float,
+    range_threshold: float,
+    range_extreme_threshold: float,
+    premium_threshold: float,
+) -> Tuple[float, float]:
+    """Detect jump-like conditions from recent bar structure and cross-market dislocation."""
+    base_vol = max(abs(float(vol_5 or 0.0)), 0.005)
+    gap_floor = max(0.004, base_vol * 0.90)
+    range_floor = max(0.010, base_vol * 1.80)
+    premium_floor = max(0.006, base_vol * 0.80)
+
+    gap_norm = max(gap_threshold, gap_floor)
+    range_norm = max(range_threshold, range_floor)
+    premium_norm = max(premium_threshold, premium_floor)
+
+    gap_score = abs(float(overnight_gap_pct or 0.0)) / gap_norm
+    range_score = abs(float(intraday_range_pct or 0.0)) / range_norm
+    premium_score = abs(float(comex_shfe_premium or 0.0)) / premium_norm
+
+    if abs(float(overnight_gap_pct or 0.0)) >= max(gap_extreme_threshold, gap_norm * 1.18):
+        gap_score += 0.30
+    if abs(float(intraday_range_pct or 0.0)) >= max(range_extreme_threshold, range_norm * 1.20):
+        range_score += 0.30
+
+    jump_signal = min(
+        3.0,
+        0.45 * min(gap_score, 3.0)
+        + 0.40 * min(range_score, 3.0)
+        + 0.15 * min(premium_score, 3.0),
+    )
+    if jump_signal >= 1.55:
+        jump_regime_code = 2.0
+    elif jump_signal >= 0.95:
+        jump_regime_code = 1.0
+    else:
+        jump_regime_code = 0.0
+    return float(jump_regime_code), float(jump_signal)
+
+
+def _recent_jump_thresholds(daily_history: pd.Series | pd.DataFrame, vol_5: float) -> Dict[str, float]:
+    if isinstance(daily_history, pd.DataFrame):
+        history_df = daily_history.copy()
+    else:
+        close_series = pd.to_numeric(daily_history, errors="coerce").astype(float)
+        history_df = pd.DataFrame({"close": close_series})
+
+    base_vol = max(abs(float(vol_5 or 0.0)), 0.005)
+    fallback_gap = max(0.005, base_vol * 1.00)
+    fallback_gap_extreme = max(0.008, base_vol * 1.45)
+    fallback_range = max(0.012, base_vol * 2.00)
+    fallback_range_extreme = max(0.018, base_vol * 2.90)
+    fallback_premium = max(0.007, base_vol * 0.90)
+
+    if history_df.empty or "close" not in history_df.columns:
+        return {
+            "gap_threshold": fallback_gap,
+            "gap_extreme_threshold": fallback_gap_extreme,
+            "range_threshold": fallback_range,
+            "range_extreme_threshold": fallback_range_extreme,
+            "premium_threshold": fallback_premium,
+        }
+
+    close_hist = pd.to_numeric(history_df.get("close"), errors="coerce").astype(float)
+    ret_1 = close_hist.pct_change().abs()
+    if {"open", "high", "low", "close"}.issubset(history_df.columns):
+        open_hist = pd.to_numeric(history_df.get("open"), errors="coerce").astype(float)
+        high_hist = pd.to_numeric(history_df.get("high"), errors="coerce").astype(float)
+        low_hist = pd.to_numeric(history_df.get("low"), errors="coerce").astype(float)
+        prev_close = close_hist.shift(1)
+        gap_hist = ((open_hist - prev_close) / prev_close.replace(0, np.nan)).abs()
+        range_hist = ((high_hist - low_hist) / close_hist.replace(0, np.nan)).abs()
+    else:
+        gap_hist = ret_1
+        range_hist = ret_1.rolling(2).max()
+
+    recent_slice = slice(-16, None)
+    gap_recent = gap_hist.iloc[recent_slice]
+    range_recent = range_hist.iloc[recent_slice]
+    premium_proxy = ret_1.iloc[recent_slice] * 0.7
+
+    return {
+        "gap_threshold": _safe_quantile(gap_recent, 0.70, fallback_gap),
+        "gap_extreme_threshold": _safe_quantile(gap_recent, 0.88, fallback_gap_extreme),
+        "range_threshold": _safe_quantile(range_recent, 0.70, fallback_range),
+        "range_extreme_threshold": _safe_quantile(range_recent, 0.88, fallback_range_extreme),
+        "premium_threshold": _safe_quantile(premium_proxy, 0.72, fallback_premium),
+    }
+
+
+def _compute_trend_reversal_signal(
+    daily_history: pd.Series | pd.DataFrame,
+    daily_features: Dict[str, float],
+) -> Tuple[float, float]:
+    if isinstance(daily_history, pd.DataFrame):
+        close_hist = pd.to_numeric(daily_history.get("close"), errors="coerce").astype(float)
+    else:
+        close_hist = pd.to_numeric(daily_history, errors="coerce").astype(float)
+
+    close_hist = close_hist.dropna()
+    if len(close_hist) < 8:
+        return 0.0, 0.0
+
+    ret_hist = close_hist.pct_change().dropna()
+    down_streak = 0
+    for value in reversed(ret_hist.tail(4).tolist()):
+        if value < 0:
+            down_streak += 1
+        else:
+            break
+
+    up_streak = 0
+    for value in reversed(ret_hist.tail(4).tolist()):
+        if value > 0:
+            up_streak += 1
+        else:
+            break
+
+    ma_gap_5 = float(daily_features.get("ma_gap_5", 0.0))
+    ma_gap_10 = float(daily_features.get("ma_gap_10", 0.0))
+    ret_3 = float(daily_features.get("ret_3", 0.0))
+    ret_5 = float(daily_features.get("ret_5", 0.0))
+    close_vs_vwap = float(daily_features.get("close_vs_vwap", 0.0))
+    close_vs_high = float(daily_features.get("close_vs_high", 0.0))
+
+    slope_input = close_hist.tail(5).values.astype(float)
+    if len(slope_input) >= 3 and slope_input[-1] != 0:
+        x_axis = np.arange(len(slope_input), dtype=float)
+        slope = float(np.polyfit(x_axis, slope_input, 1)[0] / slope_input[-1])
+    else:
+        slope = 0.0
+
+    bearish_score = (
+        1.6 * max(0.0, -ret_3)
+        + 1.2 * max(0.0, -ret_5)
+        + 1.3 * max(0.0, -ma_gap_5)
+        + 1.0 * max(0.0, -ma_gap_10)
+        + 0.8 * max(0.0, -close_vs_vwap)
+        + 0.5 * max(0.0, -close_vs_high)
+        + 4.0 * max(0.0, -slope)
+        + 0.18 * down_streak
+    )
+    bullish_score = (
+        1.6 * max(0.0, ret_3)
+        + 1.2 * max(0.0, ret_5)
+        + 1.3 * max(0.0, ma_gap_5)
+        + 1.0 * max(0.0, ma_gap_10)
+        + 0.8 * max(0.0, close_vs_vwap)
+        + 0.5 * max(0.0, close_vs_high)
+        + 4.0 * max(0.0, slope)
+        + 0.18 * up_streak
+    )
+
+    if bearish_score >= 0.20 and bearish_score > bullish_score * 1.08:
+        return -1.0, float(min(3.0, bearish_score))
+    if bullish_score >= 0.20 and bullish_score > bearish_score * 1.08:
+        return 1.0, float(min(3.0, bullish_score))
+    return 0.0, float(max(bearish_score, bullish_score))
+
+
+def _build_direct_feature_row(
+    daily_history: pd.Series | pd.DataFrame,
+    current_close: float,
+    current_date: pd.Timestamp,
+    comex_daily: pd.DataFrame,
+    usdcny_daily: pd.DataFrame,
+    cross_market: pd.DataFrame,
+    horizon_days: int,
+    cot_daily: Optional[pd.DataFrame] = None,
+    prediction_at: Optional[pd.Timestamp] = None,
+) -> Dict[str, float]:
+    daily = build_daily_features(daily_history)
+    if isinstance(daily_history, pd.DataFrame):
+        daily_closes = pd.to_numeric(daily_history["close"], errors="coerce").astype(float)
+    else:
+        daily_closes = pd.to_numeric(daily_history, errors="coerce").astype(float)
+    cutoff = daily_cutoff(current_date, prediction_at)
+    cross = build_cross_market_features(
+        comex_daily=available_observations(comex_daily, cutoff),
+        usdcny_daily=available_observations(usdcny_daily, cutoff),
+        cross_market=available_observations(cross_market, cutoff),
+        shfe_close=current_close,
+        target_date=current_date,
+    )
+    ann_vol = realized_volatility(daily_closes.astype(float), window=20)
+    regime = classify_regime(ann_vol)
+    jump_thresholds = _recent_jump_thresholds(daily_history, float(daily.get("vol_5", 0.0)))
+    jump_regime_code, jump_signal = _compute_jump_signal(
+        overnight_gap_pct=float(daily.get("overnight_gap_pct", 0.0)),
+        intraday_range_pct=float(daily.get("intraday_range_pct", 0.0)),
+        comex_shfe_premium=float(cross.get("comex_shfe_premium", 0.0)),
+        vol_5=float(daily.get("vol_5", 0.0)),
+        gap_threshold=jump_thresholds["gap_threshold"],
+        gap_extreme_threshold=jump_thresholds["gap_extreme_threshold"],
+        range_threshold=jump_thresholds["range_threshold"],
+        range_extreme_threshold=jump_thresholds["range_extreme_threshold"],
+        premium_threshold=jump_thresholds["premium_threshold"],
+    )
+    trend_regime_code, trend_signal = _compute_trend_reversal_signal(daily_history, daily)
+    meta = {
+        "horizon_days": float(horizon_days),
+        "day_of_week": float(current_date.dayofweek),
+        "month": float(current_date.month),
+        "regime_code": REGIME_TO_CODE.get(regime, 1.0),
+        "jump_regime_code": jump_regime_code,
+        "jump_signal": jump_signal,
+        "trend_regime_code": trend_regime_code,
+        "trend_signal": trend_signal,
+    }
+
+    cot = build_cot_features(cot_daily, current_date)
+
+    row: Dict[str, float] = {}
+    row.update(daily)
+    row.update(cross)
+    row.update(cot)
+    row.update(meta)
+    return row
+
+
+def _build_recency_weights(sample_dates: pd.Series, horizon_days: int) -> pd.Series:
+    if sample_dates.empty:
+        return pd.Series(dtype=float)
+
+    dates = pd.to_datetime(sample_dates).reset_index(drop=True)
+    max_date = dates.iloc[-1]
+    age_days = (max_date - dates).dt.days.clip(lower=0)
+
+    half_life = 7 if horizon_days <= 2 else 12
+    decay_component = np.exp(-age_days / max(half_life, 1))
+    weights = 0.8 + 0.35 * decay_component
+
+    tail_window = min(len(dates), 10 if horizon_days <= 2 else 5)
+    if tail_window > 0:
+        tail_boost = 0.55 if horizon_days <= 2 else 0.20
+        weights.iloc[-tail_window:] *= np.linspace(1.0, 1.0 + tail_boost, tail_window)
+
+    return weights.astype(float)
+
+
+def _build_training_dataset(
+    daily_df: pd.DataFrame,
+    comex_daily: pd.DataFrame,
+    usdcny_daily: pd.DataFrame,
+    cross_market: pd.DataFrame,
+    horizon_days: int,
+    lookback_days: int = 240,
+    cot_daily: Optional[pd.DataFrame] = None,
+    feature_cache: Optional[Dict[int, Dict[str, float]]] = None,
+) -> Tuple[pd.DataFrame, pd.Series, pd.Series, pd.Series, pd.Series]:
+    daily_sorted = daily_df.sort_values("date").reset_index(drop=True)
+    usable_end = len(daily_sorted) - horizon_days
+    if usable_end <= 20:
+        empty_x = pd.DataFrame(columns=DIRECT_FEATURE_COLUMNS)
+        empty_dates = pd.Series(dtype="datetime64[ns]")
+        return empty_x, pd.Series(dtype=float), pd.Series(dtype=int), pd.Series(dtype=float), empty_dates
+
+    start_idx = max(20, usable_end - lookback_days)
+
+    rows: List[Dict[str, float]] = []
+    y_return: List[float] = []
+    y_direction: List[int] = []
+    bases: List[float] = []
+    sample_dates: List[pd.Timestamp] = []
+
+    for idx in range(start_idx, usable_end):
+        current_date = pd.Timestamp(daily_sorted.iloc[idx]["date"])
+        current_close = float(daily_sorted.iloc[idx]["close"])
+        target_close = float(daily_sorted.iloc[idx + horizon_days]["close"])
+        if current_close <= 0 or target_close <= 0:
+            continue
+
+        daily_history = daily_sorted.iloc[max(0, idx - 20): idx + 1].copy()
+        feature_row = feature_cache.get(idx) if feature_cache is not None else None
+        if feature_row is None:
+            feature_row = _build_direct_feature_row(
+                daily_history=daily_history,
+                current_close=current_close,
+                current_date=current_date,
+                comex_daily=comex_daily,
+                usdcny_daily=usdcny_daily,
+                cross_market=cross_market,
+                horizon_days=horizon_days,
+                cot_daily=cot_daily,
+            )
+            if feature_cache is not None:
+                feature_cache[idx] = feature_row
+        rows.append({**feature_row, "horizon_days": float(horizon_days)})
+        ret = target_close / current_close - 1
+        y_return.append(float(ret))
+        y_direction.append(1 if ret > 0 else 0)
+        bases.append(current_close)
+        sample_dates.append(current_date)
+
+    if not rows:
+        empty_x = pd.DataFrame(columns=DIRECT_FEATURE_COLUMNS)
+        empty_dates = pd.Series(dtype="datetime64[ns]")
+        return empty_x, pd.Series(dtype=float), pd.Series(dtype=int), pd.Series(dtype=float), empty_dates
+
+    x = pd.DataFrame(rows)
+    for col in DIRECT_FEATURE_COLUMNS:
+        if col not in x.columns:
+            x[col] = 0.0
+    x = x[DIRECT_FEATURE_COLUMNS]
+    return (
+        x,
+        pd.Series(y_return, dtype=float),
+        pd.Series(y_direction, dtype=int),
+        pd.Series(bases, dtype=float),
+        pd.Series(sample_dates, dtype="datetime64[ns]"),
+    )
+
+
+def _evaluate(
+    reg: GradientBoostingRegressor,
+    cls: Optional[GradientBoostingClassifier],
+    x_test: pd.DataFrame,
+    y_test: pd.Series,
+    y_dir_test: pd.Series,
+    base_test: pd.Series,
+) -> Dict[str, Any]:
+    if len(x_test) == 0:
+        return {
+            "mae": None,
+            "rmse": None,
+            "mape_pct": None,
+            "direction_accuracy": None,
+        }
+
+    pred_ret = reg.predict(x_test)
+    pred_close = base_test.values * (1 + pred_ret)
+    actual_close = base_test.values * (1 + y_test.values)
+    error = pred_close - actual_close
+    abs_pct = np.abs(error) / np.maximum(np.abs(actual_close), 1e-8) * 100
+    pred_dir = (pred_ret > 0).astype(int)
+
+    cls_dir_acc = None
+    if cls is not None:
+        cls_pred = cls.predict(x_test)
+        cls_dir_acc = float(np.mean(cls_pred == y_dir_test.values) * 100)
+
+    return {
+        "mae": round(float(np.abs(error).mean()), 4),
+        "rmse": round(float(np.sqrt(np.mean(np.square(error)))), 4),
+        "mape_pct": round(float(np.nanmean(abs_pct)), 4),
+        "direction_accuracy": round(float(np.mean(pred_dir == y_dir_test.values) * 100), 2),
+        "cls_direction_accuracy": round(cls_dir_acc, 2) if cls_dir_acc is not None else None,
+    }
+
+
+def _clip_return(
+    pred_return: float,
+    vol_5: float,
+    horizon_days: int,
+    jump_regime_code: float = 0.0,
+    jump_signal: float = 0.0,
+) -> float:
+    base_vol = max(float(vol_5 or 0.0), 0.005) * np.sqrt(max(horizon_days, 1))
+    jump_multiplier = 1.0 + 0.22 * float(jump_regime_code) + 0.10 * min(float(jump_signal), 2.0)
+    cap = max(0.015, min(0.12, 2.2 * base_vol * jump_multiplier))
+    return float(np.clip(pred_return, -cap, cap))
+
+
+def _compute_asymmetric_range_multipliers(
+    pred_return: float,
+    overnight_gap_pct: float,
+    jump_regime_code: float,
+    jump_signal: float,
+    branch_name: str | None = None,
+) -> Tuple[float, float]:
+    upper_mult = 1.0
+    lower_mult = 1.0
+    if jump_regime_code <= 0:
+        return upper_mult, lower_mult
+
+    asym_scale = 0.18 * float(jump_regime_code) + 0.08 * min(float(jump_signal), 2.0)
+    if branch_name == "jump_up":
+        directional_hint = 1.0
+    elif branch_name == "jump_down":
+        directional_hint = -1.0
+    else:
+        directional_hint = float(np.sign(pred_return))
+        if directional_hint == 0.0:
+            directional_hint = float(np.sign(overnight_gap_pct))
+
+    if directional_hint >= 0:
+        upper_mult += asym_scale * 1.20
+        lower_mult += asym_scale * 0.45
+    else:
+        lower_mult += asym_scale * 1.20
+        upper_mult += asym_scale * 0.45
+    return float(upper_mult), float(lower_mult)
+
+
+def _directional_jump_branch_name(
+    jump_regime_code: float,
+    overnight_gap_pct: float,
+    ret_1: float,
+) -> str:
+    if jump_regime_code < 1.0:
+        return "normal"
+    directional_score = float(overnight_gap_pct) + 0.5 * float(ret_1)
+    return "jump_up" if directional_score >= 0 else "jump_down"
+
+
+def _trend_branch_name(trend_regime_code: float) -> str:
+    if trend_regime_code <= -1.0:
+        return "trend_down"
+    if trend_regime_code >= 1.0:
+        return "trend_up"
+    return "normal"
+
+
+def _apply_directional_guard(
+    pred_return: float,
+    horizon_days: int,
+    trend_regime_code: float,
+    trend_signal: float,
+    up_prob: Optional[float],
+    confidence: float,
+    ret_1: float,
+    vol_5: float,
+    intraday_range_pct: float,
+    ma_gap_5: float,
+    ma_gap_10: float,
+    close_vs_vwap: float,
+    close_vs_high: float,
+    ret_3: float,
+    ret_5: float,
+    comex_shfe_premium: float,
+    overnight_gap_pct: float = 0.0,
+    jump_signal: float = 0.0,
+    jump_regime_code: float = 0.0,
+    branch_name: Optional[str] = None,
+) -> Tuple[float, str]:
+    """
+    Convert weak/contradictory model output into a conservative return.
+
+    The April-May continuation backtest showed a common failure mode: the
+    regressor kept a stale bullish carry while the latest price structure had
+    already rolled over. This guard is intentionally asymmetric: it only clips
+    bullish forecasts when classifier confidence and recent trend evidence do
+    not support them.
+    """
+    pred_return = float(pred_return)
+    horizon = max(int(horizon_days), 1)
+    up_prob_value = float(up_prob) if up_prob is not None else 0.5
+    trend_strength = min(max(float(trend_signal or 0.0), 0.0), 3.0)
+    mid_trenddown_repair_rebound_setup = (
+        4 <= horizon <= 6
+        and branch_name == "trend_down"
+        and float(jump_regime_code) < 1.0
+        and float(confidence) <= 12.0
+        and up_prob_value <= 0.55
+        and float(trend_signal) >= 0.70
+        and float(jump_signal) >= 0.35
+        and -0.040 <= float(ret_5) <= -0.010
+        and -0.030 <= float(ma_gap_10) <= -0.005
+        and float(close_vs_high) < -0.006
+    )
+
+    if pred_return <= 0:
+        short_trendup_classifier_release = (
+            horizon == 1
+            and branch_name == "trend_up"
+            and float(jump_regime_code) < 1.0
+            and float(trend_regime_code) >= 1.0
+            and up_prob_value >= 0.65
+            and float(trend_signal) >= 0.35
+            and pred_return > -0.0080
+        )
+        if short_trendup_classifier_release:
+            rebound_floor = 0.0008
+            rebound = max(abs(pred_return) * 0.55, rebound_floor)
+            return float(rebound), "short_trendup_classifier_release"
+
+        cross_market_rebound = (
+            horizon <= 2
+            and abs(pred_return) < 0.0030
+            and float(comex_shfe_premium) > 0.006
+            and float(ret_1) > -0.012
+            and float(ret_5) < -0.010
+            and float(ma_gap_5) > -0.003
+            and float(ma_gap_10) < -0.002
+            and float(close_vs_high) < -0.012
+            and float(intraday_range_pct) > max(0.016, 0.80 * abs(float(vol_5 or 0.0)))
+        )
+        if cross_market_rebound:
+            rebound_floor = 0.0008 * float(np.sqrt(horizon))
+            return float(max(abs(pred_return) * 0.75, rebound_floor)), "cross_market_rebound_release"
+
+        t1_premium_countertrend_release = (
+            horizon == 1
+            and branch_name == "trend_down"
+            and float(jump_regime_code) < 1.0
+            and up_prob_value < 0.10
+            and float(trend_signal) < 0.30
+            and float(ret_1) < -0.010
+            and float(ret_3) < -0.010
+            and float(ret_5) > -0.010
+            and float(ma_gap_10) < -0.008
+            and float(close_vs_vwap) < -0.004
+            and float(close_vs_high) < -0.010
+            and float(comex_shfe_premium) > 0.010
+            and pred_return > -0.0035
+        )
+        if t1_premium_countertrend_release:
+            rebound = max(abs(pred_return) * 0.25, 0.0006)
+            return float(rebound), "t1_premium_countertrend_release"
+
+        t1_shallow_repair_rebound_release = (
+            horizon == 1
+            and branch_name in {"normal", "trend_down"}
+            and float(jump_regime_code) < 1.0
+            and -0.0035 < pred_return < 0.0
+            and up_prob_value >= 0.75
+            and float(ret_5) > -0.026
+            and float(ma_gap_10) < -0.008
+            and float(close_vs_vwap) > 0.0
+            and float(close_vs_high) > -0.008
+            and float(intraday_range_pct) >= 0.012
+            and float(comex_shfe_premium) > 0.0
+        )
+        if t1_shallow_repair_rebound_release:
+            rebound = max(abs(pred_return) * 0.65, 0.0006)
+            return float(rebound), "t1_shallow_repair_rebound_release"
+
+        washout_rebound_release = (
+            3 <= horizon <= 6
+            and float(jump_regime_code) < 1.0
+            and float(trend_regime_code) <= -1.0
+            and float(ret_3) < -0.045
+            and float(ret_5) < -0.055
+            and float(ma_gap_10) < -0.045
+            and float(close_vs_high) < -0.030
+            and float(intraday_range_pct) > 0.040
+            and float(comex_shfe_premium) > 0.020
+        )
+        if washout_rebound_release:
+            rebound = max(
+                min(abs(pred_return) * 0.20, 0.0045),
+                0.0009 * float(np.sqrt(horizon)),
+            )
+            return float(rebound), "washout_rebound_release"
+
+        t1_jump_capitulation_rebound_release = (
+            horizon == 1
+            and branch_name == "jump"
+            and float(jump_regime_code) >= 1.0
+            and float(jump_signal) >= 1.20
+            and up_prob_value < 0.08
+            and float(trend_signal) >= 1.0
+            and float(ret_1) < -0.024
+            and float(ret_3) < -0.045
+            and float(ret_5) < -0.070
+            and float(ma_gap_5) < -0.030
+            and float(ma_gap_10) < -0.040
+            and float(close_vs_vwap) < -0.003
+            and float(close_vs_high) < -0.015
+            and float(overnight_gap_pct) < -0.018
+            and float(intraday_range_pct) > 0.020
+            and float(comex_shfe_premium) < -0.006
+            and pred_return < -0.0030
+        )
+        if t1_jump_capitulation_rebound_release:
+            rebound = max(min(abs(pred_return) * 0.22, 0.0028), 0.0012)
+            return float(rebound), "t1_jump_capitulation_rebound_release"
+
+        if mid_trenddown_repair_rebound_setup and -0.0080 < pred_return < 0.0:
+            rebound = max(
+                abs(pred_return) * 0.35,
+                0.0008 * float(np.sqrt(horizon)),
+            )
+            return float(rebound), "mid_trenddown_repair_rebound_release"
+
+        return pred_return, "none"
+
+    bearish_structure = (
+        float(trend_regime_code) <= -1.0
+        or (float(ma_gap_5) < -0.003 and float(ma_gap_10) < -0.002)
+        or (float(ret_3) < -0.010 and float(ret_5) < -0.015)
+    )
+    weak_confidence = float(confidence) < (38.0 if horizon <= 3 else 42.0)
+    classifier_bearish = up_prob_value < (0.47 if horizon <= 3 else 0.49)
+    trend_down_branch = branch_name == "trend_down"
+    deep_discount_stabilization_rebound = (
+        float(jump_regime_code) < 1.0
+        and 1 <= horizon <= 9
+        and 0.0 < pred_return <= 0.0300
+        and float(ret_3) >= -0.020
+        and float(ret_5) < -0.010
+        and float(ma_gap_10) <= -0.025
+        and float(close_vs_high) < 0.0
+        and (up_prob_value >= 0.65 or trend_strength >= 0.20)
+    )
+
+    def deep_discount_stabilization_rebound_release() -> Optional[Tuple[float, str]]:
+        if not deep_discount_stabilization_rebound:
+            return None
+        rebound = max(
+            min(pred_return * 0.45, 0.0100),
+            0.0008 * float(np.sqrt(horizon)),
+        )
+        return float(rebound), "deep_discount_stabilization_rebound_release"
+
+    trenddown_repaired_ma_bullish_rollover = (
+        1 <= horizon <= 4
+        and branch_name == "trend_down"
+        and float(jump_regime_code) < 1.0
+        and up_prob_value >= 0.60
+        and float(trend_signal) >= 0.30
+        and float(ma_gap_10) >= -0.0035
+        and float(close_vs_high) < 0.0
+        and pred_return > 0.0010
+    )
+    if trenddown_repaired_ma_bullish_rollover:
+        floor = -0.0008 * float(np.sqrt(horizon))
+        if horizon >= 4 or pred_return > 0.0060:
+            floor *= 1.20
+        return (
+            float(min(pred_return * 0.12, floor)),
+            "trenddown_repaired_ma_bullish_rollover_guard",
+        )
+
+    if horizon <= 3:
+        capitulation_rebound_release = (
+            horizon <= 2
+            and float(ret_1) < -0.018
+            and float(ret_3) < -0.025
+            and float(ret_5) < -0.025
+            and float(ma_gap_5) < -0.018
+            and float(ma_gap_10) < -0.020
+            and float(close_vs_vwap) < -0.004
+            and float(close_vs_high) < -0.012
+            and float(intraday_range_pct) > max(0.015, 1.35 * abs(float(vol_5 or 0.0)))
+            and up_prob_value >= 0.62
+            and (
+                horizon == 1
+                or float(jump_regime_code) >= 1.0
+                or float(ret_5) < -0.055
+                or float(comex_shfe_premium) > 0.002
+            )
+        )
+        if capitulation_rebound_release:
+            shallow_capitulation_rebound_veto = (
+                horizon == 1
+                and branch_name == "trend_down"
+                and float(jump_regime_code) < 1.0
+                and float(jump_signal) < 0.50
+                and up_prob_value >= 0.85
+                and float(trend_signal) >= 0.80
+                and -0.023 < float(ret_1) < -0.018
+                and float(ret_5) > -0.055
+                and float(overnight_gap_pct) > -0.004
+                and float(comex_shfe_premium) < 0.0
+                and pred_return > 0.010
+            )
+            if shallow_capitulation_rebound_veto:
+                return float(min(pred_return * 0.15, -0.0009)), "shallow_capitulation_rebound_veto_guard"
+
+            return pred_return, "capitulation_rebound_release"
+
+        post_capitulation_rebound_fade = (
+            horizon == 1
+            and float(ret_1) > 0.020
+            and (float(ret_3) < 0.0 or float(ret_5) < 0.0)
+            and float(vol_5) > 0.015
+            and float(intraday_range_pct) > 0.018
+            and float(ma_gap_10) < 0.002
+            and float(comex_shfe_premium) < 0.0
+            and float(close_vs_high) < 0.002
+        )
+        if post_capitulation_rebound_fade:
+            floor = -0.0012
+            return float(min(pred_return * 0.18, floor)), "post_capitulation_rebound_fade"
+
+        weak_t1_trendup_rollover = (
+            horizon == 1
+            and branch_name == "trend_up"
+            and float(jump_regime_code) < 1.0
+            and 0.50 <= up_prob_value <= 0.60
+            and float(trend_signal) < 0.25
+            and float(ret_3) < 0.0
+            and float(ma_gap_10) < -0.006
+            and float(close_vs_high) < 0.0
+            and pred_return > 0.0010
+        )
+        if weak_t1_trendup_rollover:
+            return float(min(pred_return * 0.15, -0.0009)), "weak_t1_trendup_rollover_guard"
+
+        t1_rebound_exhaustion = (
+            horizon == 1
+            and branch_name == "trend_up"
+            and float(jump_regime_code) < 1.0
+            and up_prob_value >= 0.80
+            and float(trend_signal) >= 0.75
+            and float(ret_3) > 0.030
+            and float(ret_5) > 0.020
+            and float(close_vs_vwap) < 0.0
+            and float(close_vs_high) < -0.004
+            and float(comex_shfe_premium) < 0.0
+            and pred_return > 0.0030
+        )
+        if t1_rebound_exhaustion:
+            return float(min(pred_return * 0.15, -0.0012)), "t1_rebound_exhaustion_guard"
+
+        short_bearish_continuation = (
+            float(ret_1) < -0.005
+            and float(ma_gap_5) < -0.008
+            and float(ma_gap_10) < -0.010
+            and float(close_vs_high) < -0.008
+            and (horizon < 3 or float(ret_5) > -0.025)
+        )
+        short_failed_bounce = (
+            float(ret_1) > 0.0
+            and float(ret_3) < -0.010
+            and float(ma_gap_10) < -0.008
+            and float(close_vs_vwap) < 0.002
+            and float(close_vs_high) < -0.004
+        )
+        short_top_rollover = (
+            float(ret_1) < 0.0
+            and float(ret_3) > 0.015
+            and float(ret_5) > 0.010
+            and float(close_vs_vwap) < 0.0
+            and float(close_vs_high) < -0.006
+        )
+        if short_bearish_continuation or short_failed_bounce or short_top_rollover:
+            short_structure_classifier_rebound = (
+                2 <= horizon <= 3
+                and branch_name == "trend_down"
+                and float(jump_regime_code) < 1.0
+                and float(ret_5) > -0.025
+                and up_prob_value >= (0.85 if horizon == 2 else 0.90)
+                and float(trend_signal) >= 0.35
+                and pred_return > 0.0060
+            )
+            if short_structure_classifier_rebound:
+                rebound = max(
+                    min(pred_return * 0.18, 0.0040),
+                    0.0008 * float(np.sqrt(horizon)),
+                )
+                return float(rebound), "short_structure_classifier_rebound_release"
+
+            release = deep_discount_stabilization_rebound_release()
+            if release is not None:
+                return release
+
+            floor = -0.0010 * float(np.sqrt(horizon))
+            return float(min(pred_return * 0.15, floor)), "short_structure_guard"
+
+        short_trendup_classifier_veto = (
+            horizon == 2
+            and branch_name == "trend_up"
+            and float(jump_regime_code) < 1.0
+            and up_prob_value < 0.45
+            and float(ma_gap_10) < -0.005
+            and float(close_vs_high) < -0.004
+            and float(intraday_range_pct) > 0.012
+            and float(trend_signal) < 0.65
+            and pred_return > 0.0035
+        )
+        if short_trendup_classifier_veto:
+            floor = -0.0008 * float(np.sqrt(horizon))
+            return float(min(pred_return * 0.15, floor)), "short_trendup_classifier_veto_guard"
+
+        near_confirmed_breakdown = (
+            horizon == 3
+            and bearish_structure
+            and float(jump_regime_code) < 1.0
+            and float(ret_5) < -0.015
+            and float(close_vs_vwap) < -0.005
+            and float(close_vs_high) < -0.015
+            and abs(pred_return) > 0.0030
+        )
+        if near_confirmed_breakdown:
+            release = deep_discount_stabilization_rebound_release()
+            if release is not None:
+                return release
+
+            floor = -0.0010 * float(np.sqrt(horizon))
+            if classifier_bearish:
+                floor *= 1.35
+            return float(min(pred_return * 0.18, floor)), "near_breakdown_guard"
+
+    near_unresolved_breakdown = (
+        horizon <= 4
+        and bearish_structure
+        and float(jump_regime_code) < 1.0
+        and float(ret_1) < -0.004
+        and float(ret_5) < -0.004
+        and float(ret_5) > -0.025
+        and float(ma_gap_10) < -0.005
+        and float(close_vs_vwap) < -0.004
+        and float(close_vs_high) < -0.010
+        and (horizon > 1 or float(ret_5) > -0.010)
+        and abs(pred_return) > 0.0015
+    )
+    if near_unresolved_breakdown:
+        release = deep_discount_stabilization_rebound_release()
+        if release is not None:
+            return release
+
+        floor = -0.0009 * float(np.sqrt(horizon))
+        if horizon >= 3 or classifier_bearish:
+            floor *= 1.25
+        return float(min(pred_return * 0.16, floor)), "near_unresolved_breakdown_guard"
+
+    mid_failed_rebound = (
+        3 <= horizon <= 4
+        and float(jump_regime_code) < 1.0
+        and float(ret_1) >= -0.002
+        and float(ma_gap_10) < -0.004
+        and float(close_vs_high) < -0.002
+        and float(intraday_range_pct) > 0.011
+        and float(comex_shfe_premium) > -0.001
+        and abs(pred_return) > 0.0020
+    )
+    if mid_failed_rebound:
+        release = deep_discount_stabilization_rebound_release()
+        if release is not None:
+            return release
+
+        floor = -0.0011 * float(np.sqrt(horizon))
+        return float(min(pred_return * 0.20, floor)), "mid_failed_rebound_guard"
+
+    rebound_exhaustion = (
+        3 <= horizon <= 4
+        and branch_name == "normal"
+        and float(jump_regime_code) < 1.0
+        and float(trend_regime_code) >= 0.0
+        and float(ret_1) > 0.018
+        and float(ret_3) < 0.0
+        and float(ret_5) < 0.0
+        and float(intraday_range_pct) > 0.018
+        and float(comex_shfe_premium) < 0.0
+        and float(confidence) < 30.0
+        and pred_return > 0.0030
+    )
+    if rebound_exhaustion:
+        floor = -0.0010 * float(np.sqrt(horizon))
+        return float(min(pred_return * 0.15, floor)), "rebound_exhaustion_guard"
+
+    normal_premium_rejection = (
+        2 <= horizon <= 4
+        and branch_name == "normal"
+        and float(jump_regime_code) < 1.0
+        and abs(float(trend_regime_code)) < 1.0
+        and float(trend_signal) < 0.30
+        and float(ret_5) > 0.035
+        and float(ret_1) < 0.0
+        and float(ret_3) < 0.005
+        and float(close_vs_vwap) < -0.003
+        and float(close_vs_high) < -0.012
+        and float(intraday_range_pct) > 0.020
+        and float(comex_shfe_premium) > 0.010
+        and pred_return > 0.0020
+    )
+    if normal_premium_rejection:
+        floor = -0.0009 * float(np.sqrt(horizon))
+        return float(min(pred_return * 0.18, floor)), "normal_premium_rejection_guard"
+
+    mid_trendup_rebound_exhaustion = (
+        2 <= horizon <= 5
+        and branch_name == "trend_up"
+        and float(jump_regime_code) < 1.0
+        and (
+            (3 <= horizon <= 5 and up_prob_value >= 0.80)
+            or (
+                horizon == 2
+                and up_prob_value >= 0.95
+                and float(trend_signal) >= 0.80
+                and pred_return > 0.0040
+            )
+            or (
+                horizon == 3
+                and up_prob_value >= 0.78
+                and float(close_vs_vwap) < -0.002
+                and float(close_vs_high) < -0.008
+                and float(ma_gap_10) < 0.001
+            )
+        )
+        and float(close_vs_high) < -0.004
+        and pred_return > 0.0030
+        and (
+            (
+                float(ret_3) > 0.030
+                and float(trend_signal) >= 0.60
+                and float(close_vs_vwap) < 0.001
+                and (float(comex_shfe_premium) < 0.0 or float(ma_gap_10) < 0.002)
+            )
+            or (
+                float(ret_1) > 0.020
+                and float(ret_5) < 0.0
+                and float(ma_gap_10) < 0.0
+                and float(comex_shfe_premium) < 0.0
+                and float(intraday_range_pct) > 0.018
+            )
+        )
+    )
+    if mid_trendup_rebound_exhaustion:
+        floor = -0.0010 * float(np.sqrt(horizon / 4.0))
+        return float(min(pred_return * 0.15, floor)), "mid_trendup_rebound_exhaustion_guard"
+
+    weak_trendup_fatigue = (
+        3 <= horizon <= 4
+        and branch_name == "trend_up"
+        and float(jump_regime_code) < 1.0
+        and float(trend_signal) < 0.50
+        and float(ret_5) < -0.003
+        and float(close_vs_high) < 0.001
+        and float(intraday_range_pct) > 0.015
+        and float(confidence) < 42.0
+        and 0.0 < pred_return < 0.0040
+    )
+    if weak_trendup_fatigue:
+        floor = -0.0008 * float(np.sqrt(horizon))
+        return float(min(pred_return * 0.12, floor)), "weak_trendup_fatigue_guard"
+
+    stalled_bullish_carry = (
+        horizon == 5
+        and float(jump_regime_code) < 1.0
+        and float(trend_regime_code) >= 0.0
+        and up_prob_value >= 0.92
+        and float(confidence) >= 40.0
+        and float(ret_5) < -0.006
+        and float(ma_gap_10) < -0.014
+        and float(close_vs_high) < -0.006
+        and pred_return > 0.0100
+    )
+    if stalled_bullish_carry:
+        floor = -0.0014 * float(np.sqrt(horizon / 5.0))
+        if float(ret_5) < -0.020:
+            floor *= 1.25
+        return float(min(pred_return * 0.12, floor)), "stalled_bullish_carry_guard"
+
+    delayed_capitulation_rebound = (
+        5 <= horizon <= 6
+        and bearish_structure
+        and float(trend_regime_code) <= -1.0
+        and float(trend_signal) >= 0.70
+        and float(ret_5) < -0.025
+        and float(ma_gap_10) < -0.020
+        and float(close_vs_high) < -0.004
+        and (horizon == 5 or float(jump_regime_code) >= 1.0)
+    )
+    if delayed_capitulation_rebound:
+        rebound = max(
+            min(abs(pred_return) * 0.12, 0.0040),
+            0.0008 * float(np.sqrt(horizon)),
+        )
+        return float(rebound), "delayed_capitulation_rebound_release"
+
+    if bearish_structure and (weak_confidence or classifier_bearish or trend_down_branch):
+        if horizon <= 3:
+            fresh_breakdown_after_rebound = (
+                horizon == 2
+                and branch_name == "trend_down"
+                and float(jump_regime_code) < 1.0
+                and pred_return > 0.0010
+                and up_prob_value >= 0.50
+                and float(ret_1) < -0.018
+                and float(ret_3) < -0.020
+                and 0.0 < float(ret_5) < 0.020
+                and float(ma_gap_5) < -0.015
+                and float(ma_gap_10) < -0.008
+                and float(close_vs_high) < -0.004
+                and float(intraday_range_pct) > 0.010
+            )
+            if fresh_breakdown_after_rebound:
+                floor = -0.0010 * float(np.sqrt(horizon))
+                return float(min(pred_return * 0.15, floor)), "fresh_breakdown_after_rebound_guard"
+
+            return float(pred_return * 0.35), "near_bearish_decay"
+
+        horizon_scale = float(np.sqrt(max(horizon, 1) / 5.0))
+        mid_horizon_confirmed_breakdown = (
+            horizon == 4
+            and float(jump_regime_code) < 1.0
+            and float(ret_5) < -0.015
+            and float(ret_5) > -0.060
+            and float(close_vs_vwap) < -0.005
+            and float(close_vs_high) < -0.015
+            and abs(pred_return) > 0.0030
+        )
+        if mid_horizon_confirmed_breakdown:
+            release = deep_discount_stabilization_rebound_release()
+            if release is not None:
+                return release
+
+            floor = -0.0015 * horizon_scale
+            if classifier_bearish:
+                floor = -0.0025 * horizon_scale
+            return float(min(pred_return * 0.18, floor)), "mid_horizon_breakdown_guard"
+
+        mid_horizon_unresolved_structure = (
+            horizon == 4
+            and float(ma_gap_10) < -0.004
+            and (float(close_vs_vwap) < 0.0 or float(close_vs_high) < -0.004)
+            and float(intraday_range_pct) > max(0.012, 1.05 * abs(float(vol_5 or 0.0)))
+            and abs(pred_return) > 0.0030
+        )
+        if mid_horizon_unresolved_structure:
+            return float(pred_return * 0.45), "mid_horizon_structure_decay"
+
+        t5_low_confidence_washout_rebound = (
+            horizon == 5
+            and branch_name == "trend_down"
+            and float(jump_regime_code) < 1.0
+            and float(trend_regime_code) <= -1.0
+            and float(confidence) < 24.0
+            and 0.0 < pred_return < 0.0020
+            and 0.75 <= up_prob_value <= 0.93
+            and float(trend_signal) < 0.35
+            and float(ret_1) > 0.012
+            and float(ret_3) < -0.025
+            and float(ret_5) < -0.050
+            and float(ma_gap_10) < -0.035
+            and float(close_vs_vwap) > 0.006
+            and float(close_vs_high) < -0.004
+            and float(intraday_range_pct) > 0.030
+            and float(comex_shfe_premium) < -0.004
+        )
+        if t5_low_confidence_washout_rebound:
+            rebound = max(min(pred_return * 0.80, 0.0020), 0.0008)
+            return float(rebound), "t5_low_confidence_washout_rebound_release"
+
+        if horizon >= 5:
+            mid_bearish_normal_rebound_release = (
+                5 <= horizon <= 7
+                and branch_name == "normal"
+                and float(jump_regime_code) < 1.0
+                and float(jump_signal) < 0.60
+                and up_prob_value >= 0.95
+                and trend_strength < 0.25
+                and (
+                    (
+                        horizon == 5
+                        and float(confidence) < 42.0
+                        and pred_return > 0.0200
+                    )
+                    or (
+                        horizon >= 6
+                        and float(confidence) < 32.0
+                        and pred_return > 0.0120
+                    )
+                )
+            )
+            if mid_bearish_normal_rebound_release:
+                rebound = max(
+                    min(pred_return * 0.55, 0.0140),
+                    0.0010 * horizon_scale,
+                )
+                return float(rebound), "mid_bearish_normal_rebound_release"
+
+            mid_oversold_trenddown_rebound_release = (
+                6 <= horizon <= 7
+                and branch_name == "trend_down"
+                and float(jump_regime_code) < 1.0
+                and float(trend_regime_code) <= -1.0
+                and pred_return > 0.0030
+                and up_prob_value >= 0.55
+                and (
+                    (horizon == 6 and float(confidence) < 27.0 and up_prob_value >= 0.80)
+                    or (horizon == 7 and float(confidence) < 24.0)
+                )
+                and float(trend_signal) >= 0.70
+                and float(jump_signal) >= 0.70
+                and float(ret_3) < -0.045
+                and float(ret_5) < -0.075
+                and float(ma_gap_5) < -0.040
+                and float(ma_gap_10) < -0.055
+                and float(close_vs_vwap) < -0.004
+                and float(close_vs_high) < -0.018
+                and float(intraday_range_pct) > 0.030
+            )
+            if mid_oversold_trenddown_rebound_release:
+                rebound = max(
+                    min(pred_return * 0.45, 0.0060),
+                    0.0010 * horizon_scale,
+                )
+                return float(rebound), "mid_oversold_trenddown_rebound_release"
+
+            long_oversold_rebound_release = (
+                8 <= horizon <= 10
+                and pred_return > 0.0060
+                and up_prob_value >= 0.45
+                and float(trend_signal) >= 0.80
+                and float(ret_5) < -0.025
+                and float(ma_gap_10) < -0.020
+                and float(close_vs_high) < -0.010
+                and float(intraday_range_pct) > 0.018
+            ) or (
+                7 <= horizon <= 10
+                and pred_return > 0.0060
+                and up_prob_value >= 0.45
+                and float(ret_5) < -0.025
+                and float(ma_gap_10) < -0.020
+                and float(close_vs_high) < -0.010
+                and float(intraday_range_pct) > 0.018
+                and float(jump_signal) >= 0.60
+                and (
+                    float(trend_signal) >= 0.80
+                    or float(ret_3) >= -0.020
+                )
+            )
+            if long_oversold_rebound_release:
+                rebound = max(
+                    min(pred_return * 0.35, 0.0120),
+                    0.0008 * horizon_scale,
+                )
+                return float(rebound), "long_oversold_rebound_release"
+
+            positive_gap_trenddown_rebound_release = (
+                5 <= horizon <= 7
+                and branch_name == "trend_down"
+                and float(jump_regime_code) < 1.0
+                and pred_return > 0.0030
+                and float(trend_signal) >= 0.80
+                and float(jump_signal) >= 0.50
+                and float(overnight_gap_pct) > 0.0
+                and -0.030 <= float(ret_5) <= -0.020
+                and -0.020 <= float(ma_gap_10) <= -0.010
+                and float(close_vs_high) < -0.006
+            )
+            if positive_gap_trenddown_rebound_release:
+                rebound = max(
+                    min(pred_return * 0.35, 0.0080),
+                    0.0008 * horizon_scale,
+                )
+                return (
+                    float(rebound),
+                    "positive_gap_trenddown_rebound_release",
+                )
+
+            release = deep_discount_stabilization_rebound_release()
+            if release is not None:
+                return release
+
+            if mid_trenddown_repair_rebound_setup and 0.0 < pred_return < 0.0080:
+                rebound = max(
+                    pred_return * 0.35,
+                    0.0008 * horizon_scale,
+                )
+                return float(rebound), "mid_trenddown_repair_rebound_release"
+
+            floor = -0.0015 * horizon_scale
+            if classifier_bearish:
+                floor = -0.0025 * horizon_scale
+            if trend_strength >= 0.35:
+                floor *= min(1.45, 1.0 + 0.18 * trend_strength)
+            return float(min(pred_return * 0.18, floor)), "bearish_guard"
+
+    if weak_confidence and horizon >= 5:
+        long_low_confidence_fragility = (
+            float(jump_regime_code) < 1.0
+            and float(close_vs_high) < 0.0
+            and (
+                float(ma_gap_10) < 0.003
+                or float(ret_3) < 0.0
+                or float(ret_5) < 0.0
+            )
+            and trend_strength < 0.65
+            and abs(pred_return) > 0.0015
+        )
+        if long_low_confidence_fragility:
+            trendup_low_confidence_rebound_release = (
+                5 <= horizon <= 6
+                and branch_name == "trend_up"
+                and float(jump_regime_code) < 1.0
+                and float(jump_signal) >= 0.70
+                and up_prob_value >= 0.90
+                and trend_strength < 0.30
+                and pred_return > 0.0100
+            )
+            if trendup_low_confidence_rebound_release:
+                horizon_scale = float(np.sqrt(max(horizon, 1) / 5.0))
+                rebound = max(
+                    min(pred_return * 0.45, 0.0110),
+                    0.0010 * horizon_scale,
+                )
+                return float(rebound), "trendup_low_confidence_rebound_release"
+
+            release = deep_discount_stabilization_rebound_release()
+            if release is not None:
+                return release
+
+            horizon_scale = float(np.sqrt(max(horizon, 1) / 5.0))
+            floor = -0.0012 * horizon_scale
+            if float(ret_5) < -0.010 or float(close_vs_high) < -0.006:
+                floor *= 1.25
+            return float(min(pred_return * 0.12, floor)), "long_low_confidence_fragility_guard"
+
+        low_confidence_bullish_carry_rollover = (
+            pred_return > 0.0
+            and float(jump_regime_code) < 1.0
+            and float(close_vs_high) < -0.005
+            and (
+                float(close_vs_vwap) < 0.0
+                or float(ret_1) < 0.0
+                or horizon >= 8
+            )
+            and (
+                (
+                    branch_name == "trend_up"
+                    and horizon >= 6
+                    and trend_strength >= 0.50
+                )
+                or (
+                    branch_name == "normal"
+                    and trend_strength < 0.35
+                )
+            )
+        )
+        if low_confidence_bullish_carry_rollover:
+            horizon_scale = float(np.sqrt(max(horizon, 1) / 5.0))
+            floor = -0.0010 * horizon_scale
+            if float(close_vs_high) < -0.010:
+                floor *= 1.20
+            return (
+                float(min(pred_return * 0.10, floor)),
+                "low_confidence_bullish_carry_rollover_guard",
+            )
+
+        scale = 0.35 if horizon <= 7 else 0.20
+        return float(pred_return * scale), "low_confidence_decay"
+
+    if branch_name == "trend_up" and weak_confidence and horizon >= 8:
+        return float(pred_return * 0.45), "long_horizon_trend_decay"
+
+    return pred_return, "none"
+
+
+def _train_horizon_model(
+    daily_df: pd.DataFrame,
+    comex_daily: pd.DataFrame,
+    usdcny_daily: pd.DataFrame,
+    cross_market: pd.DataFrame,
+    horizon_days: int,
+    lookback_days: int,
+    cot_daily: Optional[pd.DataFrame] = None,
+    feature_cache: Optional[Dict[int, Dict[str, float]]] = None,
+) -> Dict[str, Any]:
+    x, y_ret, y_dir, bases, sample_dates = _build_training_dataset(
+        daily_df=daily_df,
+        comex_daily=comex_daily,
+        usdcny_daily=usdcny_daily,
+        cross_market=cross_market,
+        horizon_days=horizon_days,
+        lookback_days=lookback_days,
+        cot_daily=cot_daily,
+        feature_cache=feature_cache,
+    )
+    if len(x) < 50:
+        return {"trained": False, "reason": f"insufficient data ({len(x)} < 50)"}
+
+    split = int(len(x) * 0.8)
+    # Purge by actual label maturity, including when invalid prices removed rows.
+    calendar = pd.DatetimeIndex(pd.to_datetime(daily_df.sort_values("date")["date"]))
+    positions = calendar.get_indexer(pd.DatetimeIndex(sample_dates))
+    label_dates = pd.Series(calendar[positions + horizon_days], index=x.index)
+    validation_origin = pd.Timestamp(sample_dates.iloc[split])
+    train_mask = (x.index < split) & (label_dates <= validation_origin)
+    x_train, x_test = x.loc[train_mask], x.iloc[split:]
+    y_ret_train, y_ret_test = y_ret.loc[train_mask], y_ret.iloc[split:]
+    y_dir_train, y_dir_test = y_dir.loc[train_mask], y_dir.iloc[split:]
+    base_test = bases.iloc[split:]
+    train_dates = sample_dates.loc[train_mask]
+    train_weights = _build_recency_weights(train_dates, horizon_days)
+
+    reg, cls = _fit_branch_pair(x_train, y_ret_train, y_dir_train, train_weights)
+
+    metrics = _evaluate(reg, cls, x_test, y_ret_test, y_dir_test, base_test)
+    metrics["train_size"] = len(x_train)
+    metrics["test_size"] = len(x_test)
+    metrics["purged_size"] = int(split - len(x_train))
+    metrics["last_validation_train_label"] = str(label_dates.loc[train_mask].max().date())
+    metrics["first_validation_origin"] = str(validation_origin.date())
+    metrics["refit_size"] = len(x)
+    metrics["last_refit_label"] = str(label_dates.max().date())
+    metrics["train_weight_mean"] = round(float(train_weights.mean()), 4)
+    metrics["recent_weight_mean"] = round(float(train_weights.tail(min(len(train_weights), 10)).mean()), 4)
+
+    # Bias estimates must be out of sample, not residuals of the fitted model.
+    tail_size = min(len(x_test), 10 if horizon_days <= 2 else 6)
+    recent_bias_return = 0.0
+    if tail_size > 0:
+        tail_pred = reg.predict(x_test.tail(tail_size))
+        tail_actual = y_ret_test.tail(tail_size).values
+        recent_bias_return = float(np.mean(tail_actual - tail_pred))
+        bias_cap = 0.012 if horizon_days <= 2 else 0.008
+        recent_bias_return = float(np.clip(recent_bias_return, -bias_cap, bias_cap))
+    metrics["recent_bias_return_pct"] = round(recent_bias_return * 100, 3)
+
+    drift_bias_by_regime: Dict[str, float] = {}
+    drift_tail = min(len(x_test), 14 if horizon_days <= 2 else 8)
+    if drift_tail > 0:
+        drift_x = x_test.tail(drift_tail)
+        drift_pred = reg.predict(drift_x)
+        drift_actual = y_ret_test.tail(drift_tail).values
+        drift_resid = drift_actual - drift_pred
+        trend_tail = drift_x["trend_regime_code"]
+        drift_masks = {
+            "trend_down": trend_tail <= -1.0,
+            "trend_up": trend_tail >= 1.0,
+            "normal": trend_tail.abs() < 1.0,
+        }
+        drift_cap = 0.014 if horizon_days <= 2 else 0.010
+        for regime_name, regime_mask in drift_masks.items():
+            if int(regime_mask.sum()) == 0:
+                continue
+            regime_bias = float(np.mean(drift_resid[regime_mask.values]))
+            drift_bias_by_regime[regime_name] = float(np.clip(regime_bias, -drift_cap, drift_cap))
+
+    # Keep validation metrics above; fit deployable base/branch models on all
+    # labels already known at this origin. Never refit on future target labels.
+    x_train, y_ret_train, y_dir_train = x, y_ret, y_dir
+    train_weights = _build_recency_weights(sample_dates, horizon_days)
+    reg, cls = _fit_branch_pair(x_train, y_ret_train, y_dir_train, train_weights)
+    branch_models: Dict[str, Any] = {}
+    branch_blend_weights: Dict[str, float] = {}
+    if horizon_days <= 10:
+        jump_mask = x_train["jump_regime_code"] >= 1.0
+        trend_down_mask = x_train["trend_regime_code"] <= -1.0
+        trend_up_mask = x_train["trend_regime_code"] >= 1.0
+        directional_score = x_train["overnight_gap_pct"] + 0.5 * x_train["ret_1"]
+        jump_up_mask = jump_mask & (directional_score >= 0)
+        jump_down_mask = jump_mask & (directional_score < 0)
+        branch_specs: Dict[str, pd.Series] = {}
+        if horizon_days <= 2:
+            branch_specs.update(
+                {
+                    "jump_up": jump_up_mask,
+                    "jump_down": jump_down_mask,
+                    "jump": jump_mask,
+                }
+            )
+        trend_only_mask = (~jump_mask) if horizon_days <= 2 else pd.Series(True, index=x_train.index)
+        branch_specs.update(
+            {
+                "trend_down": trend_down_mask & trend_only_mask,
+                "trend_up": trend_up_mask & trend_only_mask,
+                "normal": ~(jump_mask | trend_down_mask | trend_up_mask),
+            }
+        )
+        for branch_name, mask in branch_specs.items():
+            branch_x = x_train.loc[mask]
+            if branch_name in {"jump_up", "jump_down"}:
+                min_samples = 8
+            elif branch_name == "jump":
+                min_samples = 12
+            elif branch_name in {"trend_down", "trend_up"}:
+                min_samples = 10 if horizon_days <= 2 else (12 if horizon_days <= 4 else (14 if horizon_days <= 7 else 16))
+            else:
+                min_samples = 16 if horizon_days <= 2 else (18 if horizon_days <= 4 else (20 if horizon_days <= 7 else 22))
+            if len(branch_x) < min_samples:
+                continue
+            branch_y_ret = y_ret_train.loc[mask]
+            branch_y_dir = y_dir_train.loc[mask]
+            branch_weights = train_weights.loc[mask]
+            branch_reg, branch_cls = _fit_branch_pair(branch_x, branch_y_ret, branch_y_dir, branch_weights)
+
+            # No branch-specific out-of-sample calibration available yet.
+            branch_bias = 0.0
+
+            branch_models[branch_name] = {
+                "reg_model": branch_reg,
+                "cls_model": branch_cls,
+                "sample_count": int(len(branch_x)),
+                "recent_bias_return": branch_bias,
+            }
+        if "jump_up" in branch_models:
+            branch_blend_weights["jump_up"] = 0.78
+        if "jump_down" in branch_models:
+            branch_blend_weights["jump_down"] = 0.78
+        if "jump" in branch_models:
+            branch_blend_weights["jump"] = 0.65
+        if "trend_down" in branch_models:
+            branch_blend_weights["trend_down"] = (
+                0.72 if horizon_days <= 2 else (0.62 if horizon_days <= 4 else (0.50 if horizon_days <= 7 else 0.42))
+            )
+        if "trend_up" in branch_models:
+            branch_blend_weights["trend_up"] = (
+                0.68 if horizon_days <= 2 else (0.58 if horizon_days <= 4 else (0.42 if horizon_days <= 7 else 0.30))
+            )
+        if "normal" in branch_models:
+            branch_blend_weights["normal"] = (
+                0.55 if horizon_days <= 2 else (0.45 if horizon_days <= 4 else (0.35 if horizon_days <= 7 else 0.25))
+            )
+
+    return {
+        "trained": True,
+        "reg_model": reg,
+        "cls_model": cls,
+        "metrics": metrics,
+        "recent_bias_return": recent_bias_return,
+        "drift_bias_by_regime": drift_bias_by_regime,
+        "branch_models": branch_models,
+        "branch_blend_weights": branch_blend_weights,
+    }
+
+
+def run_direct_multi_day_prediction(
+    daily_df: pd.DataFrame,
+    comex_daily: pd.DataFrame,
+    usdcny_daily: pd.DataFrame,
+    cross_market: pd.DataFrame,
+    target_dates: Sequence[pd.Timestamp],
+    lookback_days: int = 240,
+    verbose: bool = True,
+    cot_daily: Optional[pd.DataFrame] = None,
+    horizons_to_train: Optional[Sequence[int]] = None,
+    prediction_at: Optional[pd.Timestamp] = None,
+) -> List[Dict[str, Any]]:
+    """
+    horizons_to_train: optional subset of horizons (1..N) to train. If None,
+    train all horizons from 1 to len(target_dates). Use this to skip wasted
+    training when only a specific horizon (e.g. T+20) is needed.
+    """
+    if len(target_dates) == 0:
+        return []
+
+    daily_sorted = daily_df.sort_values("date").reset_index(drop=True)
+    current_close = float(daily_sorted.iloc[-1]["close"])
+    current_date = pd.Timestamp(daily_sorted.iloc[-1]["date"])
+    cutoff = daily_cutoff(current_date, prediction_at)
+    dates = pd.DatetimeIndex(target_dates)
+    if not dates.is_monotonic_increasing or dates.has_duplicates or (dates <= current_date).any():
+        raise ValueError("target_dates must be unique, increasing future trading dates")
+    if horizons_to_train is not None and any(int(h) < 1 or int(h) > len(dates) for h in horizons_to_train):
+        raise ValueError("horizons_to_train must index target_dates (1-based)")
+    external_audit = {name: availability_audit(frame, cutoff) for name, frame in
+                      [("comex", comex_daily), ("usdcny", usdcny_daily), ("cross_market", cross_market)]}
+    regime_info = compute_regime_info(daily_sorted["close"].astype(float))
+    regime = regime_info["regime"]
+
+    if verbose:
+        print(
+            f"  [Regime] {regime} (vol={regime_info['annualized_vol']}%, dampening={regime_info['dampening']})"
+        )
+
+    horizons_iter = (
+        sorted(set(int(h) for h in horizons_to_train))
+        if horizons_to_train
+        else list(range(1, len(target_dates) + 1))
+    )
+    models: Dict[int, Dict[str, Any]] = {}
+    # Input frames are fixed for this invocation; never share across origins/runs.
+    feature_cache: Dict[int, Dict[str, float]] = {}
+    for horizon_days in horizons_iter:
+        if verbose:
+            print(f"  [Train] T+{horizon_days} direct model ...", end=" ")
+        model_info = _train_horizon_model(
+            daily_df=daily_sorted,
+            comex_daily=comex_daily,
+            usdcny_daily=usdcny_daily,
+            cross_market=cross_market,
+            horizon_days=horizon_days,
+            lookback_days=lookback_days,
+            cot_daily=cot_daily,
+            feature_cache=feature_cache,
+        )
+        models[horizon_days] = model_info
+        if verbose:
+            if model_info["trained"]:
+                m = model_info["metrics"]
+                print(
+                    f"OK (n={m['train_size']}+{m['test_size']}, "
+                    f"dir={m['direction_accuracy']}%, mape={m['mape_pct']}%)"
+                )
+            else:
+                print(f"SKIP ({model_info.get('reason', 'unknown')})")
+
+    history_window = daily_sorted.iloc[max(0, len(daily_sorted) - 21):].copy()
+    predictions: List[Dict[str, Any]] = []
+    for horizon_days, target_date in enumerate(target_dates, start=1):
+        model_info = models.get(horizon_days, {})
+        if not model_info.get("trained", False):
+            continue
+
+        feature_row = _build_direct_feature_row(
+            daily_history=history_window,
+            current_close=current_close,
+            current_date=current_date,
+            comex_daily=comex_daily,
+            usdcny_daily=usdcny_daily,
+            cross_market=cross_market,
+            horizon_days=horizon_days,
+            cot_daily=cot_daily,
+            prediction_at=cutoff,
+        )
+        x_row = pd.DataFrame([[feature_row[col] for col in DIRECT_FEATURE_COLUMNS]], columns=DIRECT_FEATURE_COLUMNS)
+        vol_5 = float(feature_row.get("vol_5", 0.0))
+        jump_regime_code = float(feature_row.get("jump_regime_code", 0.0))
+        jump_signal = float(feature_row.get("jump_signal", 0.0))
+        trend_regime_code = float(feature_row.get("trend_regime_code", 0.0))
+        trend_signal = float(feature_row.get("trend_signal", 0.0))
+        overnight_gap_pct = float(feature_row.get("overnight_gap_pct", 0.0))
+        ret_1 = float(feature_row.get("ret_1", 0.0))
+        ret_3 = float(feature_row.get("ret_3", 0.0))
+        ret_5 = float(feature_row.get("ret_5", 0.0))
+        ma_gap_5 = float(feature_row.get("ma_gap_5", 0.0))
+        ma_gap_10 = float(feature_row.get("ma_gap_10", 0.0))
+        close_vs_vwap = float(feature_row.get("close_vs_vwap", 0.0))
+        close_vs_high = float(feature_row.get("close_vs_high", 0.0))
+        intraday_range_pct = float(feature_row.get("intraday_range_pct", 0.0))
+        comex_shfe_premium = float(feature_row.get("comex_shfe_premium", 0.0))
+
+        pred_return = float(model_info["reg_model"].predict(x_row)[0])
+        preferred_branch = _directional_jump_branch_name(jump_regime_code, overnight_gap_pct, ret_1)
+        branch_models = model_info.get("branch_models", {})
+        branch_blend_weights = model_info.get("branch_blend_weights", {})
+        branch_name = None
+        branch_info = None
+        if preferred_branch in {"jump_up", "jump_down"}:
+            if preferred_branch in branch_models:
+                branch_name = preferred_branch
+                branch_info = branch_models[branch_name]
+            elif "jump" in branch_models:
+                branch_name = "jump"
+                branch_info = branch_models[branch_name]
+        elif abs(trend_regime_code) >= 1.0:
+            trend_branch = _trend_branch_name(trend_regime_code)
+            if trend_branch in branch_models:
+                branch_name = trend_branch
+                branch_info = branch_models[branch_name]
+            elif "normal" in branch_models:
+                branch_name = "normal"
+                branch_info = branch_models[branch_name]
+        elif "normal" in branch_models:
+            branch_name = "normal"
+            branch_info = branch_models[branch_name]
+
+        branch_blend_weight = float(branch_blend_weights.get(branch_name, 0.0)) if branch_name else 0.0
+        branch_used = False
+        if branch_info is not None and branch_blend_weight > 0.0:
+            branch_pred = float(branch_info["reg_model"].predict(x_row)[0])
+            pred_return = (1.0 - branch_blend_weight) * pred_return + branch_blend_weight * branch_pred
+            branch_used = True
+
+        bias_adjustment = float(model_info.get("recent_bias_return", 0.0))
+        if horizon_days >= 3:
+            bias_adjustment *= 0.65
+        drift_bias_by_regime = model_info.get("drift_bias_by_regime", {})
+        if abs(trend_regime_code) >= 1.0:
+            drift_key = _trend_branch_name(trend_regime_code)
+        else:
+            drift_key = "normal"
+        bias_adjustment += 0.70 * float(drift_bias_by_regime.get(drift_key, 0.0))
+        if branch_info is not None:
+            branch_bias = float(branch_info.get("recent_bias_return", 0.0))
+            bias_adjustment = 0.55 * bias_adjustment + 0.45 * branch_bias
+        pred_return += bias_adjustment
+
+        up_prob = None
+        cls_model = model_info.get("cls_model")
+        if branch_info is not None and branch_info.get("cls_model") is not None and branch_used:
+            cls_model = branch_info.get("cls_model")
+        if cls_model is not None:
+            probs = cls_model.predict_proba(x_row)[0]
+            up_prob = float(probs[1]) if len(probs) > 1 else None
+
+        metrics = model_info.get("metrics", {})
+        prob_conf = abs(up_prob - 0.5) * 2 if up_prob is not None else 0.0
+        dir_acc = float(metrics.get("direction_accuracy") or 50.0) / 100.0
+        horizon_decay = max(0.45, 1.0 - 0.10 * (horizon_days - 1))
+        confidence = (0.55 * prob_conf + 0.45 * dir_acc) * 100 * horizon_decay
+        confidence_guard = "none"
+        whipsaw_reversal = (
+            horizon_days >= 2
+            and abs(ret_1) > 0.018
+            and (ret_1 * ret_3 < 0 or ret_1 * ret_5 < 0)
+            and (vol_5 > 0.014 or intraday_range_pct > 0.018)
+        )
+        if whipsaw_reversal:
+            confidence *= 0.72 if horizon_days == 2 else 0.60
+            confidence_guard = "whipsaw_confidence_dampen"
+
+        pre_guard_return = pred_return
+        pred_return, direction_guard = _apply_directional_guard(
+            pred_return=pred_return,
+            horizon_days=horizon_days,
+            trend_regime_code=trend_regime_code,
+            trend_signal=trend_signal,
+            up_prob=up_prob,
+            confidence=confidence,
+            ret_1=ret_1,
+            vol_5=vol_5,
+            intraday_range_pct=intraday_range_pct,
+            ma_gap_5=ma_gap_5,
+            ma_gap_10=ma_gap_10,
+            close_vs_vwap=close_vs_vwap,
+            close_vs_high=close_vs_high,
+            ret_3=ret_3,
+            ret_5=ret_5,
+            comex_shfe_premium=comex_shfe_premium,
+            overnight_gap_pct=overnight_gap_pct,
+            jump_signal=jump_signal,
+            jump_regime_code=jump_regime_code,
+            branch_name=branch_name if branch_used else None,
+        )
+        post_guard_confidence_notes: List[str] = []
+        if direction_guard not in {"none", "capitulation_rebound_release"}:
+            guard_change = abs(pred_return - pre_guard_return)
+            if guard_change > 0.0005 or np.sign(pred_return) != np.sign(pre_guard_return):
+                confidence *= 0.68
+                post_guard_confidence_notes.append("direction_guard_dampen")
+        if abs(pred_return) < 0.0010:
+            confidence *= 0.45
+            post_guard_confidence_notes.append("tiny_edge_confidence_dampen")
+        elif horizon_days <= 3 and abs(pred_return) < max(0.0018, 0.12 * max(abs(vol_5), 0.005)):
+            confidence *= 0.62
+            post_guard_confidence_notes.append("low_edge_confidence_dampen")
+        if post_guard_confidence_notes:
+            confidence_guard = (
+                "|".join([confidence_guard] + post_guard_confidence_notes)
+                if confidence_guard != "none"
+                else "|".join(post_guard_confidence_notes)
+            )
+        pred_return = _clip_return(
+            pred_return,
+            vol_5,
+            horizon_days,
+            jump_regime_code=jump_regime_code,
+            jump_signal=jump_signal,
+        )
+        pred_close_raw = current_close * (1 + pred_return)
+        pred_close = float(dampen_prediction(pred_close_raw, current_close, regime))
+
+        range_pct = max(float(metrics.get("mape_pct") or 1.0) / 100.0, 0.005)
+        range_pct *= min(1.6, 1.0 + 0.12 * (horizon_days - 1))
+        if jump_regime_code > 0:
+            range_pct *= 1.0 + 0.18 * jump_regime_code + 0.08 * min(jump_signal, 2.0)
+        upper_mult, lower_mult = _compute_asymmetric_range_multipliers(
+            pred_return=pred_return,
+            overnight_gap_pct=overnight_gap_pct,
+            jump_regime_code=jump_regime_code,
+            jump_signal=jump_signal,
+            branch_name=branch_name if branch_used else None,
+        )
+        range_low = pred_close * (1 - range_pct * lower_mult)
+        range_high = pred_close * (1 + range_pct * upper_mult)
+
+        delta = pred_close - current_close
+        direction = "涨" if delta > 0.5 else ("跌" if delta < -0.5 else "平")
+        predictions.append(
+            {
+                "date": pd.Timestamp(target_date).strftime("%Y-%m-%d"),
+                "close": round(pred_close, 2),
+                "direction": direction,
+                "confidence": round(float(np.clip(confidence, 0.0, 95.0)), 1),
+                "range_low": round(range_low, 2),
+                "range_high": round(range_high, 2),
+                "regime": regime,
+                "n_models": 1,
+                "model_details": {
+                    "model_name": "direct_gbm_multi_horizon_v2",
+                    "training_policy": "purged_validation_full_refit",
+                    "prediction_at": cutoff.isoformat(),
+                    "external_availability": {
+                        name: "explicit" if "available_at" in frame else "assumed_next_day_0800_shanghai"
+                        for name, frame in [("comex", comex_daily), ("usdcny", usdcny_daily), ("cross_market", cross_market)]
+                    },
+                    "external_observations": external_audit,
+                    "confidence_kind": "heuristic_score_not_probability",
+                    "probability_kind": "uncalibrated_classifier",
+                    "validation_train_size": metrics.get("train_size"),
+                    "validation_purged_size": metrics.get("purged_size"),
+                    "refit_size": metrics.get("refit_size"),
+                    "last_refit_label": metrics.get("last_refit_label"),
+                    "horizon_days": horizon_days,
+                    "pre_guard_return_pct": round(pre_guard_return * 100, 3),
+                    "pred_return_pct": round(pred_return * 100, 3),
+                    "direction_guard": direction_guard,
+                    "confidence_guard": confidence_guard,
+                    "up_probability": round(up_prob, 4) if up_prob is not None else None,
+                    "test_mape_pct": metrics.get("mape_pct"),
+                    "test_direction_accuracy": metrics.get("direction_accuracy"),
+                    "recent_weight_mean": metrics.get("recent_weight_mean"),
+                    "recent_bias_return_pct": metrics.get("recent_bias_return_pct"),
+                    "jump_regime_code": jump_regime_code,
+                    "jump_signal": round(jump_signal, 3),
+                    "trend_regime_code": trend_regime_code,
+                    "trend_signal": round(trend_signal, 3),
+                    "branch_used": branch_used,
+                    "branch_name": branch_name if branch_used else None,
+                    "effective_base": round(current_close, 2),
+                },
+            }
+        )
+
+    return predictions
+
+
+def rolling_backtest_direct(
+    daily_df: pd.DataFrame,
+    comex_daily: pd.DataFrame,
+    usdcny_daily: pd.DataFrame,
+    cross_market: pd.DataFrame,
+    lookback: int = 240,
+    max_horizon: int = 5,
+    stride: int = 10,
+    cot_daily: Optional[pd.DataFrame] = None,
+) -> pd.DataFrame:
+    daily_sorted = daily_df.sort_values("date").reset_index(drop=True)
+    start_idx = max(lookback, 80)
+    end_idx = len(daily_sorted) - max_horizon
+    origins = list(range(start_idx, end_idx, max(stride, 1)))
+    total = len(origins)
+    records: List[Dict[str, Any]] = []
+
+    for done, oi in enumerate(origins):
+        history_daily = daily_sorted.iloc[: oi + 1].copy()
+        origin_close = float(history_daily.iloc[-1]["close"])
+        origin_date = pd.Timestamp(history_daily.iloc[-1]["date"])
+        future_dates = []
+        for h in range(1, max_horizon + 1):
+            ti = oi + h
+            if ti < len(daily_sorted):
+                future_dates.append(pd.Timestamp(daily_sorted.iloc[ti]["date"]))
+
+        if not future_dates:
+            continue
+
+        try:
+            cot_truncated = None
+            if cot_daily is not None and not cot_daily.empty and "date" in cot_daily.columns:
+                cot_truncated = cot_daily[cot_daily["date"] <= origin_date]
+            preds = run_direct_multi_day_prediction(
+                daily_df=history_daily,
+                comex_daily=comex_daily[comex_daily["date"] <= origin_date],
+                usdcny_daily=usdcny_daily[usdcny_daily["date"] <= origin_date],
+                cross_market=cross_market[cross_market["date"] <= origin_date],
+                target_dates=future_dates,
+                lookback_days=lookback,
+                verbose=False,
+                cot_daily=cot_truncated,
+            )
+        except Exception as exc:
+            raise RuntimeError(f"Gold backtest failed at origin {origin_date.date()}") from exc
+
+        by_date = {pd.Timestamp(pred["date"]): pred for pred in preds}
+        if len(by_date) != len(preds) or set(by_date) != set(future_dates):
+            raise RuntimeError(f"Missing/duplicate forecast targets at origin {origin_date.date()}")
+        for h_idx, target_date in enumerate(future_dates):
+            pred = by_date[target_date]
+            ti = oi + h_idx + 1
+            records.append(
+                {
+                    "horizon": h_idx + 1,
+                    "origin_date": origin_date.strftime("%Y-%m-%d"),
+                    "target_date": pd.Timestamp(daily_sorted.iloc[ti]["date"]).strftime("%Y-%m-%d"),
+                    "origin_close": origin_close,
+                    "pred_close": pred["close"],
+                    "actual_close": float(daily_sorted.iloc[ti]["close"]),
+                    "regime": pred.get("regime", "unknown"),
+                    "confidence": pred.get("confidence", 0),
+                }
+            )
+
+        if (done + 1) % 10 == 0:
+            print(f"    回测进度: {done + 1}/{total}")
+
+    print(f"    回测完成: {len(records)} 条记录")
+    return pd.DataFrame(records)

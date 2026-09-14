@@ -1,0 +1,55 @@
+{
+  "origins": 200,
+  "warmup": 80,
+  "paths": 8,
+  "horizons": [
+    1,
+    3,
+    5
+  ],
+  "data": {
+    "shfe": "6f38f0dad7a7195d8c8327427afe1bb07f138a8eff8d863ec51c1442ebed71e6",
+    "comex": "e658f43887b22af2585ee78f6e2e0ae0b982fd41022266c56c5d2726833e7a4a",
+    "usdcny": "73219c33189952cb1091aab59d897b4f21759170f99ea96503ceecec5ea16d0d",
+    "cross": "bee263bdd69da2e8ffa8b41e52b895a2a8974d4455e3933b7489fe383ec5236f"
+  },
+  "code": {
+    "scripts/run_gold_research.py": "826fc059eebe0b52709eaf3669d8e6c696afcc2841478316cb2bfa02991e1fa7",
+    "scripts/summarize_gold_research.py": "0ee155d6bac8b53022f1eb62090cb99a19e5e3331f7c1a2daafd1e652f4de945",
+    "ml-service/models/multi_day_direct_predictor.py": "c142d37291f381811b966ae2acaaa7f37679c425cb5165dd9a3ecc74007e42fe",
+    "ml-service/models/market_availability.py": "20c275f37da35261529ccb643f5314ec2357a145b42365425a7b295efc89f120",
+    "ml-service/models/multi_bar_features.py": "4a56572927c958252e48cf5932f8bb9b444f2a30af2d8d3d7e71d68aa12174ca",
+    "ml-service/models/volatility_regime.py": "3cecef274f603ba81dbcfffd3d7a20896f146a46b740f05f14f060f3afec9cf8",
+    "ml-service/models/kronos_combination.py": "43bb6f09734cc1a504f164c04cd0864fc5d2693755a045ae16cb5ae871b7cae3"
+  },
+  "weights": {
+    "small/config.json": "5e0f6a605d5f81b5c9b559fe5cf716a1acb041c744e6f41bd05b097b7a685396",
+    "small/model.safetensors": "b082dfcbd8e8c142a725c8bbb99781802f38fec81210e13479effb32b3c3e020",
+    "tokenizer/config.json": "2366e7ccfec76cbc19cf3c4c1b9c5d901be336ca1e83f2d2292c9bff381b77a2",
+    "tokenizer/model.safetensors": "59d85f6af76a2c3b8240ea06cb21db4213b4eeca053f246b23e29cf832fc6bee"
+  },
+  "packages": {
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "scikit-learn": "1.9.0",
+    "torch": "2.14.0+cpu",
+    "huggingface_hub": "0.33.1"
+  },
+  "kronos_code": {
+    "model/__init__.py": "f8f856ca3fedadcaac97e196be23d1aeda1c3c9ffe8903d66d43ea3bcac6240c",
+    "model/kronos.py": "0a5f90282e2039c2de0771473419715c845def154896dbd0f5747837e6241032",
+    "model/module.py": "a07edbadc0e96804c8158c021bbc6063bb7cc43b34d7fc470d5c8ff2005a409f"
+  },
+  "first_origin": "2025-07-08",
+  "last_origin": "2026-08-28",
+  "first_evaluation_origin": "2025-11-05",
+  "external_policy": "explicit available_at else next-calendar-day 08:00 Asia/Shanghai",
+  "kronos": {
+    "context": 240,
+    "T": 1.0,
+    "top_p": 0.9,
+    "sample_count": 1,
+    "seed": "YYYYMMDD + 17"
+  },
+  "note": "Exploratory historical study; date-only market publication times are assumed."
+}

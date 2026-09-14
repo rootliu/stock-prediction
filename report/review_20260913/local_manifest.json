@@ -1,0 +1,26 @@
+{
+  "variant": "local",
+  "upstream_commit": "8418fad",
+  "origins": 69,
+  "horizons": [
+    1,
+    3,
+    5,
+    10
+  ],
+  "lookback": 240,
+  "predictions": 261,
+  "elapsed_seconds": 592.6612790590152,
+  "model_sha256": "adb13ad70a8836f68c86dd4148ae5ce8755a0d450cb01406508ec2b09955f494",
+  "data": {
+    "shfe": "66ef0d5634de755f09dea68c20192f58174fe6d1129544ca334874fb0e0a2454",
+    "comex": "986b0d8662a94203b346dfb242ce6fe0d5e744fe44f9bf68e59647199f5d546f",
+    "usdcny": "86dccb6e858c1230a0a65732077a92c5c98d18da5e615aa3083ec2f1ffe81988",
+    "cross": "3d5d95d697433b77f09e827f1472fa1a89aa94c2b6721ac4374c6b8d1a0ba3f7"
+  },
+  "source": {
+    "report/review_20260913/run_backtest.py": "6751df6234417ed9f718a93e86ac2b0ec2e18f93359c8c41a202d9d7a5bee216",
+    "ml-service/models/market_availability.py": "20c275f37da35261529ccb643f5314ec2357a145b42365425a7b295efc89f120",
+    "ml-service/models/multi_bar_features.py": "4a56572927c958252e48cf5932f8bb9b444f2a30af2d8d3d7e71d68aa12174ca"
+  }
+}

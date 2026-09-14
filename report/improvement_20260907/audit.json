@@ -1,0 +1,8 @@
+{
+  "complete_origins": 280,
+  "expected_origins": 280,
+  "integrity_checks": "passed",
+  "sampled_bars": 11200,
+  "invalid_ohlc_bars": 875,
+  "note": "OHLC violations are model-output diagnostics, not silently corrected or discarded."
+}

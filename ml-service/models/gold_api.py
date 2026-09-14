@@ -22,6 +22,7 @@ def predict_direct_gbm(
     verbose: bool = False,
     cot_daily: pd.DataFrame = None,
     horizons_to_train: Optional[Sequence[int]] = None,
+    prediction_at: Optional[pd.Timestamp] = None,
 ) -> List[Dict[str, Any]]:
     """Predict GBM direct multi-horizon closes and return flat dicts.
 
@@ -44,7 +45,7 @@ def predict_direct_gbm(
     """
     from models.multi_day_direct_predictor import run_direct_multi_day_prediction
 
-    if not target_dates:
+    if len(target_dates) == 0:
         return []
 
     raw = run_direct_multi_day_prediction(
@@ -57,6 +58,7 @@ def predict_direct_gbm(
         verbose=verbose,
         cot_daily=cot_daily,
         horizons_to_train=horizons_to_train,
+        prediction_at=prediction_at,
     )
 
     flat: List[Dict[str, Any]] = []
@@ -82,6 +84,12 @@ def predict_direct_gbm(
             "jump_signal": md.get("jump_signal"),
             "branch_name": md.get("branch_name"),
             "effective_base": md.get("effective_base"),
+            "prediction_at": md.get("prediction_at"),
+            "training_policy": md.get("training_policy"),
+            "confidence_kind": md.get("confidence_kind"),
+            "probability_kind": md.get("probability_kind"),
+            "external_availability": md.get("external_availability"),
+            "external_observations": md.get("external_observations"),
         })
     return flat
 
