@@ -102,6 +102,14 @@ def _build_records(
                     "pred_delta": round(pred_delta, 4),
                     "actual_delta": round(actual_delta, 4),
                     "confidence": float(pred.get("confidence", 0.0)),
+                    **{key: pred.get(key) for key in (
+                        "confidence_method", "confidence_status", "up_probability", "down_probability", "flat_probability",
+                        "direction_signal", "confidence_reasons", "confidence_low", "confidence_high",
+                        "calibration_count", "calibration_total", "calibration_raw_up", "legacy_confidence_score",
+                    )},
+                    "direction_match_3class": pred.get("direction") == (
+                        "涨" if actual_delta > 0.5 else ("跌" if actual_delta < -0.5 else "平")
+                    ),
                     "abs_error": round(abs_error, 4),
                     "ape_pct": round(ape_pct, 6),
                     "dir_match": bool(np.sign(pred_delta) == np.sign(actual_delta)),
@@ -111,7 +119,7 @@ def _build_records(
                     "pred_return_pct": model_details.get("pred_return_pct"),
                     "direction_guard": model_details.get("direction_guard"),
                     "confidence_guard": model_details.get("confidence_guard"),
-                    "up_probability": model_details.get("up_probability"),
+                    "branch_raw_up_probability": model_details.get("up_probability"),
                     "trend_regime_code": model_details.get("trend_regime_code"),
                     "trend_signal": model_details.get("trend_signal"),
                     "jump_regime_code": model_details.get("jump_regime_code"),

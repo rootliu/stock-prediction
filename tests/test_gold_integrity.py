@@ -56,6 +56,22 @@ def test_validation_labels_are_purged_and_final_fit_uses_mature_labels(market):
     assert metrics['last_refit_label']==str(daily.iloc[-1].date.date())
 
 
+def test_calibration_uses_pre_refit_classifier_and_mature_disjoint_labels(market):
+    daily, empty = market
+    fitted = m._train_horizon_model(daily, empty, empty, empty, 5, 80)
+    assert fitted['calibration_cls_model'] is not fitted['cls_model']
+    x, ret, _, bases, dates = m._build_training_dataset(daily, empty, empty, empty, 5, 80)
+    positions = pd.DatetimeIndex(daily.date).get_indexer(pd.DatetimeIndex(dates))
+    targets = pd.Series(daily.date.iloc[positions + 5].values)
+    indices = m.maturity_calibration_rows(dates, targets, int(len(x) * .8))
+    classifier = fitted['calibration_cls_model']
+    expected = classifier.predict_proba(x.iloc[indices])[:, list(classifier.classes_).index(1)]
+    np.testing.assert_allclose(expected, fitted['direction_calibration']['raw_up'])
+    np.testing.assert_allclose((ret * bases).iloc[indices], fitted['direction_calibration']['deltas'])
+    assert pd.Timestamp(fitted['metrics']['last_validation_train_label']) <= dates.iloc[indices[0]]
+    assert all(targets.iloc[a] <= dates.iloc[b] for a, b in zip(indices, indices[1:]))
+
+
 def test_future_external_values_do_not_change_historical_features(market):
     daily,empty=market
     date=daily.iloc[-1].date

@@ -10,6 +10,24 @@ from models import multi_day_direct_predictor as model
 
 
 class ContinuationTests(unittest.TestCase):
+    def test_confidence_rollback_preserves_price(self):
+        import os
+        dates = pd.bdate_range("2026-01-01", periods=100)
+        close = 900 + np.arange(100) * 0.2 + np.sin(np.arange(100)) * 4
+        daily = pd.DataFrame({"date": dates, "close": close, "open": close - 1,
+                              "high": close + 3, "low": close - 3, "volume": 1000})
+        empty = pd.DataFrame({"date": pd.Series(dtype="datetime64[ns]")})
+        args = dict(daily_df=daily, comex_daily=empty, usdcny_daily=empty,
+                    cross_market=empty, target_dates=[dates[-1] + pd.offsets.BDay()], verbose=False)
+        with patch.dict(os.environ, {"GOLD_DIRECTION_CONFIDENCE_MODE": "calibrated"}):
+            calibrated = model.run_direct_multi_day_prediction(**args)[0]
+        with patch.dict(os.environ, {"GOLD_DIRECTION_CONFIDENCE_MODE": "legacy"}):
+            legacy = model.run_direct_multi_day_prediction(**args)[0]
+        for key in ("close", "direction", "range_low", "range_high", "model_details"):
+            self.assertEqual(calibrated[key], legacy[key])
+        self.assertEqual(legacy["confidence"], calibrated["legacy_confidence_score"])
+        self.assertEqual(legacy["confidence_method"], "legacy_score_not_probability")
+
     def setUp(self):
         dates = pd.bdate_range("2025-01-01", periods=75)
         close = 600 + np.arange(75) + np.sin(np.arange(75)) * 4

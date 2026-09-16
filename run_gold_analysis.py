@@ -507,7 +507,7 @@ def format_forecast(
 ) -> str:
     header = (
         f"{'日期':<12}  {'16:00预测(元/克)':>16}  {'方向':>4}"
-        f"  {'涨跌':>10}  {'信心度':>6}  {'波动区间':>16}  {detail_label:>6}"
+        f"  {'涨跌':>10}  {'方向估计/评分':>8}  {'波动区间':>16}  {detail_label:>6}  状态"
     )
     sep = "-" * 85
     lines = [header, sep]
@@ -516,13 +516,13 @@ def format_forecast(
     for pred in predictions:
         c = pred["close"]
         d = pred["direction"]
-        chg = c - prev
+        chg = c - (base_close if pred.get("confidence_method") else prev)
         chg_str = f"{'+' if chg >= 0 else ''}{chg:.2f}"
         conf = f"{pred['confidence']:.1f}%"
         rng = f"[{pred['range_low']:.0f}~{pred['range_high']:.0f}]"
         detail_count = pred.get("n_checkpoints", pred.get("n_models", "?"))
         lines.append(
-            f"{pred['date']:<12}  {c:>16.2f}  {d:>4}  {chg_str:>10}  {conf:>6}  {rng:>16}  {str(detail_count):>6}"
+            f"{pred['date']:<12}  {c:>16.2f}  {d:>4}  {chg_str:>10}  {conf:>6}  {rng:>16}  {str(detail_count):>6}  {pred.get('direction_signal', 'legacy')}"
         )
         prev = c
 
@@ -536,7 +536,7 @@ def format_prediction_details(pred: Dict[str, Any]) -> str:
         for cp in ["04:00", "09:00", "12:00", "16:00", "20:00", "24:00"]:
             if cp in details:
                 d = details[cp]
-                prob_str = f"prob={d['up_probability']:.1%}" if d.get("up_probability") is not None else "prob=N/A"
+                prob_str = f"raw_up={d['up_probability']:.1%}" if d.get("up_probability") is not None else "raw_up=N/A"
                 lines.append(
                     f"    {cp}  pred={d['pred_close']:>8.2f}  w={d['weight']:.3f}  {prob_str}  base={d['effective_base']:.2f}"
                 )
@@ -552,7 +552,7 @@ def format_prediction_details(pred: Dict[str, Any]) -> str:
                 (
                     f"    horizon=T+{model_details['horizon_days']}  "
                     f"pred_ret={model_details['pred_return_pct']:+.3f}%  "
-                    f"prob={prob_str}  "
+                    f"raw_up={prob_str}  "
                     f"test_mape={model_details.get('test_mape_pct')}%  "
                     f"dir_acc={model_details.get('test_direction_accuracy')}%  "
                     f"base={model_details['effective_base']:.2f}"
@@ -805,6 +805,11 @@ def _write_report_outputs(
                 "close": row["close"],
                 "direction": row["direction"],
                 "confidence": row["confidence"],
+                **{key: row.get(key) for key in (
+                    "up_probability", "down_probability", "flat_probability", "direction_signal",
+                    "confidence_low", "confidence_high", "calibration_count", "confidence_method",
+                    "confidence_reasons", "confidence_status", "legacy_confidence_score",
+                )},
                 "range_low": row["range_low"],
                 "range_high": row["range_high"],
             }
@@ -815,10 +820,13 @@ def _write_report_outputs(
     report_frame = pd.DataFrame()
     if not scenario_frame.empty:
         report_frame = scenario_frame.merge(
-            pred_frame[["date", "direction", "confidence"]],
+            pred_frame.drop(columns=["close", "range_low", "range_high"]),
             on="date",
             how="left",
         )
+
+    if not report_frame.empty:
+        report_frame.to_csv(scenario_csv, index=False)
 
     md_lines = [
         f"# Gold {forecast_mode} Scenario Report",
@@ -835,7 +843,7 @@ def _write_report_outputs(
         md_lines.extend(
             [
                 f"- 最新基准: `{latest_date.strftime('%Y-%m-%d')}` 收盘 `{latest_close:.2f}` 元/克",
-                f"- 首日预测: `{first_pred['date']}` 基础情景 `{first_pred['close']:.2f}` 元/克，方向 `{first_pred['direction']}`，置信度 `{first_pred['confidence']:.1f}%`",
+                f"- 首日预测: `{first_pred['date']}` 基础情景 `{first_pred['close']:.2f}` 元/克，方向 `{first_pred['direction']}`，方向估计/评分 `{first_pred['confidence']:.1f}%`（{first_pred.get('confidence_method', 'legacy_score_not_probability')}）",
                 f"- 波动区间: `{first_pred['range_low']:.2f} ~ {first_pred['range_high']:.2f}` 元/克",
             ]
         )
@@ -854,6 +862,13 @@ def _write_report_outputs(
                         "bull_close",
                         "direction",
                         "confidence",
+                        "up_probability",
+                        "down_probability",
+                        "flat_probability",
+                        "direction_signal",
+                        "confidence_low",
+                        "confidence_high",
+                        "calibration_count",
                         "bull_driver",
                         "bear_driver",
                     ]
@@ -865,6 +880,15 @@ def _write_report_outputs(
         )
     md_lines.extend(
         [
+            "### 方向概率解释",
+            "",
+            "direct 模式的 confidence 是价格预测方向对应的概率估计，非旧版模型强度分。涨/跌/平以相对基准价 +/-0.5 元区分。",
+            "up/down/flat_probability 为 0~1；confidence 和 low/high 为百分数。90% 区间描述校准频率的不确定性，不是价格区间。",
+            "watch 表示观望：样本不足、价格方向与概率不一致或证据不足；不得将其推送为高把握买卖信号。",
+            "校准按期限剔除重叠训练标签并间隔取样；小样本向对称先验收缩。此概率仍需样本外验证，不保证未来命中。",
+            "confidence_status=experimental_not_validated：当前校准层尚未通过独立长期验证，supported 也不等于获准交易。",
+            "legacy_score_not_probability 表示回退评分，不得解读为概率。原价格区间也不是已验证覆盖率的置信区间。",
+            "",
             "### 调用说明",
             "",
             "其它 agent 优先使用 wrapper 定时生成固定文件名的报告包：",

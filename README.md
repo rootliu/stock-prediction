@@ -270,3 +270,37 @@ CSV 包含逐条预测、实际价格、误差、方向和信心评分。
 ## 📄 许可证
 
 MIT License
+
+## Direction Confidence v2 (2026-09-16)
+
+固定生产入口不变：`scripts/run_gold_direct_report.sh <output-dir> [target-end]`。
+价格、方向 guard 和价格区间保留原算法；仅重新定义 direct 输出的方向置信字段。
+
+- `confidence`：最终价格方向对应的涨/跌/平概率估计，百分数，不再是强度分。
+- `up_probability/down_probability/flat_probability`：0~1，合计为 1；相对预测基准价 +/-0.5 元视为平。
+- `confidence_method=maturity_bin_dirichlet_v2`：训练集按标签成熟时间 purge；校准集按实际起止日期取非重叠样本，避免缺失交易日导致错位。校准与实时评分使用同一个重训前分类器，不得使用全量重训分类器的训练内分数或分支概率。
+- `confidence_low/high`：所选方向频率的 90% Beta 后验区间，非价格区间；不涵盖市场分布变化。
+- `calibration_count`：命中概率桶的非重叠标签数量；`calibration_total` 是全部校准样本数。
+- `direction_signal=watch`：样本少于 10、价格方向与最高概率冲突、概率低于 60% 或区间下界不超过 50%。其它 agent 必须保留观望及原因，不得只转发一个百分数。
+- `confidence_status=experimental_not_validated`：尚未通过独立长期校准验证，`supported` 也不是交易许可。
+- `legacy_confidence_score`：原始强度分，仅供对照。模型详情中的 `up_probability` 仍是旧分支原始值；扁平 API 将其命名为 `branch_raw_up_probability`。
+
+校准为三个固定桶（1/3、2/3 分界），固定 Dirichlet 先验 `[4.75, 0.5, 4.75]`（跌/平/涨），总强度 10。参数未按本次外层回测择优调参。长期稀疏样本会明显收缩，不能据此宣称更高准确率。
+
+```bash
+# 默认方向概率版
+scripts/run_gold_direct_report.sh /tmp/gold-report
+# 回退旧评分；不变更 cron、入口或价格模型
+GOLD_DIRECTION_CONFIDENCE_MODE=legacy scripts/run_gold_direct_report.sh /tmp/gold-legacy
+# 回测与概率评估
+MPLCONFIGDIR=/tmp/mpl-stock .venv/bin/python scripts/run_gold_continuation_backtest.py \
+  --cutoff 2026-08-28 --report-dir /tmp/gold-backtest --repo-report-dir /tmp/gold-backtest
+.venv/bin/python scripts/evaluate_direction_confidence.py \
+  /tmp/gold-backtest/gold_continuation_backtest_2026-08-28_to_2026-09-15.csv --output /tmp/gold-evaluation
+.venv/bin/python scripts/test_direction_confidence.py
+MPLCONFIGDIR=/tmp/mpl-stock .venv/bin/python scripts/test_gold_continuation.py
+```
+
+报告：`report/gold_confidence_2026-09-16/review_v2.md`。`review.md` 是合并远端修复前的历史实验，不能代表当前模型。v2 保留远端数据可用时间过滤、成熟标签 purge 与全量价格模型重训；无 available_at 的外部日线仍采用次日上海 08:00 假设，不是已核验的真实发布时间。
+
+评估脚本另输出 `direction_threshold_audit.csv`：逐期限、上涨/下跌/横盘、50/60/70% 阈值的覆盖率与实际命中率，并提供 90% Wilson 区间。每个期限先按日期剔除重叠标签，跨期限仍有相关性；少于 30 条标记 insufficient_evidence，不得用少量连续同向行情证明可靠。

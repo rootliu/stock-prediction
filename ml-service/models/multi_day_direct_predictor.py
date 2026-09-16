@@ -13,12 +13,14 @@ Recent upgrades:
 
 from __future__ import annotations
 
+import os
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import GradientBoostingClassifier, GradientBoostingRegressor
 from models.market_availability import available_observations, availability_audit, daily_cutoff
+from models.direction_confidence import maturity_calibration_rows, fit_calibration, directional_confidence
 
 from models.multi_bar_features import (
     FEATURE_COLUMNS_COT,
@@ -1423,6 +1425,20 @@ def _train_horizon_model(
             regime_bias = float(np.mean(drift_resid[regime_mask.values]))
             drift_bias_by_regime[regime_name] = float(np.clip(regime_bias, -drift_cap, drift_cap))
 
+    # Save the validation classifier BEFORE full refit. Both calibration scores
+    # and live scores must come from this same untouched model.
+    calibration_cls = cls
+    indices = maturity_calibration_rows(sample_dates, label_dates, split)
+    calibration = fit_calibration([], [])
+    if cls is not None and len(indices) and 1 in cls.classes_:
+        up_index = list(cls.classes_).index(1)
+        calibration = fit_calibration(
+            cls.predict_proba(x.iloc[indices])[:, up_index],
+            (y_ret.iloc[indices] * bases.iloc[indices]).values,
+        )
+    metrics["calibration_size"] = len(indices)
+    metrics["calibration_policy"] = "maturity_thinned_pre_refit_classifier"
+
     # Keep validation metrics above; fit deployable base/branch models on all
     # labels already known at this origin. Never refit on future target labels.
     x_train, y_ret_train, y_dir_train = x, y_ret, y_dir
@@ -1501,6 +1517,8 @@ def _train_horizon_model(
 
     return {
         "trained": True,
+        "direction_calibration": calibration,
+        "calibration_cls_model": calibration_cls,
         "reg_model": reg,
         "cls_model": cls,
         "metrics": metrics,
@@ -1754,12 +1772,27 @@ def run_direct_multi_day_prediction(
 
         delta = pred_close - current_close
         direction = "涨" if delta > 0.5 else ("跌" if delta < -0.5 else "平")
+        # Leave legacy scores inside price guards; calibrate a separate global
+        # classifier consistently on held-out and live rows, not branch mixtures.
+        global_cls = model_info.get("calibration_cls_model")
+        global_up = None
+        if global_cls is not None and 1 in global_cls.classes_:
+            global_up = float(global_cls.predict_proba(x_row)[0, list(global_cls.classes_).index(1)])
+        confidence_result = directional_confidence(
+            model_info.get("direction_calibration", {}), global_up, direction,
+        )
+        legacy_score = round(float(np.clip(confidence, 0.0, 95.0)), 1)
+        confidence_result["legacy_confidence_score"] = legacy_score
+        if os.environ.get("GOLD_DIRECTION_CONFIDENCE_MODE", "calibrated") == "legacy":
+            confidence_result["confidence"] = legacy_score
+            confidence_result["confidence_method"] = "legacy_score_not_probability"
+            confidence_result["confidence_kind"] = "heuristic_score_not_probability"
         predictions.append(
             {
                 "date": pd.Timestamp(target_date).strftime("%Y-%m-%d"),
                 "close": round(pred_close, 2),
                 "direction": direction,
-                "confidence": round(float(np.clip(confidence, 0.0, 95.0)), 1),
+                **confidence_result,
                 "range_low": round(range_low, 2),
                 "range_high": round(range_high, 2),
                 "regime": regime,
