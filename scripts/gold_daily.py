@@ -65,10 +65,21 @@ def load_calibration(path: Path, version: str) -> Dict[str, Dict[str, float]]:
 
 
 def interval_for(cal: Dict[str, Dict[str, float]], horizon: int, pred: float) -> tuple[Optional[float], Optional[float]]:
-    entry = cal.get(str(int(horizon)))
-    if not entry:
+    """Nearest calibrated horizon, widened/narrowed by sqrt(h) for the gap.
+
+    Calibration only carries T+1/3/5/10; T+2 and T+4 must still get an interval,
+    otherwise the report silently ships a point forecast with no uncertainty.
+    """
+    if not cal:
         return (None, None)
-    return (round(pred + entry["q_low"], 2), round(pred + entry["q_high"], 2))
+    key = str(int(horizon))
+    if key in cal:
+        entry, scale = cal[key], 1.0
+    else:
+        nearest = min(cal, key=lambda k: abs(int(k) - int(horizon)))
+        entry = cal[nearest]
+        scale = (float(horizon) / float(nearest)) ** 0.5
+    return (round(pred + entry["q_low"] * scale, 2), round(pred + entry["q_high"] * scale, 2))
 
 
 def rolling_skill(history: pd.DataFrame, version: str, window: int = ROLLING_SKILL_WINDOW) -> Optional[float]:
@@ -88,7 +99,38 @@ def rolling_skill(history: pd.DataFrame, version: str, window: int = ROLLING_SKI
     return float(1 - model / base)
 
 
-def build_predictions_live(horizons: int) -> pd.DataFrame:
+class DataError(RuntimeError):
+    """Upstream data unavailable and no usable cache; maps to exit code 2."""
+
+
+def _cached_fetch(name: str, fn, cache_dir: Path) -> tuple[pd.DataFrame, str | None]:
+    """Fetch a series, persist it, and fall back to the last good copy.
+
+    Yahoo rate-limits aggressively, so a cron job that dies on the first 429
+    would be useless. A cache hit is real historical data and is disclosed in
+    the manifest; a miss is a hard failure rather than a silent guess.
+    """
+    cache = cache_dir / f"{name}.csv"
+    try:
+        df = fn()
+        if df is None or df.empty:
+            raise DataError(f"{name} returned no rows")
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        df.to_csv(cache, index=False)
+        return df, None
+    except Exception as exc:  # noqa: BLE001
+        if cache.exists():
+            df = pd.read_csv(cache, parse_dates=["date"])
+            note = (
+                f"{name}: 抓取失败({type(exc).__name__})，使用缓存 {cache.name}"
+                f"（数据截至 {pd.Timestamp(df['date'].max()).date()}）"
+            )
+            _log("WARN " + note)
+            return df, note
+        raise DataError(f"{name} 抓取失败且无缓存，请先成功运行一次: {exc}") from exc
+
+
+def build_predictions_live(horizons: int) -> tuple[pd.DataFrame, list[str]]:
     """Fetch the daily bars and run the direct model. Network + akshare required."""
     import akshare as ak  # noqa: F401  (fail fast with a clear message)
 
@@ -103,20 +145,32 @@ def build_predictions_live(horizons: int) -> pd.DataFrame:
         fetch_usdcny_daily,
     )
 
-    daily = fetch_shfe_au_daily()
+    cache = ROOT / ".cache/gold"
+    warnings: list[str] = []
+
+    def grab(name: str, fn):
+        df, note = _cached_fetch(name, fn, cache)
+        if note:
+            warnings.append(note)
+        return df
+
+    daily = grab("shfe", fetch_shfe_au_daily)
     if daily.empty:
-        raise RuntimeError("empty SHFE daily series")
+        raise DataError("empty SHFE daily series")
+    if len(daily) < 300:
+        raise DataError(f"SHFE history too short: {len(daily)} rows")
+
     last_date = pd.Timestamp(daily["date"].iloc[-1]).normalize()
     target_end = last_date + pd.Timedelta(days=horizons * 2 + 4)
     future, _meta = build_future_trade_dates(last_date, target_end)
     if len(future) == 0:
-        raise RuntimeError("no future trading day resolved")
+        raise DataError("no future trading day resolved")
 
     predictions = run_direct_multi_day_prediction(
         daily_df=daily,
-        comex_daily=fetch_comex_daily(),
-        usdcny_daily=fetch_usdcny_daily(),
-        cross_market=fetch_cross_market(),
+        comex_daily=grab("comex", fetch_comex_daily),
+        usdcny_daily=grab("usdcny", fetch_usdcny_daily),
+        cross_market=grab("cross", fetch_cross_market),
         target_dates=list(future[:horizons]),
         lookback_days=240,
         verbose=False,
@@ -134,7 +188,48 @@ def build_predictions_live(horizons: int) -> pd.DataFrame:
                 "actual_close": np.nan,
             }
         )
-    return pd.DataFrame(rows)
+    return pd.DataFrame(rows), warnings
+
+
+def load_history(ledger: Path, daily: Optional[pd.DataFrame]) -> pd.DataFrame:
+    """Reconstruct matured forecast rows from the append-only ledger.
+
+    Without this the rolling-skill gate can never fire in live mode: every run
+    would report skill=None and the fallback would be dead code.
+    """
+    empty = pd.DataFrame(columns=["origin_date", "target_date", "horizon", "origin_close", "pred_close", "actual_close"])
+    if not ledger.exists() or daily is None or daily.empty:
+        return empty
+    close_by_date = {
+        pd.Timestamp(d).normalize(): float(c) for d, c in zip(daily["date"], daily["close"])
+    }
+    rows = []
+    for line in ledger.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            entry = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        for row in entry.get("rows", []):
+            target = pd.Timestamp(row["date"]).normalize()
+            actual = close_by_date.get(target)
+            if actual is None:
+                continue
+            rows.append(
+                {
+                    "origin_date": pd.Timestamp(entry["origin_date"]),
+                    "target_date": target,
+                    "horizon": int(row["horizon"]),
+                    "origin_close": float(entry["origin_close"]),
+                    "pred_close": float(row.get("raw_model_close", row["model_close"])),
+                    "actual_close": actual,
+                }
+            )
+    if not rows:
+        return empty
+    return pd.DataFrame(rows).drop_duplicates(subset=["origin_date", "horizon"]).sort_values("target_date")
 
 
 def build_outputs(pred: pd.DataFrame, version: str, cal: Dict[str, Dict[str, float]], gate_note: str) -> Dict[str, Any]:
@@ -180,6 +275,8 @@ def render_markdown(manifest: Dict[str, Any], skill: Optional[float]) -> str:
             lines.append("- ⚠️ skill < 0：本模型不优于“价格不变”，预测仅作参考")
     if manifest.get("gate_note"):
         lines.append(f"- 闸门：{manifest['gate_note']}")
+    for warn in manifest.get("data_warnings") or []:
+        lines.append(f"- ⚠️ 数据：{warn}")
     lines += ["", "| 日期 | T+n | 基准 | 模型 | 80% 区间 |", "|---|---:|---:|---:|---|"]
     for row in manifest["rows"]:
         rng = (
@@ -245,13 +342,14 @@ def main() -> int:
     try:
         if args.live and args.predictions_csv:
             raise SystemExit("use either --live or --predictions-csv, not both")
+        data_warnings: list[str] = []
         history = pd.DataFrame(columns=["origin_date", "target_date", "horizon", "origin_close", "pred_close", "actual_close"])
         if args.predictions_csv:
             pred = pd.read_csv(args.predictions_csv, parse_dates=["origin_date", "target_date"])
             if "actual_close" not in pred:
                 pred["actual_close"] = np.nan
         elif args.live:
-            pred = build_predictions_live(args.horizons)
+            pred, data_warnings = build_predictions_live(args.horizons)
         else:
             raise SystemExit("one of --live / --predictions-csv is required")
 
@@ -259,9 +357,19 @@ def main() -> int:
             _log("ERROR no predictions; upstream produced nothing")
             return 2
 
+        live_daily: Optional[pd.DataFrame] = None
+        if args.live:
+            live_daily = pd.read_csv(ROOT / ".cache/gold/shfe.csv", parse_dates=["date"]) if (ROOT / ".cache/gold/shfe.csv").exists() else None
+
         origin = pd.Timestamp(args.origin) if args.origin else pd.Timestamp(pred["origin_date"].max())
         forecast = pred[pred["origin_date"] == origin].copy()
         history = pred[(pred["origin_date"] < origin) & pred["actual_close"].notna()].copy()
+        if args.live:
+            ledger_path = args.out / "forecasts.jsonl"
+            reconciled = load_history(ledger_path, live_daily)
+            if not reconciled.empty:
+                history = pd.concat([history, reconciled], ignore_index=True)
+                _log(f"reconciled {len(reconciled)} matured rows from ledger")
         if forecast.empty:
             _log(f"ERROR no forecast rows for origin {origin.date()}")
             return 2
@@ -281,6 +389,7 @@ def main() -> int:
         manifest = build_outputs(forecast, version, cal, gate_note)
         manifest["generated_at"] = datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
         manifest["calibration_source"] = str(args.calibration)
+        manifest["data_warnings"] = data_warnings
 
         out = args.out
         if args.dry_run:
@@ -299,7 +408,7 @@ def main() -> int:
         # Append-only ledger; never rewrite history.
         ledger = out / "forecasts.jsonl"
         with ledger.open("a", encoding="utf-8") as fh:
-            fh.write(json.dumps({k: v for k, v in manifest.items() if k != "rows"}, ensure_ascii=False) + "\n")
+            fh.write(json.dumps(manifest, ensure_ascii=False) + "\n")
 
         _log(f"wrote {out}/report.md (version={version}, skill={skill})")
 
@@ -325,6 +434,9 @@ def main() -> int:
                 return 4
         return 0
 
+    except DataError as exc:
+        _log(f"ERROR data unavailable: {exc}")
+        return 2
     except SystemExit:
         raise
     except Exception:  # noqa: BLE001

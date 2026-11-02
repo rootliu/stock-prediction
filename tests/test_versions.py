@@ -92,3 +92,60 @@ def test_rolling_skill_is_one_when_forecast_equals_actual():
     import gold_daily
 
     assert gold_daily.rolling_skill(history, "v1") == pytest.approx(1.0)
+
+def test_interval_falls_back_to_nearest_calibrated_horizon():
+    import gold_daily
+
+    cal = {"1": {"q_low": -10.0, "q_high": 12.0, "n": 50}}
+    lo, hi = gold_daily.interval_for(cal, 1, 900.0)
+    assert (lo, hi) == (890.0, 912.0)
+
+    lo2, hi2 = gold_daily.interval_for(cal, 2, 900.0)   # scaled by sqrt(2), not dropped
+    assert lo2 is not None and hi2 is not None
+    assert round(lo2, 2) == round(900.0 - 10.0 * 2 ** 0.5, 2)
+    assert gold_daily.interval_for({}, 3, 900.0) == (None, None)
+
+
+def test_ledger_reconciliation_produces_matured_rows(tmp_path):
+    import json as _json
+    import gold_daily
+
+    ledger = tmp_path / "forecasts.jsonl"
+    ledger.write_text(
+        _json.dumps(
+            {
+                "origin_date": "2026-09-08",
+                "origin_close": 900.0,
+                "version": "v7",
+                "rows": [{"date": "2026-09-09", "horizon": 1, "model_close": 901.0, "raw_model_close": 903.0}],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    daily = pd.DataFrame({"date": pd.to_datetime(["2026-09-09"]), "close": [905.0]})
+    hist = gold_daily.load_history(ledger, daily)
+    assert len(hist) == 1
+    assert hist.iloc[0]["actual_close"] == 905.0
+    # raw model output is kept so the version transform is not applied twice
+    assert hist.iloc[0]["pred_close"] == 903.0
+
+
+def test_ledger_without_matured_targets_yields_nothing(tmp_path):
+    import json as _json
+    import gold_daily
+
+    ledger = tmp_path / "forecasts.jsonl"
+    ledger.write_text(
+        _json.dumps(
+            {
+                "origin_date": "2026-09-08",
+                "origin_close": 900.0,
+                "rows": [{"date": "2026-09-30", "horizon": 1, "model_close": 901.0, "raw_model_close": 903.0}],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    daily = pd.DataFrame({"date": pd.to_datetime(["2026-09-09"]), "close": [905.0]})
+    assert gold_daily.load_history(ledger, daily).empty

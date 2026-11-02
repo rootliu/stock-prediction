@@ -109,10 +109,22 @@ export FEISHU_WEBHOOK_URL="https://open.feishu.cn/open-apis/bot/v2/hook/xxxx"
 
 `rows[]` 每条含 `date, horizon, baseline_close, model_close, range_low, range_high`。新增字段只会追加，不改名、不删除。
 
+### 数据降级与缓存
+
+Yahoo 会在高频请求下限流（`YFRateLimitError`），新浪偶发 TLS 断连。每日任务因此带一层缓存：
+
+- 抓取成功后写入 `.cache/gold/{shfe,comex,usdcny,cross}.csv`（已 gitignore）
+- 抓取失败时回退到缓存，并把「数据截至哪天」写进 `report.md` 的 ⚠️ 行和 JSON 的 `data_warnings`
+- **没有缓存则直接失败（退出码 2）**，不会拿残缺输入静默出一份预测
+
+首次部署请先手动跑一次 `--live` 建立缓存，之后再交给 cron。
+
 ### 版本与闸门
 
 - 上线版本：`v7`（模型收益 × 分段收缩 0.30/0.25/0.20/0.10）
 - 自动降级：最近 30 条成熟样本的滚动 `skill < -0.05` 时，自动回退 `v0`（价格不变），并在 `report.md` 的"闸门"一行写明
+  - 成熟样本来自 `forecasts.jsonl` 回填：每次运行会把台账里**目标日已到**的历史预测与真实收盘对账，因此闸门要跑几天后才开始生效
+  - 对账用的是 `raw_model_close`（收缩前的原始模型价），避免版本变换被重复应用
 - 手动指定：`--version v0|v1|v3|v4|v7`
 
 重跑回测、更换 champion：
