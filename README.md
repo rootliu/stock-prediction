@@ -80,6 +80,15 @@ export FEISHU_WEBHOOK_URL="https://open.feishu.cn/open-apis/bot/v2/hook/xxxx"
 
 > 只从环境变量读 webhook，**不要在仓库里写任何 token / secret**。
 
+### 可选：把日报也同步回仓库
+
+`--publish-dir` 会把当天报告额外拷贝成 `report/daily/YYYY-MM-DD.md` 并追加一行索引，方便事后查阅、也让协作者不必登录 server 就能看到结果。
+
+```cron
+# 与上面同一时间段；需要 server 上有可推送的 deploy key
+30 16 * * 1-5 cd /srv/gold/app && .venv/bin/python scripts/gold_daily.py --live --out /srv/gold/out --publish-dir report/daily && git add report/daily && git commit -m "chore: gold daily $(date +\%F)" && git push
+```
+
 ### 退出码（决定了监控怎么配）
 
 | 码 | 含义 | 建议动作 |

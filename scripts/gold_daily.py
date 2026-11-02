@@ -238,6 +238,7 @@ def main() -> int:
     parser.add_argument("--horizons", type=int, default=5)
     parser.add_argument("--origin", help="forecast origin date (default: latest in input)")
     parser.add_argument("--feishu-webhook", default=os.environ.get("FEISHU_WEBHOOK_URL", ""))
+    parser.add_argument("--publish-dir", type=Path, help="also copy report.md into this dir as YYYY-MM-DD.md")
     parser.add_argument("--dry-run", action="store_true", help="write to a temp dir, do not push")
     args = parser.parse_args()
 
@@ -301,6 +302,19 @@ def main() -> int:
             fh.write(json.dumps({k: v for k, v in manifest.items() if k != "rows"}, ensure_ascii=False) + "\n")
 
         _log(f"wrote {out}/report.md (version={version}, skill={skill})")
+
+        if args.publish_dir and not args.dry_run:
+            pub = args.publish_dir
+            pub.mkdir(parents=True, exist_ok=True)
+            atomic_write(pub / f"{manifest['origin_date']}.md", report)
+            index = pub / "index.md"
+            line = (
+                f"- {manifest['origin_date']} · {version} · 基准 {manifest['origin_close']:.2f} · "
+                f"skill {'n/a' if skill is None else f'{skill:+.3f}'} · [报告]({manifest['origin_date']}.md)\n"
+            )
+            with index.open("a", encoding="utf-8") as fh:
+                fh.write(line)
+            _log(f"published {pub}/{manifest['origin_date']}.md")
 
         if args.feishu_webhook and not args.dry_run:
             try:
