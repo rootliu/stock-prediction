@@ -41,6 +41,108 @@ stock-prediction/
     └── REQUIREMENTS.md
 ```
 
+## 🖥 服务器每日预测（上线入口）
+
+> 这一节给跑 cron 的 server 看。生产入口是 `scripts/gold_daily.py`；旧的 `run.py --bot-output-dir` 仍然保留，两者请用**不同的输出目录**，避免同名文件互相覆盖。
+
+### 一分钟部署
+
+```bash
+git clone git@github.com:rootliu/stock-prediction.git /srv/gold/app
+cd /srv/gold/app
+python3 -m venv .venv && .venv/bin/pip install -r ml-service/requirements.txt
+
+# 1) 自检：19 项测试，全部应通过
+.venv/bin/python -m pytest tests -q
+
+# 2) 离线干跑：不联网、不推送，验证产物格式
+.venv/bin/python scripts/gold_daily.py \
+  --predictions-csv report/review_20260913/local_predictions.csv \
+  --out /tmp/gold-dry --dry-run
+
+# 3) 实跑：联网抓行情 + 跑模型
+.venv/bin/python scripts/gold_daily.py --live --out /srv/gold/out
+```
+
+### cron
+
+```cron
+# 交易日收盘后 16:10；失败不静默——非 0 退出交给监控告警
+10 16 * * 1-5 cd /srv/gold/app && .venv/bin/python scripts/gold_daily.py --live --out /srv/gold/out >> /srv/gold/logs/daily.log 2>&1
+```
+
+飞书推送：
+
+```bash
+export FEISHU_WEBHOOK_URL="https://open.feishu.cn/open-apis/bot/v2/hook/xxxx"
+# 或显式传参：--feishu-webhook "$FEISHU_WEBHOOK_URL"
+```
+
+> 只从环境变量读 webhook，**不要在仓库里写任何 token / secret**。
+
+### 退出码（决定了监控怎么配）
+
+| 码 | 含义 | 建议动作 |
+|---|---|---|
+| 0 | 正常 | — |
+| 2 | 数据问题（空预测、价格非法、无未来交易日） | 重试一次，仍失败再报警 |
+| 3 | 质量闸门 | 查看 `report.md` 的闸门说明 |
+| 4 | 未预期异常 | 报警，保留日志 |
+
+### 产物与契约
+
+输出到 `--out` 目录（原子写，中断不会留半成品）：
+
+- `report.md` — 人读版：基准价、逐日预测、80% 区间、滚动 skill
+- `gold_prediction.json` — 机器读版：`origin_date / origin_close / version / gate_note / rows[]`
+- `gold_forecast.csv` — 逐日表：`baseline_close / model_close / raw_model_close / range_low / range_high`
+- `forecasts.jsonl` — append-only 台账，每次运行追加一行，**不回写历史**
+
+`rows[]` 每条含 `date, horizon, baseline_close, model_close, range_low, range_high`。新增字段只会追加，不改名、不删除。
+
+### 版本与闸门
+
+- 上线版本：`v7`（模型收益 × 分段收缩 0.30/0.25/0.20/0.10）
+- 自动降级：最近 30 条成熟样本的滚动 `skill < -0.05` 时，自动回退 `v0`（价格不变），并在 `report.md` 的"闸门"一行写明
+- 手动指定：`--version v0|v1|v3|v4|v7`
+
+重跑回测、更换 champion：
+
+```bash
+# 用仓库自带固定快照
+.venv/bin/python scripts/bench_versions.py --from-snapshot
+
+# 用 server 上最新一次模型输出
+.venv/bin/python scripts/bench_versions.py --predictions /path/to/predictions.csv
+```
+
+输出在 `config/gold_versions/`（`leaderboard.md` 是给人看的结论，`calibration.json` 是每日任务用的区间校准）。
+
+> 与 `scripts/run_gold_model_leaderboard.py` 的分工：那个做**模型/特征消融**（要重训，慢）；`bench_versions.py` 只做**后处理版本对比**（不重训，秒级）。日常选 champion 用后者。
+
+### 当前基线（务必如实告知使用者）
+
+在 2026-09-13 固定快照上，各版本相对"价格不变"的 skill：
+
+| 版本 | T+1 | T+3 | T+5 | T+10 |
+|---|---:|---:|---:|---:|
+| v0 基线 | 0.000 | 0.000 | 0.000 | 0.000 |
+| **v7 上线版** | −0.024 | −0.016 | −0.011 | −0.002 |
+| v1 旧模型 | −0.166 | −0.105 | −0.054 | −0.041 |
+
+**v7 没有优于"价格不变"，只是损失最小的信息型版本**（方向 95% 置信区间下限 30.1%，无方向优势）。报告里必须保留这条披露，不得宣传为"预测准确"。
+
+### 回滚
+
+```bash
+# 换回基线
+.venv/bin/python scripts/gold_daily.py --live --out /srv/gold/out --version v0
+# 或整体回滚代码
+cd /srv/gold/app && git checkout <上一个 tag>
+```
+
+---
+
 ## 🚀 快速启动
 
 ### 统一入口
@@ -65,7 +167,7 @@ python run.py --bot-output-dir /path/to/openclaw/stock-prediction
 OpenClaw 旧巡检包也可以直接用：
 
 ```bash
-/Users/rootliu/code/stock-prediction/scripts/run_openclaw_report.sh /path/to/openclaw/stock-prediction
+scripts/run_openclaw_report.sh /path/to/openclaw/stock-prediction
 ```
 
 或者通过环境变量：
@@ -111,7 +213,7 @@ python run.py
 
 外部方向因子支持本地 CSV 手动更新，默认路径：
 
-- `/Users/rootliu/code/stock-prediction/ml-service/data/external_direction_signal.csv`
+- `ml-service/data/external_direction_signal.csv`
 
 CSV 列格式：
 
@@ -150,8 +252,7 @@ python main.py
 当前默认预测粒度为 `4h`。`15min/30min` 仍可用于研究，但不是主流程默认配置。
 
 ```bash
-/Users/rootliu/code/stock-prediction/.venv/bin/python \
-  /Users/rootliu/code/stock-prediction/ml-service/backtest/gold_rolling_backtest.py \
+.venv/bin/python ml-service/backtest/gold_rolling_backtest.py \
   --source SHFE_AU_MAIN \
   --period 4h \
   --session ALL \
@@ -192,21 +293,21 @@ Bot 模式默认也会使用 `4h` 作为黄金巡检图表与预测粒度。
 最小调用示例：
 
 ```bash
-/Users/rootliu/code/stock-prediction/scripts/run_gold_direct_report.sh /tmp/gold-direct-agent
+scripts/run_gold_direct_report.sh /tmp/gold-direct-agent
 ```
 
 新黄金情景报告的最小调用示例：
 
 ```bash
-/Users/rootliu/code/stock-prediction/scripts/run_gold_direct_report.sh /tmp/gold-direct-agent 2026-04-03
+scripts/run_gold_direct_report.sh /tmp/gold-direct-agent 2026-04-03
 ```
 
 需要显式指定模型时：
 
 ```bash
-OPENCLAW_PREDICT_MODEL=ensemble /Users/rootliu/code/stock-prediction/scripts/run_openclaw_report.sh /tmp/agent-gold-report
-OPENCLAW_PREDICT_MODEL=boosting /Users/rootliu/code/stock-prediction/scripts/run_openclaw_report.sh /tmp/agent-gold-report
-OPENCLAW_PREDICT_MODEL=linear /Users/rootliu/code/stock-prediction/scripts/run_openclaw_report.sh /tmp/agent-gold-report
+OPENCLAW_PREDICT_MODEL=ensemble scripts/run_openclaw_report.sh /tmp/agent-gold-report
+OPENCLAW_PREDICT_MODEL=boosting scripts/run_openclaw_report.sh /tmp/agent-gold-report
+OPENCLAW_PREDICT_MODEL=linear scripts/run_openclaw_report.sh /tmp/agent-gold-report
 ```
 
 直接调用 API：
@@ -223,7 +324,7 @@ curl -sS -X POST http://127.0.0.1:8000/api/v1/gold/predict/SHFE_AU_MAIN \
 本次没有替换预测模型或调整权重。
 
 ```bash
-cd /Users/rootliu/code/stock-prediction
+cd /path/to/stock-prediction
 MPLCONFIGDIR=/tmp/mpl-stock .venv/bin/python scripts/run_gold_continuation_backtest.py \
   --cutoff 2026-09-04 --report-dir /tmp/gold-backtest --repo-report-dir /tmp/gold-backtest
 MPLCONFIGDIR=/tmp/mpl-stock .venv/bin/python scripts/test_gold_continuation.py
