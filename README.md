@@ -439,3 +439,26 @@ JSON 新增 `skill_version`、`skill_as_of`、`skill_sample_count`、`rolling_sk
 
 旧的 `scripts/run_gold_direct_report.sh` 和 `run_gold_analysis.py` 路线未改动；没有修改 cron。
 本次验证及局限见 `report/gold_daily_review_2026-11-03.md`。
+
+### 2026-11-03 最新行情回测与版本审计
+
+完整结果：`report/gold_backtest_2026-11-03/review.md`。本次真实行情目标期为
+2026-10-26 至 2026-11-02；上期所连续期货不是上金所现货。
+版本筛选现按 T+1/3/5 平均 skill 排名，缺期限、覆盖率或有效样本时拒绝放行。
+`nonoverlap_*` 字段按期限剔除重叠标签后统计方向及 95% Wilson 区间；
+至少 30 个不重叠样本才允许声明方向优势。没有合格模型时 reason 为
+`no_eligible_model`，不能把样本不足误报成所有模型负 skill。
+
+```bash
+MPLCONFIGDIR=/tmp/mpl-stock .venv/bin/python scripts/run_gold_continuation_backtest.py \
+  --cutoff 2026-10-23 --report-dir /tmp/gold-backtest --repo-report-dir /tmp/gold-backtest
+.venv/bin/python scripts/bench_versions.py \
+  --predictions /tmp/gold-backtest/gold_continuation_backtest_2026-10-23_to_2026-11-02.csv \
+  --out-dir /tmp/gold-benchmark
+MPLCONFIGDIR=/tmp/mpl-stock .venv/bin/python scripts/evaluate_direction_confidence.py \
+  /tmp/gold-backtest/gold_continuation_backtest_2026-10-23_to_2026-11-02.csv \
+  --output /tmp/gold-confidence
+```
+
+文件名截止日期以实际获取的最新交易日为准。报告中的 calibration.json 仅用于审计，
+不得直接复制到生产配置；本次未改预测参数、版本注册配置、cron 或旧预测入口。

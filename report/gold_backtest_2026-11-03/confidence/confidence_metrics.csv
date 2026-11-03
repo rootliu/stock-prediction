@@ -1,0 +1,4 @@
+window,n,direction_accuracy_pct,mean_confidence_pct,multiclass_brier,symmetric_prior_brier,raw_binary_brier,raw_multiclass_brier,supported_n,supported_accuracy_pct
+all,60,75.0,46.04,0.4948,0.5179,0.4449,0.9028,0,
+T+1~3,18,55.56,47.07,0.475,0.551,0.3448,0.733,0,
+T+5~10,36,88.89,46.62,0.5119,0.5038,0.5171,1.0343,0,

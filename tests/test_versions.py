@@ -57,7 +57,7 @@ def _board(skill_by_version: dict[str, float], coverage: float = 0.80) -> pd.Dat
 def test_every_version_below_the_band_falls_back_to_persistence():
     verdict = bench.select_champion(_board({"v0": 0.0, "v1": -0.09, "v7": -0.05}))
     assert verdict["champion"] == "v0"
-    assert verdict["reason"] == "all_models_negative"
+    assert verdict["reason"] == "no_eligible_model"
 
 
 def test_near_baseline_version_is_allowed_as_least_worse():
@@ -209,3 +209,55 @@ def test_daily_offline_gate_is_causal(tmp_path, monkeypatch):
     assert manifest["rolling_skill"] == pytest.approx(1.)
     assert manifest["skill_sample_count"] == 1
     assert manifest["direction_probability_status"] == "not_estimated"
+
+
+@pytest.mark.parametrize("broken", ["coverage", "horizon", "skill", "duplicate"])
+def test_champion_gate_fails_closed(broken):
+    board = _board({"v0": 0., "v7": .03})
+    if broken == "coverage":
+        board.loc[(board.version == "v7") & (board.horizon == 1), "coverage"] = float("nan")
+    elif broken == "horizon":
+        board = board[~((board.version == "v7") & (board.horizon == 1))]
+    elif broken == "skill":
+        board.loc[board.version == "v7", "skill"] = float("nan")
+    else:
+        board = pd.concat([board, board[board.version == "v7"].iloc[:1]])
+    assert bench.select_champion(board)["champion"] == "v0"
+
+
+def test_long_horizon_cannot_rescue_bad_short_horizon_skill():
+    board = _board({"v0": 0., "v7": -.03})
+    board.loc[(board.version == "v7") & (board.horizon == 10), "skill"] = .9
+    assert bench.select_champion(board)["champion"] == "v0"
+
+
+def test_direction_evidence_requires_nonoverlapping_samples():
+    board = _board({"v0": 0., "v7": .03})
+    board["direction_ci_low"] = 80.
+    assert bench.select_champion(board)["directional_edge"] is False
+    board["nonoverlap_n"] = 30
+    board["nonoverlap_direction_ci_low"] = 60.
+    assert bench.select_champion(board)["directional_edge"] is True
+    board.loc[board.horizon == 10, "nonoverlap_n"] = 7
+    assert bench.select_champion(board)["directional_edge"] is False
+
+
+def test_evaluation_thins_overlapping_labels():
+    rows = pd.DataFrame({
+        "origin_date": pd.to_datetime(["2026-01-01", "2026-01-02", "2026-01-03"]),
+        "target_date": pd.to_datetime(["2026-01-03", "2026-01-04", "2026-01-05"]),
+        "horizon": [2, 2, 2], "origin_close": [900., 900., 900.],
+        "actual_close": [910., 890., 910.], "model_return": [.01, .01, .01],
+    })
+    board = bench.evaluate(bench.add_version_predictions(rows)).set_index("version")
+    assert board.loc["v1", "nonoverlap_n"] == 2
+    assert board.loc["v1", "nonoverlap_direction_accuracy"] == 100.
+
+
+def test_benchmark_rejects_unmatured_targets(tmp_path):
+    rows = _daily_rows()
+    rows.loc[0, "actual_close"] = float("nan")
+    path = tmp_path / "predictions.csv"
+    rows.to_csv(path, index=False)
+    with pytest.raises(ValueError, match="matured"):
+        bench.load_predictions(path)

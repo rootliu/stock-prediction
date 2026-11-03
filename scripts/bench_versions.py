@@ -55,6 +55,10 @@ def load_predictions(path: Path) -> pd.DataFrame:
     missing = required - set(df.columns)
     if missing:
         raise SystemExit(f"{path} is missing columns: {sorted(missing)}")
+    from gold_daily import validate_predictions
+    df = validate_predictions(df)
+    if df["actual_close"].isna().any():
+        raise ValueError("benchmark requires matured actual_close for every row")
     df["model_return"] = df["pred_close"] / df["origin_close"] - 1.0
     return df.sort_values(["horizon", "origin_date"]).reset_index(drop=True)
 
@@ -72,6 +76,14 @@ def add_version_predictions(df: pd.DataFrame) -> pd.DataFrame:
 def evaluate(df: pd.DataFrame) -> pd.DataFrame:
     rows: List[Dict[str, object]] = []
     for horizon, group in df.groupby("horizon"):
+        # Select intervals before looking at returns or correctness.
+        independent = []
+        last_target = None
+        for idx, row in group.sort_values("origin_date").iterrows():
+            if last_target is None or row.origin_date >= last_target:
+                independent.append(idx)
+                last_target = row.target_date
+        thin = group.loc[independent]
         base = group["actual_close"]
         base_mae = float((base - group["pred_v0"]).abs().mean())
         for name in VERSIONS:
@@ -83,6 +95,9 @@ def evaluate(df: pd.DataFrame) -> pd.DataFrame:
                 (np.sign(pred - group["origin_close"]) == np.sign(base - group["origin_close"])).sum()
             )
             lo, hi = wilson_interval(signed_hits, len(group))
+            independent_hits = int((np.sign(thin[f"pred_{name}"] - thin["origin_close"]) ==
+                                    np.sign(thin["actual_close"] - thin["origin_close"])).sum())
+            independent_lo, independent_hi = wilson_interval(independent_hits, len(thin))
             rows.append(
                 {
                     "version": name,
@@ -95,6 +110,10 @@ def evaluate(df: pd.DataFrame) -> pd.DataFrame:
                     "direction_accuracy": round(100 * signed_hits / len(group), 2),
                     "direction_ci_low": round(100 * lo, 2),
                     "direction_ci_high": round(100 * hi, 2),
+                    "nonoverlap_n": len(thin),
+                    "nonoverlap_direction_accuracy": round(100 * independent_hits / len(thin), 2),
+                    "nonoverlap_direction_ci_low": round(100 * independent_lo, 2),
+                    "nonoverlap_direction_ci_high": round(100 * independent_hi, 2),
                 }
             )
     return pd.DataFrame(rows)
@@ -185,7 +204,7 @@ def select_champion(merged: pd.DataFrame, band: float = -0.02) -> Dict[str, obje
     Rank eligible versions by mean skill; v0 is the fallback champion.
     """
     notes: List[str] = []
-    mean_skill = merged.groupby("version")["skill"].mean()
+    mean_skill = merged[merged["horizon"].isin([1, 3, 5])].groupby("version")["skill"].mean()
     eligible: List[str] = []
 
     for name in VERSIONS:
@@ -194,9 +213,15 @@ def select_champion(merged: pd.DataFrame, band: float = -0.02) -> Dict[str, obje
         rows = merged[merged["version"] == name]
         short = rows[rows["horizon"].isin([1, 3])]
         reasons = []
+        if not set(HORIZONS).issubset(set(rows["horizon"])) or rows["horizon"].duplicated().any():
+            reasons.append("missing or duplicate required horizons")
+        if not np.isfinite(rows[["n", "skill"]].to_numpy(dtype=float)).all():
+            reasons.append("non-finite sample count or skill")
         if rows["n"].min() < 40:
             reasons.append(f"n={int(rows['n'].min())} < 40")
         cov = short["coverage"].dropna()
+        if set(short.loc[short["coverage"].notna(), "horizon"]) != {1, 3}:
+            reasons.append("missing coverage at T+1/T+3")
         if len(cov) and ((cov < 0.72) | (cov > 0.88)).any():
             reasons.append("coverage outside 0.72-0.88 at T+1/T+3")
         if mean_skill[name] < band:
@@ -209,7 +234,7 @@ def select_champion(merged: pd.DataFrame, band: float = -0.02) -> Dict[str, obje
 
     if not eligible:
         notes.append("no model version cleared the gates -> champion = v0 (persistence)")
-        return {"champion": "v0", "reason": "all_models_negative", "notes": notes}
+        return {"champion": "v0", "reason": "no_eligible_model", "directional_edge": False, "notes": notes}
 
     best = max(eligible, key=lambda n: mean_skill[n])
     verdict = {
@@ -222,20 +247,20 @@ def select_champion(merged: pd.DataFrame, band: float = -0.02) -> Dict[str, obje
 
     # Direction is disclosed, not gated.
     champ = merged[merged["version"] == best]
-    ci_lo = float(champ["direction_ci_low"].min())
-    if ci_lo < 50.0:
-        verdict["directional_edge"] = False
-        notes.append(
-            f"{best}: direction CI low {ci_lo:.1f}% < 50% -> no directional edge; "
-            "report must not claim one"
-        )
-    else:
-        verdict["directional_edge"] = True
-
-    notes.append(
-        f"{best}: promoted, but skill {mean_skill[best]:+.3f} means it is NOT better than a flat forecast; "
-        "deploy as 'least-worse informative model', disclose the negative skill"
+    evidence_cols = ["nonoverlap_n", "nonoverlap_direction_ci_low"]
+    evidence = champ.reindex(columns=evidence_cols)
+    verdict["directional_edge"] = bool(
+        np.isfinite(evidence.to_numpy(dtype=float)).all()
+        and (evidence["nonoverlap_n"] >= 30).all()
+        and (evidence["nonoverlap_direction_ci_low"] > 50).all()
     )
+    if not verdict["directional_edge"]:
+        notes.append(f"{best}: insufficient non-overlapping direction evidence; do not claim an edge")
+
+    notes.append(f"{best}: descriptive T+1/T+3/T+5 mean skill {mean_skill[best]:+.3f}; "
+                 "selection on this evaluation set is not independent validation")
+    if mean_skill[best] <= 0:
+        notes.append("not better than a flat forecast; allowed only by the configured tolerance")
     return verdict
 
 
@@ -260,10 +285,18 @@ def to_markdown(board: pd.DataFrame, intervals: pd.DataFrame, verdict: Dict[str,
     lines += ["## Skill (1 - MAE / persistence MAE)", "", pivot_skill.round(3).to_markdown(), ""]
     lines += ["## MAE (CNY/g)", "", pivot_mae.round(2).to_markdown(), ""]
     lines += ["## 80% interval coverage (walk-forward, causal)", "", pivot_cov.round(3).to_markdown(), ""]
+    direction = board[["version", "horizon", "n", "direction_accuracy", "nonoverlap_n",
+                       "nonoverlap_direction_accuracy", "nonoverlap_direction_ci_low",
+                       "nonoverlap_direction_ci_high"]]
+    lines += ["## Direction audit", "", direction.to_markdown(index=False), "",
+              "Non-overlapping intervals are selected separately per horizon before scoring. "
+              "They reduce overlap, not all market dependence; CI is 95% Wilson. "
+              "Fewer than 30 selected samples cannot support a direction-edge claim.", ""]
     lines += ["## Decision", ""] + [f"- {n}" for n in verdict["notes"]] + [""]
     lines += [
-        "Selection rule is pre-registered: gate on direction CI, then mean skill > 0.",
-        "If every model version is negative, the champion is v0 (persistence).",
+        "Selection requires all T+1/3/5/10 horizons, n >= 40, and T+1/3 coverage in [0.72, 0.88].",
+        "Rank by mean skill at T+1/3/5; default tolerance is -0.02. Negative skill is not an edge.",
+        "Direction is disclosed, not a promotion gate. Overlapping-row Wilson intervals are descriptive only.",
     ]
     return "\n".join(lines)
 
