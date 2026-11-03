@@ -149,3 +149,63 @@ def test_ledger_without_matured_targets_yields_nothing(tmp_path):
     )
     daily = pd.DataFrame({"date": pd.to_datetime(["2026-09-09"]), "close": [905.0]})
     assert gold_daily.load_history(ledger, daily).empty
+
+
+def _daily_rows():
+    return pd.DataFrame({
+        "origin_date": ["2026-10-01", "2026-10-02"],
+        "target_date": ["2026-10-02", "2026-10-10"],
+        "horizon": [1, 5], "origin_close": [900., 900.],
+        "pred_close": [905., 950.], "actual_close": [905., 850.],
+    })
+
+
+def test_skill_cannot_use_future_realizations():
+    import gold_daily
+    rows = gold_daily.validate_predictions(_daily_rows())
+    cutoff = pd.Timestamp("2026-10-03")
+    assert gold_daily.rolling_skill(rows, "v1", as_of=cutoff) == pytest.approx(1.)
+    rows.loc[1, "actual_close"] = 1000.
+    assert gold_daily.rolling_skill(rows, "v1", as_of=cutoff) == pytest.approx(1.)
+    assert gold_daily.rolling_skill(rows, "v1", as_of=pd.Timestamp("2026-10-01")) is None
+
+
+@pytest.mark.parametrize("column,value", [
+    ("pred_close", float("inf")), ("origin_close", 0),
+    ("actual_close", "bad"), ("horizon", 1.5),
+    ("target_date", "2026-09-30"), ("origin_date", "invalid"),
+])
+def test_daily_rejects_invalid_input(column, value):
+    import gold_daily
+    rows = _daily_rows()
+    rows[column] = rows[column].astype(object)
+    rows.loc[0, column] = value
+    with pytest.raises(gold_daily.DataError):
+        gold_daily.validate_predictions(rows)
+
+
+def test_daily_rejects_duplicates_and_accepts_unmatured_rows():
+    import gold_daily
+    rows = _daily_rows()
+    with pytest.raises(gold_daily.DataError):
+        gold_daily.validate_predictions(pd.concat([rows, rows]))
+    rows["actual_close"] = float("nan")
+    assert gold_daily.validate_predictions(rows)["actual_close"].isna().all()
+
+
+def test_daily_offline_gate_is_causal(tmp_path, monkeypatch):
+    import json
+    import gold_daily
+    rows = _daily_rows()
+    rows.loc[len(rows)] = ["2026-10-03", "2026-10-04", 1, 900., 910., float("nan")]
+    source = tmp_path / "input.csv"
+    rows.to_csv(source, index=False)
+    out = tmp_path / "out"
+    monkeypatch.setattr(sys, "argv", ["gold_daily", "--predictions-csv", str(source),
+                                     "--out", str(out), "--version", "v1", "--feishu-webhook", ""])
+    assert gold_daily.main() == 0
+    manifest = json.loads((out / "gold_prediction.json").read_text())
+    assert manifest["version"] == "v1"
+    assert manifest["rolling_skill"] == pytest.approx(1.)
+    assert manifest["skill_sample_count"] == 1
+    assert manifest["direction_probability_status"] == "not_estimated"

@@ -37,10 +37,10 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "ml-service"))
 
-from models.versions import FALLBACK, predict_close  # noqa: E402
+from models.versions import CHAMPION_DEFAULT, FALLBACK, predict_close  # noqa: E402
 
 DEFAULT_CALIBRATION = ROOT / "config/gold_versions/calibration.json"
-DEFAULT_VERSION = "v7"
+DEFAULT_VERSION = CHAMPION_DEFAULT
 ROLLING_SKILL_WINDOW = 30
 SKILL_FLOOR = -0.05
 
@@ -82,9 +82,13 @@ def interval_for(cal: Dict[str, Dict[str, float]], horizon: int, pred: float) ->
     return (round(pred + entry["q_low"] * scale, 2), round(pred + entry["q_high"] * scale, 2))
 
 
-def rolling_skill(history: pd.DataFrame, version: str, window: int = ROLLING_SKILL_WINDOW) -> Optional[float]:
+def rolling_skill(history: pd.DataFrame, version: str, window: int = ROLLING_SKILL_WINDOW,
+                  as_of: Optional[pd.Timestamp] = None) -> Optional[float]:
     """Skill over the most recent matured rows (history only, never the forecast)."""
     matured = history.dropna(subset=["actual_close"]).copy()
+    if as_of is not None:
+        matured = matured[(matured["origin_date"] < as_of) & (matured["target_date"] <= as_of)]
+    matured = matured.drop_duplicates(subset=["origin_date", "horizon"])
     if matured.empty:
         return None
     matured["model_return"] = matured["pred_close"] / matured["origin_close"] - 1.0
@@ -101,6 +105,36 @@ def rolling_skill(history: pd.DataFrame, version: str, window: int = ROLLING_SKI
 
 class DataError(RuntimeError):
     """Upstream data unavailable and no usable cache; maps to exit code 2."""
+
+
+def validate_predictions(pred: pd.DataFrame) -> pd.DataFrame:
+    """Reject ambiguous or non-finite inputs before evaluating or publishing."""
+    required = {"origin_date", "target_date", "horizon", "origin_close", "pred_close"}
+    missing = required - set(pred.columns)
+    if missing:
+        raise DataError(f"missing prediction columns: {sorted(missing)}")
+    out = pred.copy()
+    for col in ("origin_date", "target_date"):
+        out[col] = pd.to_datetime(out[col], errors="coerce")
+        if out[col].isna().any():
+            raise DataError(f"invalid {col}")
+    for col in ("origin_close", "pred_close", "horizon", "actual_close"):
+        if col not in out:
+            out[col] = np.nan
+        values = pd.to_numeric(out[col], errors="coerce")
+        present = out[col].notna() if col == "actual_close" else pd.Series(True, index=out.index)
+        if ((~np.isfinite(values) | (values <= 0)) & present).any():
+            raise DataError(f"{col} must contain finite positive numbers")
+        out[col] = values
+    if (out["horizon"] % 1 != 0).any():
+        raise DataError("horizon must be an integer")
+    if (out["target_date"] <= out["origin_date"]).any():
+        raise DataError("target_date must follow origin_date")
+    if out.duplicated(["origin_date", "horizon"]).any():
+        raise DataError("duplicate origin_date/horizon")
+    if (out.groupby("origin_date")["origin_close"].nunique() > 1).any():
+        raise DataError("inconsistent origin_close for the same origin")
+    return out.sort_values(["origin_date", "horizon"]).reset_index(drop=True)
 
 
 def _cached_fetch(name: str, fn, cache_dir: Path) -> tuple[pd.DataFrame, str | None]:
@@ -275,6 +309,8 @@ def render_markdown(manifest: Dict[str, Any], skill: Optional[float]) -> str:
             lines.append("- ⚠️ skill < 0：本模型不优于“价格不变”，预测仅作参考")
     if manifest.get("gate_note"):
         lines.append(f"- 闸门：{manifest['gate_note']}")
+    if manifest.get("skill_version"):
+        lines.append(f"- skill 评估对象：`{manifest['skill_version']}`，截至 {manifest['skill_as_of']}，成熟样本 {manifest['skill_sample_count']} 条（样本可能重叠，不代表独立样本数）")
     for warn in manifest.get("data_warnings") or []:
         lines.append(f"- ⚠️ 数据：{warn}")
     lines += ["", "| 日期 | T+n | 基准 | 模型 | 80% 区间 |", "|---|---:|---:|---:|---|"]
@@ -291,6 +327,7 @@ def render_markdown(manifest: Dict[str, Any], skill: Optional[float]) -> str:
     lines += [
         "",
         "> 区间来自历史残差分位数，标称 80%；实际覆盖率见 leaderboard。",
+        "> 价格区间覆盖率不是涨跌概率；收益收缩也不代表方向准确率提高。",
         "> 本报告不构成投资建议。",
     ]
     return "\n".join(lines)
@@ -345,7 +382,7 @@ def main() -> int:
         data_warnings: list[str] = []
         history = pd.DataFrame(columns=["origin_date", "target_date", "horizon", "origin_close", "pred_close", "actual_close"])
         if args.predictions_csv:
-            pred = pd.read_csv(args.predictions_csv, parse_dates=["origin_date", "target_date"])
+            pred = pd.read_csv(args.predictions_csv)
             if "actual_close" not in pred:
                 pred["actual_close"] = np.nan
         elif args.live:
@@ -356,6 +393,8 @@ def main() -> int:
         if pred.empty:
             _log("ERROR no predictions; upstream produced nothing")
             return 2
+
+        pred = validate_predictions(pred)
 
         live_daily: Optional[pd.DataFrame] = None
         if args.live:
@@ -379,7 +418,8 @@ def main() -> int:
 
         version = args.version
         gate_note = ""
-        skill = rolling_skill(history, version)
+        history = history[(history["origin_date"] < origin) & (history["target_date"] <= origin)].copy()
+        skill = rolling_skill(history, version, as_of=origin)
         if skill is not None and skill < SKILL_FLOOR:
             gate_note = f"{version} rolling skill {skill:+.3f} < {SKILL_FLOOR:+.2f} -> fell back to {FALLBACK}"
             _log(gate_note)
@@ -390,6 +430,11 @@ def main() -> int:
         manifest["generated_at"] = datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
         manifest["calibration_source"] = str(args.calibration)
         manifest["data_warnings"] = data_warnings
+        manifest["skill_version"] = args.version
+        manifest["skill_as_of"] = origin.isoformat()
+        manifest["skill_sample_count"] = min(len(history.drop_duplicates(["origin_date", "horizon"])), ROLLING_SKILL_WINDOW)
+        manifest["rolling_skill"] = skill
+        manifest["direction_probability_status"] = "not_estimated"
 
         out = args.out
         if args.dry_run:

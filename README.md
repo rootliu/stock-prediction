@@ -426,3 +426,16 @@ MPLCONFIGDIR=/tmp/mpl-stock .venv/bin/python scripts/test_gold_continuation.py
 报告：`report/gold_confidence_2026-09-16/review_v2.md`。`review.md` 是合并远端修复前的历史实验，不能代表当前模型。v2 保留远端数据可用时间过滤、成熟标签 purge 与全量价格模型重训；无 available_at 的外部日线仍采用次日上海 08:00 假设，不是已核验的真实发布时间。
 
 评估脚本另输出 `direction_threshold_audit.csv`：逐期限、上涨/下跌/横盘、50/60/70% 阈值的覆盖率与实际命中率，并提供 90% Wilson 区间。每个期限先按日期剔除重叠标签，跨期限仍有相关性；少于 30 条标记 insufficient_evidence，不得用少量连续同向行情证明可靠。
+
+### 2026-11-03 每日任务可靠性修复
+
+`scripts/gold_daily.py` 保留另一台机器新增的版本注册、缓存回退、账本和发布功能。
+滚动 skill 现在仅使用 `origin_date < 当前起点` 且 `target_date <= 当前起点` 的成熟结果，
+避免用未来实际价格决定历史版本回退。日线口径假设任务在起点日收盘后运行，不适用于盘中回放。
+输入的日期、价格、整数期限、重复起点/期限及同一起点价格一致性均会校验；无效数据退出码为 2。
+JSON 新增 `skill_version`、`skill_as_of`、`skill_sample_count`、`rolling_skill` 与
+`direction_probability_status=not_estimated`。skill 属于回退前候选版本，不是回退后版本的成绩。
+成熟样本数不是独立样本数；80% 价格区间也不是涨跌置信度。
+
+旧的 `scripts/run_gold_direct_report.sh` 和 `run_gold_analysis.py` 路线未改动；没有修改 cron。
+本次验证及局限见 `report/gold_daily_review_2026-11-03.md`。
