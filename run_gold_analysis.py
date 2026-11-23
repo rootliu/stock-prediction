@@ -12,6 +12,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 import warnings
 from pathlib import Path
@@ -48,6 +49,7 @@ from models.event_sentiment import (
 )
 from models.volatility_regime import compute_regime_info
 from models.market_regime import compute_market_regime, format_regime_report
+from models import gold_feed, gold_shadow
 
 TROY_OZ_TO_GRAM = 31.1035
 _TRADE_CALENDAR_CACHE: pd.DatetimeIndex | None = None
@@ -109,7 +111,7 @@ def fetch_shfe_au_daily() -> pd.DataFrame:
     df = df.rename(columns=rename_map)
     df["date"] = pd.to_datetime(df["date"])
     df["close"] = pd.to_numeric(df["close"], errors="coerce")
-    df["volume"] = pd.to_numeric(df.get("volume", 0), errors="coerce").fillna(0)
+    df["volume"] = pd.to_numeric(df["volume"], errors="coerce")
     df = df.dropna(subset=["close"]).sort_values("date").reset_index(drop=True)
     print(f"         {len(df)} 行, {df['date'].iloc[0].date()} ~ {df['date'].iloc[-1].date()}")
     return df
@@ -167,14 +169,8 @@ def fetch_comex_daily() -> pd.DataFrame:
 
 def fetch_usdcny_daily() -> pd.DataFrame:
     print("  [数据] USDCNY ...")
-    # CNY=X broke around Apr 2026; try USDCNY=X first, then CNY=X as fallback
-    raw = None
-    for ticker in ("USDCNY=X", "CNY=X"):
-        raw = yf.download(ticker, start="2023-01-01", interval="1d",
-                          auto_adjust=False, progress=False)
-        if raw is not None and not raw.empty:
-            print(f"         (使用 {ticker})")
-            break
+    raw = yf.download("USDCNY=X", start="2023-01-01", interval="1d",
+                      auto_adjust=False, progress=False)
     if raw is None or raw.empty:
         raise RuntimeError("USDCNY 数据为空")
     df = _flatten_yf(raw).reset_index()
@@ -212,6 +208,13 @@ def fetch_cross_market() -> pd.DataFrame:
     return merged.sort_values("date").reset_index(drop=True)
 
 
+def live_frames(skip_cross_market=False):
+    fetchers = {"shfe": fetch_shfe_au_daily, "comex": fetch_comex_daily, "usdcny": fetch_usdcny_daily}
+    if not skip_cross_market:
+        fetchers["cross"] = fetch_cross_market
+    return gold_feed.load(fetchers)
+
+
 def fetch_trade_calendar() -> pd.DatetimeIndex:
     global _TRADE_CALENDAR_CACHE
     if _TRADE_CALENDAR_CACHE is not None:
@@ -243,6 +246,11 @@ def build_future_trade_dates(
             "calendar_source": "none",
         }
 
+    if last_trade_date.year == target_end_ts.year == 2026:
+        dates = pd.date_range(last_trade_date + pd.Timedelta(days=1), target_end_ts)
+        dates = dates[[gold_feed.session(d, "shfe") for d in dates]]
+        return dates, {"target_end": target_end_ts, "target_end_is_trade_day": target_end_ts in dates,
+                       "calendar_source": "SHFE_official_2026"}
     target_end_is_trade_day = False
     try:
         trade_calendar = fetch_trade_calendar()
@@ -763,6 +771,8 @@ def _write_report_outputs(
     scenario_bundle: Dict[str, Any] | None,
     backtest_metrics: pd.DataFrame | None,
     event_backtest_metrics: pd.DataFrame | None,
+    data_evidence=None,
+    shadow=None,
 ) -> Dict[str, str]:
     output_dir = _ensure_dir(report_dir)
     stamp = latest_date.strftime("%Y-%m-%d")
@@ -776,8 +786,6 @@ def _write_report_outputs(
 
     scenario_rows = scenario_bundle.get("scenario_rows", []) if scenario_bundle else []
     scenario_frame = pd.DataFrame(scenario_rows)
-    if not scenario_frame.empty:
-        scenario_frame.to_csv(scenario_csv, index=False)
 
     if backtest_metrics is not None and not backtest_metrics.empty:
         backtest_metrics.to_csv(metrics_csv, index=False)
@@ -785,6 +793,8 @@ def _write_report_outputs(
         event_backtest_metrics.to_csv(event_metrics_csv, index=False)
 
     payload = {
+        "input_data": data_evidence,
+        "shadow_interval": shadow,
         "forecast_mode": forecast_mode,
         "latest_date": latest_date.strftime("%Y-%m-%d"),
         "latest_close": latest_close,
@@ -825,8 +835,11 @@ def _write_report_outputs(
             how="left",
         )
 
-    if not report_frame.empty:
-        report_frame.to_csv(scenario_csv, index=False)
+    export = report_frame if not report_frame.empty else pred_frame
+    if shadow and shadow.get("rows"):
+        bounds = pd.DataFrame(shadow["rows"])[["date", "shadow_low", "shadow_high", "mature_n"]]
+        export = export.merge(bounds, on="date", how="left", validate="one_to_one")
+    export.to_csv(scenario_csv, index=False)
 
     md_lines = [
         f"# Gold {forecast_mode} Scenario Report",
@@ -894,10 +907,10 @@ def _write_report_outputs(
             "其它 agent 优先使用 wrapper 定时生成固定文件名的报告包：",
             "",
             "```bash",
-            f"/Users/rootliu/code/stock-prediction/scripts/run_gold_direct_report.sh {output_dir} <截止日期>",
+            "/Users/rootliu/code/stock-prediction/scripts/run_gold_direct_report.sh <输出根目录> <截止日期>",
             "```",
             "",
-            "如果只需要原始动态命名产物，也可以直接调用：",
+            "也可以通过 Python 入口生成同一份 direct 报告包：",
             "",
             "```bash",
             f"cd /Users/rootliu/code/stock-prediction && .venv/bin/python run_gold_analysis.py --forecast-mode {forecast_mode} --skip-backtest --target-end <截止日期> --report-dir /Users/rootliu/code/report",
@@ -905,7 +918,7 @@ def _write_report_outputs(
             "",
             "推荐读取顺序：",
             "",
-            "1. 读取本 Markdown 作为汇报版正文",
+            "1. 先读输出根目录 manifest.json；仅当本次 status=ok 时按 files 读取正文和附件",
             "2. 读取同名 PNG 用于展示曲线图",
             "3. 如需结构化数据，读取同名 CSV / JSON",
             "",
@@ -959,6 +972,20 @@ def _write_report_outputs(
         md_lines.extend(["## Base Backtest", "", backtest_metrics.to_markdown(index=False), ""])
     if event_backtest_metrics is not None and not event_backtest_metrics.empty:
         md_lines.extend(["## Event Interval Backtest", "", event_backtest_metrics.to_markdown(index=False), ""])
+    if data_evidence:
+        md_lines.extend(["## 行情截止（已完成日线）", ""])
+        md_lines.extend(f"- {k}: {v['source']}，{v['cutoffs']}" for k, v in data_evidence.items())
+    if shadow and shadow.get("rows"):
+        risk = shadow["features"]
+        md_lines.extend(["", "## 实验附表：价格风险区间（非涨跌胜率）", "",
+                         "不替换正文点位或事件情景。mature_n 为同配置、已到期的归档预测数，少于 5 条不做残差更新。",
+                         f"近五日振幅 / 此前二十日振幅：{risk['range_ratio']:.2f}；"
+                         f"沪金开盘跳空 {risk['gap_pct']:+.2f}%；最近可用美盘（{risk['us_session']}）"
+                         f"涨跌 {risk['us_last_return_pct']:+.2f}%。相对残差分位数，下侧放大 "
+                         f"{risk['lower_factor']:.2f} 倍、上侧 {risk['upper_factor']:.2f} 倍。", "",
+                         pd.DataFrame(shadow["rows"]).to_markdown(index=False), ""])
+    elif shadow:
+        md_lines.extend(["", f"影子区间：{shadow['status']} {shadow.get('reason', '')}"])
     report_md.write_text("\n".join(md_lines), encoding="utf-8")
 
     fig, ax = plt.subplots(figsize=(12, 6))
@@ -980,6 +1007,11 @@ def _write_report_outputs(
             alpha=0.18,
             label="Scenario Band",
         )
+    if shadow and shadow.get("rows"):
+        risk = pd.DataFrame(shadow["rows"])
+        x = pd.to_datetime(risk["date"])
+        ax.plot(x, risk.shadow_low, ":", color="#805533", label="Experimental risk bounds")
+        ax.plot(x, risk.shadow_high, ":", color="#805533")
     ax.set_title(f"Gold {forecast_mode} Forecast with Event Scenarios", loc="left", fontsize=14, fontweight="bold")
     ax.grid(alpha=0.2)
     ax.legend(loc="best")
@@ -1003,7 +1035,7 @@ def _write_report_outputs(
 # ═══════════════════════════════════════════════════════════════════════
 
 def main(
-    target_end: str = "2026-04-03",
+    target_end: str | None = None,
     lookback: int = 240,
     backtest_stride: int = 10,
     backtest_horizon: int = 5,
@@ -1015,6 +1047,8 @@ def main(
     event_context_csv: str | None = None,
     report_dir: str | None = None,
 ):
+    if target_end is None:
+        target_end = gold_feed.target_after(gold_feed.expected(pd.Timestamp.now(tz="Asia/Shanghai"), "shfe"))
     mode_label = "Multi-Bar Model" if forecast_mode == "multibar" else "Direct Multi-Horizon Model"
     print("=" * 85)
     print(f"  黄金价格预测 — {mode_label} (SHFE AU, CNY/克)")
@@ -1023,12 +1057,15 @@ def main(
 
     # ── 1. 获取数据 ──────────────────────────────────────────────────
     print()
-    comex = fetch_comex_daily()
-    usdcny = fetch_usdcny_daily()
+    frames, evidence = live_frames(skip_cross_market)
+    comex, usdcny = frames["comex"], frames["usdcny"]
     latest_usdcny = float(usdcny["usdcny"].iloc[-1])
 
-    shfe_daily = fetch_shfe_au_daily()
-    shfe_60min = fetch_shfe_au_60min()
+    shfe_daily = frames["shfe"]
+    shfe_60min = (fetch_shfe_au_60min() if forecast_mode == "multibar"
+                  else pd.DataFrame({"date": pd.Series(dtype="datetime64[ns]")}))
+    for name, record in evidence.items():
+        print(f"  [行情] {name}: {record['source']} {record['cutoffs']}")
 
     latest_close = float(shfe_daily["close"].iloc[-1])
     latest_date = shfe_daily["date"].iloc[-1]
@@ -1051,7 +1088,7 @@ def main(
     # Cross-market
     if not skip_cross_market:
         print()
-        cross = fetch_cross_market()
+        cross = frames["cross"]
     else:
         print("\n  [跳过] 跨市场信号")
         cross = pd.DataFrame(columns=["date"])
@@ -1260,6 +1297,9 @@ def main(
                 scenario_bundle=scenario_bundle,
                 backtest_metrics=metrics,
                 event_backtest_metrics=event_metrics,
+                data_evidence=evidence,
+                shadow=(gold_shadow.report(shfe_daily, comex, latest_date, predictions)
+                        if forecast_mode == "direct" else None),
             )
             print()
             print(f"  Report written to: {outputs['report_md']}")
@@ -1304,7 +1344,7 @@ def _parse_args():
   python run_gold_analysis_legacy.py --skip-backtest
 """,
     )
-    parser.add_argument("--target-end", default="2026-04-03",
+    parser.add_argument("--target-end", default=None,
                         help="预测截止日期 YYYY-MM-DD")
     parser.add_argument("--lookback", type=int, default=240,
                         help="模型训练窗口大小 (天)")
@@ -1348,6 +1388,9 @@ def _parse_args():
 
 if __name__ == "__main__":
     args = _parse_args()
+    if args.forecast_mode == "direct" and args.report_dir and not os.environ.get("GOLD_DIRECT_CHILD"):
+        from scripts.gold_publish import issue
+        sys.exit(issue(args.report_dir, args.target_end, sys.argv[1:]))
     main(
         target_end=args.target_end,
         lookback=args.lookback,

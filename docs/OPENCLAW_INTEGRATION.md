@@ -84,22 +84,14 @@ If the downstream bot wants the newer `direct + bull/base/bear` report flow inst
 /Users/rootliu/code/stock-prediction/scripts/run_gold_direct_report.sh /path/to/openclaw/gold-direct [target-end]
 ```
 
-This writes a fixed bundle:
+Each invocation prints a unique `runs/<run_id>` directory. Treat its manifest as the outcome of this invocation, not the presence of a root-level file.
 
-- `manifest.json`
-- `report.md`
-- `scenario.png`
-- `scenario.csv`
-- `scenario.json`
+1. Wait for the process to finish. Require a matching run ID. Do not send while the status is `running` or if the invocation was interrupted.
+2. On exit 0 and `status=ok`, resolve `files` against the output root, check the SHA-256 digests and send the Markdown summary and PNG from that run. CSV and JSON are available for structured data.
+3. On exit 2 and `status=no_forecast`, send only this run's data alert. Never send an older forecast, image or confidence value.
+4. Record a receipt only after Feishu returns an actual message ID: `.venv/bin/python scripts/gold_publish.py <output> --ack <run_id> <message_id>`. Report generation is not proof of delivery.
 
-Recommended agent read order:
-
-1. Wait for `manifest.json`
-2. Read `report.md` for the ready-to-send “汇报版”
-3. Read `scenario.png` if the downstream channel supports images
-4. Read `scenario.csv` / `scenario.json` for structured fields
-
-If `target-end` is omitted, the wrapper defaults to the third future SHFE trading day.
+Use persistent storage for delivery audits and matured shadow residuals. If the target date is omitted, the default is the third SHFE session after the latest completed SHFE session. `GOLD_SHADOW_INTERVAL=0` disables experimental price bounds without changing directions or point forecasts.
 
 ## Environment Variables For Cron
 

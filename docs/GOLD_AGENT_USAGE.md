@@ -61,59 +61,25 @@ cd /Users/rootliu/code/stock-prediction
   --report-dir /Users/rootliu/code/report
 ```
 
-### 方式 1.0: Agent/cron wrapper (最适合定时调用)
+### 定时任务：生成、校验、推送
 
-如果希望下游 agent 永远只读取固定文件名，直接用这个 wrapper：
+工作日上海时间 09:00 和 20:00 的现行入口如下。不传截止日期表示最近已完成沪金日线之后的第三个交易日，早盘不会使用当天未收盘价格。
 
-```bash
-/Users/rootliu/code/stock-prediction/scripts/run_gold_direct_report.sh /path/to/output 2026-04-03
-```
-
-如果不传 `target-end`，wrapper 会默认取“未来第 3 个 SHFE 交易日”，不是普通 weekday。
-
-产物固定为：
-
-- `report.md`
-- `scenario.png`
-- `scenario.csv`
-- `scenario.json`
-- `manifest.json`
-
-其中 `manifest.json` 最后写入，可作为完成标记。
-
-### 方式 1.1: 定时任务 / cron 示例
-
-工作日早上和晚上各跑一次：
-
-```bash
-0 9,20 * * 1-5 cd /Users/rootliu/code/stock-prediction && .venv/bin/python run_gold_analysis.py --forecast-mode direct --skip-backtest --target-end 2026-04-03 --report-dir /Users/rootliu/code/report >> /tmp/gold-direct-agent.log 2>&1
-```
-
-如果 agent 需要“每天自动预测未来 3 个交易日”，建议由调度器先计算目标日期，再传给 `--target-end`。
-
-更推荐直接用 wrapper：
-
-```bash
+```cron
 0 9,20 * * 1-5 /Users/rootliu/code/stock-prediction/scripts/run_gold_direct_report.sh /tmp/gold-direct-agent >> /tmp/gold-direct-agent.log 2>&1
 ```
 
-### 方式 1.2: 其它 agent 的最小调用约定
+1. 等待本次进程结束，记录其打印的 `runs/<run_id>`；若被中断或未得到本次编号，不得发送旧报告。
+2. 读取该运行目录内的 `manifest.json`；核对 `run_id`。根目录同名文件仅指向最近一次运行，看到 `running` 不推送。
+3. 退出码 0 且 `status=ok` 时，按 `files` 相对**输出根目录**取本次 Markdown、PNG、CSV、JSON，逐项核对 `sha256`。发送“汇报版”和图片；正文点位、事件情景、实验价格区间与方向概率不可混用。
+4. 退出码 2 且 `status=no_forecast` 时，只发本次 `files.report_md` 行情告警。不搜索旧文件，不复用上一期价格和图片。
+5. 飞书 API 返回真实消息 ID 后才登记回执：`.venv/bin/python scripts/gold_publish.py <输出根目录> --ack <run_id> <飞书消息ID>`。生成成功不等于送达成功。
 
-其它 agent 只需要做这三步：
-
-1. 执行命令生成报告
-2. 读取 `report.md`
-3. 展示 `scenario.png`
-
-推荐读取顺序：
-
-1. `manifest.json`
-2. `report.md`
-3. `scenario.png`
-4. `scenario.csv`
-5. `scenario.json`
+用于长期校准或投递审计时选用持久化输出目录；系统可能清空 `/tmp`。设置 `GOLD_SHADOW_INTERVAL=0` 可关闭实验区间，不改变点位或方向。当前显式交易日历覆盖 2026 年，未配置年份拒绝发布。
 
 ### 方式 2: Python 函数调用
+
+仅供研究：直接调用函数不会产生带校验和的发布清单，不能代替 cron 入口。
 
 ```python
 import sys
@@ -169,13 +135,13 @@ predictions = main(
 | "预测下周金价" | `.venv/bin/python run_gold_analysis.py --forecast-mode direct --skip-backtest --target-end <下周五> --report-dir /Users/rootliu/code/report` |
 | "跑个回测" | `.venv/bin/python run_gold_analysis.py --forecast-mode direct --target-end <截止日期> --backtest-stride 60 --report-dir /Users/rootliu/code/report` |
 | "用旧模型对比" | `.venv/bin/python run_gold_analysis_legacy.py --skip-backtest` |
-| "极速预测" | `.venv/bin/python run_gold_analysis.py --forecast-mode direct --skip-backtest --skip-cross-market --target-end <截止日期> --report-dir /Users/rootliu/code/report` |
+| "极速预测" | `.venv/bin/python run_gold_analysis.py --forecast-mode direct --skip-backtest --skip-cross-market --target-end <截止日期>` |
 
 ## 输出字段说明
 
 ### `run_gold_analysis.py` 输出产物
 
-执行 `--report-dir /Users/rootliu/code/report` 后，默认会写入：
+正式 direct 发布将文件写入 `<输出根目录>/runs/<run_id>/`（回测附件仅在运行对应模块时生成）：
 
 - `gold_direct_scenario_<latest_date>.md`
 - `gold_direct_scenario_<latest_date>.png`
@@ -184,7 +150,7 @@ predictions = main(
 - `gold_direct_scenario_<latest_date>_backtest.csv`
 - `gold_direct_scenario_<latest_date>_event_backtest.csv`
 
-如果执行 `scripts/run_gold_direct_report.sh`，则会额外整理为固定文件名：
+根目录保留以下兼容入口。机器读取以本次清单的状态和文件路径为准：
 
 - `report.md`
 - `scenario.png`

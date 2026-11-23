@@ -114,8 +114,8 @@ export FEISHU_WEBHOOK_URL="https://open.feishu.cn/open-apis/bot/v2/hook/xxxx"
 Yahoo 会在高频请求下限流（`YFRateLimitError`），新浪偶发 TLS 断连。每日任务因此带一层缓存：
 
 - 抓取成功后写入 `.cache/gold/{shfe,comex,usdcny,cross}.csv`（已 gitignore）
-- 抓取失败时回退到缓存，并把「数据截至哪天」写进 `report.md` 的 ⚠️ 行和 JSON 的 `data_warnings`
-- **没有缓存则直接失败（退出码 2）**，不会拿残缺输入静默出一份预测
+- 抓取失败时，外盘先尝试相同品种的 Yahoo chart 接口，再检查缓存。按市场和字段验证应到的已完成交易日；过期缓存不参与预测。
+- 数据不足时退出并写数据告警；不发布旧价格或旧图。当年的交易日历必须已配置。
 
 首次部署请先手动跑一次 `--live` 建立缓存，之后再交给 cron。
 
@@ -307,9 +307,11 @@ Bot 模式默认也会使用 `4h` 作为黄金巡检图表与预测粒度。
 - 旧巡检包默认粒度使用 `4h`
 - 旧巡检包默认模型使用 `ensemble`
 - 需要回退时显式指定 `boosting` 或 `linear`
-- 机器人模式以下游读取 `manifest.json` 作为完成标记
+- direct 机器人仅在本次运行清单为 `ok` 时发送报告，`no_forecast` 仅发送本次告警；生成成功不等于飞书已送达。详见 [Agent 发布契约](docs/GOLD_AGENT_USAGE.md)。
 - 现阶段不要把 `15min/30min` 作为 agent 默认入口
 - 如果需要直接产出“汇报版 + 三情景 + 图片”的新黄金报告，优先使用 `scripts/run_gold_direct_report.sh`
+
+11 月波动回测、反弹漏判及实验风险区间的代价见[回测续报](report/gold_backtest_2026-11-23/shadow.md)。该区间与正式点位并行展示，不提升涨跌置信度。
 
 最小调用示例：
 

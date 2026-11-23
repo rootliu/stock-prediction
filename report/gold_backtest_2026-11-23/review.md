@@ -74,3 +74,5 @@ v0 为不变价；v1 是包含保护规则的 direct 路径；v7 是按期限缩
 MPLCONFIGDIR=/tmp/mpl-stock .venv/bin/python report/gold_backtest_2026-11-23/audit.py \
   /Users/rootliu/code/report/gold_backtest_2026-11-23/data --output /tmp/gold-audit-reproduction
 ```
+
+11/23 晚间续报：[新增收盘标签、实验风险区间和生产入口验证](shadow.md)。原表仍截至 11/20，便于复核。
